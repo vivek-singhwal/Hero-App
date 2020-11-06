@@ -1,0 +1,12 @@
+{
+  "name": "BleApp",
+  "displayName": "BleApp",
+  "expo": {
+    "name": "BleApp",
+    "slug": "BleApp",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
