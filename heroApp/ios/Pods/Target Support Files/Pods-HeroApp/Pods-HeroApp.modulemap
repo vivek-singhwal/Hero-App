@@ -1,0 +1,6 @@
+module Pods_HeroApp {
+  umbrella header "Pods-HeroApp-umbrella.h"
+
+  export *
+  module * { export * }
+}
