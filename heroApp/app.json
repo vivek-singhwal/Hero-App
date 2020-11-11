@@ -1,12 +1,4 @@
 {
-  "name": "Hero-App",
-  "displayName": "Hero-App",
-  "expo": {
-    "name": "Hero-App",
-    "slug": "Hero-App",
-    "version": "1.0.0",
-    "assetBundlePatterns": [
-      "**/*"
-    ]
-  }
+  "name": "heroApp",
+  "displayName": "HeroApp"
 }
