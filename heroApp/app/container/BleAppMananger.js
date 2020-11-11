@@ -3,6 +3,7 @@ import {
   StyleSheet , Text , View , TouchableHighlight , NativeEventEmitter , NativeModules , Platform , PermissionsAndroid , ScrollView , AppState , FlatList , Dimensions , Button , SafeAreaView ,Alert} from 'react-native';
 import BleManager from 'react-native-ble-manager';
 import { EventRegister } from 'react-native-event-listeners';
+import BleService from '../services/BleService';
 
 const window = Dimensions.get('window');
 const BleManagerModule = NativeModules.BleManager;
@@ -14,7 +15,7 @@ export default class BleAppmanager extends Component {
     this.state = {
       scanning:false ,
       peripherals: new Map(),
-      appState: ''
+      appState: '',
     }
 
     this.handleDiscoverPeripheral = this.handleDiscoverPeripheral.bind(this);
@@ -51,7 +52,25 @@ export default class BleAppmanager extends Component {
         this.turnOnBle();
         this.startScan();
       }
+      if (data.cmd == "disconnect"){
+        this.test(BleService.getPeripherial());
+      }
     } );
+  }
+
+  //not working
+  BleDisconnect(){
+    console.log(">>Call BleDisconnect");
+    BleManager.disconnect(BleService.getPeripherial().id)
+        .then(() => {
+          //bleService.setPeripheral(null);
+          //EventRegister.emit('BLE_STATUS', { event: "disconnected" })
+          console.log("Successfully Disconnected");
+        })
+        .catch((error) => {
+          // Failure code
+          console.log(error);
+        });
   }
   handleAppStateChange(nextAppState) {
     if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
@@ -83,6 +102,7 @@ export default class BleAppmanager extends Component {
     // this.getStringFromAscii(data.value);
     console.log('Received data ' + data.value+' String',this.getStringFromAscii(data.value));
     EventRegister.emit('BLE_STATUS', { event: "Data_Recieved" , value:this.getStringFromAscii(data.value)});
+    BleService.setData({model:this.getStringFromAscii(data.value)});
   }
   handleStopScan() {
     console.log('Scan is stopped');
@@ -93,7 +113,10 @@ export default class BleAppmanager extends Component {
       this.setState({ peripherals: new Map() });
       //scan for 20 seconds
       BleManager.scan([], 4, true).then((results) => {
-        if (typeof (results) != undefined) { this.setState({ scanning: true }); }
+        if (typeof (results) != undefined) { 
+          EventRegister.emit('BLE_STATUS', { event: "scanning"});
+          this.setState({ scanning: true 
+          }); }
       }).catch((error) => {
       });
     }
@@ -115,6 +138,7 @@ export default class BleAppmanager extends Component {
       var peripherals = this.state.peripherals;
       for (var i = 0; i < results.length; i++) {
         var peripheral = results[i];
+        console.log(results.length)
         peripheral.connected = true;
         peripherals.set(peripheral.id, peripheral);
         this.setState({ peripherals });
@@ -125,58 +149,42 @@ export default class BleAppmanager extends Component {
  {"advertising": {"isConnectable": true, "localName": "GhostBaster_V1", "manufacturerData": {"CDVType": "ArrayBuffer", "bytes": [Array], "data": "AgEGDwlHaG9zdEJhc3Rlcl9WMQUSZADoAwIKCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="}, "serviceData": {}, "serviceUUIDs": [], "txPowerLevel": 8}, "id": "00:80:E1:00:00:AA", "name": "GhostBaster_V1", "rssi": -66}
 */
   handleDiscoverPeripheral(peripheral){
-    console.log("handleDiscoverPeripheral>>>"+peripheral.name)
+    //console.log("handleDiscoverPeripheral>>>"+peripheral.name)
     var peripherals = this.state.peripherals;
-    console.log('Got ble peripheral', peripheral.name );
+    //console.log('Got ble peripheral', peripheral.name );
     if (!peripheral.name) {
       peripheral.name = 'NO NAME';
     }
-    if(peripheral.name == "GhostBaster_V1"){
-        console.log(peripheral.name);
+    if(peripheral.name == "GhostBaster_V1"|| peripheral.name == "BlueNRG0"){
         peripherals.set(peripheral.id, peripheral);
         this.setState({ peripherals });
+        this.test(peripheral);
     }
   }
   test(peripheral) {
+    console.log(peripheral)
     if (peripheral){
       if (peripheral.connected){
         BleManager.disconnect(peripheral.id);
-        EventRegister.emit('BLE_STATUS', { event: "disconnected" });
+        //EventRegister.emit('BLE_STATUS', { event: "disconnected" });
+        //BleService.setPeripherial(null);
+        //this.setState({peripheral:null});
       }else{
+        console.log(">>>>"+peripheral.id)
         BleManager.connect(peripheral.id).then(() => {
           let peripherals = this.state.peripherals;
           let p = peripherals.get(peripheral.id);
           if (p) {
             p.connected = true;
+            BleService.setPeripherial(peripheral);
+            this.setState({peripheral});
             peripherals.set(peripheral.id, p);
-            this.setState({peripherals});
           }
           EventRegister.emit('BLE_STATUS', { event: "connected" });
           Alert.alert("Hero", "Connected to "+peripheral.id  +"\n"+peripheral.name)
           console.log('Connected to ' + peripheral.id +"\n"+peripheral.name);
-
-          setTimeout(() => {
-            BleManager.retrieveServices(peripheral.id).then((peripheralInfo) => {
-             
-              var BLE_SPP_Service = "d973f2e0-b19e-11e2-9e96-0800200c9a66";
-              var BLE_SPP_Notify_Characteristic = "d973f2e1-b19e-11e2-9e96-0800200c9a66";
-              var  BLE_SPP_Write_Characteristic = "d973f2e2-b19e-11e2-9e96-0800200c9a66";
-              var  BLE_SPP_AT_Characteristic = "0000fee3-0000-1000-8000-00805f9b34fb";
-              
-                BleManager.startNotification(peripheral.id, BLE_SPP_Service, BLE_SPP_Notify_Characteristic).then((res) => {
-                  console.log('Started notification on ' + res);
-                  setTimeout(() => {
-                    var asciValue =this.getAsciValue('getSerial');
-                    BleManager.write(peripheral.id, BLE_SPP_Service, BLE_SPP_Write_Characteristic,asciValue).then((resWrite) => {
-                      console.log('responce ',resWrite);
-                    }).catch((error)=>console.log(">>Error",error));
-                  }, 500);
-                }).catch((error) => {
-                  console.log('Notification error', error);
-                });
-              // }, 500);
-            });
-
+          setTimeout(() => { 
+            this.readAllData(peripheral);
           }, 900);
         }).catch((error) => {
           console.log('Connection error', error);
@@ -185,6 +193,28 @@ export default class BleAppmanager extends Component {
     }
   }
 
+  readAllData(peripheral){
+
+    BleManager.retrieveServices(peripheral.id).then((peripheralInfo) => {
+      var BLE_SPP_Service = BleService.bleService;
+      var BLE_SPP_Notify_Characteristic = BleService.TXCharacteristic;
+      var  BLE_SPP_Write_Characteristic = BleService.RXCharacteristic;
+      var  BLE_SPP_AT_Characteristic = BleService.UART;
+      console.log(BLE_SPP_Service);
+        BleManager.startNotification(peripheral.id, BLE_SPP_Service, BLE_SPP_Notify_Characteristic).then((res) => {
+          console.log('Started notification on ' + res);
+          setTimeout(() => {
+            var asciValue =this.getAsciValue('getSerial');
+            BleManager.write(peripheral.id, BLE_SPP_Service, BLE_SPP_Write_Characteristic,asciValue).then((resWrite) => {
+              console.log('responce ',resWrite);
+            }).catch((error)=>console.log(">>Error",error));
+          }, 500);
+        }).catch((error) => {
+          console.log('Notification error', error);
+        });
+      // }, 500);
+    });
+  };
   getAsciValue(value){
     var ascivalue=[];
     for(let i=0;i<value.length;i++){
@@ -201,6 +231,7 @@ export default class BleAppmanager extends Component {
     return ascivalue;
   }
   renderItem(item) {
+    console.log(item);
     const color = item.connected ? 'green' : '#fff';
     return (
       <TouchableHighlight onPress={() => this.test(item) }>
@@ -214,9 +245,10 @@ export default class BleAppmanager extends Component {
   }
   render() {
     const list = Array.from(this.state.peripherals.values());
+    //console.log(list);
     const btnScanTitle = 'Scan Bluetooth (' + (this.state.scanning ? 'on' : 'off') + ')';
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container,{height:'0%'}}>
         <View style={styles.container}>
           <View style={{margin: 10}}>
             <Button title="Turn On Bluetooth" onPress={() => this.turnOnBle() } />

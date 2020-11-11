@@ -1,174 +1,138 @@
-import React from 'react';
+import React,{useEffect,useState} from 'react';
 import { StyleSheet, Text, View, TouchableOpacity ,Image} from 'react-native';
 import { NavigationEvents } from 'react-navigation';
 import Prompt from 'react-native-input-prompt';
 import { EventRegister } from 'react-native-event-listeners';
 
-export default class Settings extends React.Component {
-  static navigationOptions = {
-    title:"Settings",
-    headerStyle: {
-      backgroundColor: '#556983',
-    },
-    headerBackTitleVisible:false,
-    headerTintColor: '#DFECF5',
-    headerTitleStyle: {
-      paddingRight:'10%',
-      textAlign:'center',
-      fontWeight: 'bold',
-    }
-  };
-  constructor() {
-    super()
-    this.state = {
-        sprayOnOff:false,
-        esvOnOff:false,
-        sprayInOz:true,
-        isPrompt:false,
-    }
-  }
-  componentDidMount() {
+export default function Settings({navigation}){
 
+  const [sprayOnOff, setsprayOnOff] = useState(false);
+  const [esvOnOff, setesvOnOff] = useState(false);
+  const [sprayInOz, setsprayInOz] = useState(false);
+  const [isPrompt, setisPrompt] = useState(false);
+
+  useEffect(()=>{
+   
+  return ()=>{
   }
-  componentWillUnmount() {
-  }
-  inputValue(){
-        
-  }
-  render() {
+  });
+
     return ( 
         <View style={styles.container}>
              <Prompt
-                visible = {this.state.isPrompt}
+                visible = {isPrompt}
                 title="Input "
                 placeholder="Enter Value"
                 onCancel={() =>
-                    this.setState({
-                        text: "User Cancelled!",
-                        isPrompt: !this.state.isPrompt
-                    })
+                  setisPrompt(!isPrompt)
                 }
                 onSubmit={text =>
-                    this.setState({
-                        text: "User submitted: " + text,
-                        isPrompt: !this.state.isPrompt
-                    })
+                  setisPrompt(!isPrompt)
                 }
             />
           <View style={styles.buttonContainer}>
               <View style={{justifyContent:'center',flexDirection:'row'}}>
-                <View style={styles.buttonStyles} >
-                    <TouchableOpacity 
+              <TouchableOpacity 
                         onPress={() => 
                         {
-                            if(this.state.sprayOnOff){
-                                this.setState({sprayOnOff:false})
-                            }else{
-                                this.setState({sprayOnOff:true})
-                            }
+                          setsprayOnOff(!sprayOnOff)
                         }} >
+                <View style={styles.buttonStyles} >
                         <Text style={styles.buttonText}>
-                            {this.state.sprayOnOff?'SPRAY ON':'SPRAY OFF'}
+                            {sprayOnOff?'SPRAY ON':'SPRAY OFF'}
                         </Text>
-                    </TouchableOpacity>
+                    
                 </View>
+                </TouchableOpacity>
                 <View style={{margin:'5%'}}></View>
-                <View style={styles.buttonStyles}>
                     <TouchableOpacity 
                         onPress={() => {
-                            if(this.state.esvOnOff){
-                                this.setState({esvOnOff:false})
-                            }else{
-                                this.setState({esvOnOff:true})
-                            }
+                          setesvOnOff(!esvOnOff)
                         }} >
+                      <View style={styles.buttonStyles}>
                         <Text style={styles.buttonText}>
-                        {this.state.esvOnOff?'ESV ON':'ESV OFF'}
+                        {esvOnOff?'ESV ON':'ESV OFF'}
                         </Text>
+                      </View>
                     </TouchableOpacity>
-                </View>
               </View>
               <View style={{margin:'5%'}}></View>
               <View style={{justifyContent:'center',flexDirection:'row'}}>
-                <View style={styles.setButtonButtonStyles}>
                     <TouchableOpacity 
                         onPress={() => {
-                            if(this.state.sprayInOz){
-                                this.setState({sprayInOz:false})
-                            }else{
-                                this.setState({sprayInOz:true})
-                            }
+                            setsprayInOz(!sprayInOz)
                         }} >
+                      <View style={styles.setButtonButtonStyles}>
                         <Text style={styles.buttonText}>
-                         {this.state.sprayInOz?'OZ':'MIN'}
+                         {sprayInOz?'OZ':'MIN'}
                         </Text>
                         <Text style={styles.buttonText}>
-                         {this.state.sprayInOz?'Set to min':'Set To oz'}
+                         {sprayInOz?'Set to min':'Set To oz'}
                         </Text>
+                      </View>
                     </TouchableOpacity>
-                </View>
-                <View style={{margin:'5%'}}></View>
-                <View style={styles.setButtonButtonStyles}>
+              <View style={{margin:'5%'}}></View>
                     <TouchableOpacity 
                         onPress={() => {
-                           this.setState({isPrompt:true})
-                           this.inputValue();
+                           setisPrompt(!isPrompt)
                         }} >
+                      <View style={styles.setButtonButtonStyles}>
                         <Text style={styles.buttonText}>
                         Set Pump Current
                         </Text>
+                      </View>
                     </TouchableOpacity>
-                </View>
               </View>
               <View style={{margin:'1%'}}></View>
               <View style={{justifyContent:'center',flexDirection:'row'}}>
-                <View style={styles.setButtonButtonStyles}>
                     <TouchableOpacity 
                         onPress={() => {
 
                         }} >
+                      <View style={styles.setButtonButtonStyles}>
                         <Text style={styles.buttonText}>
                         Set Battery Capacity
                         </Text>
+                      </View>
                     </TouchableOpacity>
-                </View>
                 <View style={{margin:'5%'}}></View>
-                <View style={styles.setButtonButtonStyles}>
                     <TouchableOpacity 
                         onPress={() =>{
 
                         }} >
+                      <View style={styles.setButtonButtonStyles}>
                         <Text style={styles.buttonText}>
                         Set Error Code
                         </Text>
+                      </View>
                     </TouchableOpacity>
-                </View>
               </View>
               <View style={{margin:'1%'}}></View>
               <View style={{justifyContent:'center',flexDirection:'row'}}>
-                <View style={styles.setButtonButtonStyles}>
+                
                     <TouchableOpacity 
-                        onPress={() => this.props.navigation.navigate('Setting')} >
+                      onPress={() => navigation.navigate('Settings')}
+                    >
+                      <View style={styles.setButtonButtonStyles}>
                         <Text style={styles.buttonText}>
                         Set Serial No 
                         </Text>
+                      </View>
                     </TouchableOpacity>
-                </View>
                 <View style={{margin:'5%'}}></View>
-                <View style={styles.setButtonButtonStyles}>
                     <TouchableOpacity 
-                        onPress={() => this.props.navigation.navigate('Setting')} >
+                          onPress={() => navigation.navigate('Settings')}>
+                      <View style={styles.setButtonButtonStyles}>
                         <Text style={styles.buttonText}>
                         Set Firmware  
                         </Text>
+                      </View>
                     </TouchableOpacity>
-                </View>
               </View>
           </View>
       </View>
     );
   }
-}
 const styles = StyleSheet.create({
   container: {
     height: '100%',
@@ -186,7 +150,8 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     textAlign:'center',
-    fontSize: 15,
+    justifyContent:'center',
+    fontSize: 16,
     color: '#DFECF5',
   },
   buttonContainer: {

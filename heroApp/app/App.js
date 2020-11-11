@@ -3,16 +3,9 @@ import { View, Text,StatusBar, SafeAreaView,StyleSheet,Button} from 'react-nativ
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Home from './container/Home';
+import DeviceStatus from './container/DeviceStatus';
+import Settings from './container/Settings';
 import BleAppManager from './container/BleAppMananger';
-
-
-function AboutScreen() {
-  return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>About Screen</Text>
-    </View>
-  );
-}
 
 const Stack = createStackNavigator();
 
@@ -26,9 +19,32 @@ function App() {
       <Stack.Navigator>
       <Stack.Screen name="Home" component={Home} options={{
           headerShown: false,
-          headerTitle: "",
         }} />
-      <Stack.Screen name="About" component={AboutScreen} />
+        
+      <Stack.Screen name="DeviceStatus" component={DeviceStatus} options={{
+          title:"Device Status",
+          headerStyle: {
+            backgroundColor: '#556983',
+          },
+          headerBackTitleVisible:false,
+          headerTintColor: '#DFECF5',
+          headerTitleStyle: {
+            textAlign:'center',
+            fontWeight: 'bold',
+          }
+        }} />
+      <Stack.Screen name="Settings" component={Settings} options={{
+          title:"Settings",
+          headerStyle: {
+            backgroundColor: '#556983',
+          },
+          headerBackTitleVisible:false,
+          headerTintColor: '#DFECF5',
+          headerTitleStyle: {
+            textAlign:'center',
+            fontWeight: 'bold',
+          }
+        }}/>
       </Stack.Navigator>
     </NavigationContainer>
     </>

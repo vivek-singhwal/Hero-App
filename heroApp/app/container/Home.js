@@ -3,31 +3,51 @@ import { StyleSheet, Text, Button, View, ActivityIndicator, TouchableOpacity ,Im
 import { EventRegister } from 'react-native-event-listeners';
 
 export default function Home({navigation}){
-  const [name, setName] = useState('');
-  const [init, setInit] = useState(false);
+  const [deviceStatus, setDeviceStatus] = useState('');
+  const [isDeviceConnected, setisDeviceConnected] = useState(false);
+
   useEffect(()=>{
-    if(!init){
-      setInit(true);
       var listener = EventRegister.addEventListener('BLE_STATUS', (data) => {
       if(data.event == "Data_Recieved"){
         console.log(data.value);
       }
+      if(data.event == "connected"){
+        setisDeviceConnected(true);
+        setDeviceStatus("Connected");
+      }
+      if(data.event == "scanning"){
+        setDeviceStatus("Scanning...");
+      }
+      if(data.event == "disconnected"){
+        setisDeviceConnected(false);
+        setDeviceStatus("Disconnected");
+        setTimeout(()=>{
+          setDeviceStatus("");
+        },500)
+      }
     });
+
     return ()=>{
       EventRegister.removeEventListener(listener);
     }
-  }
   })
+
   var scanAndConenct = () => {
-    EventRegister.emit('SCAN', { cmd: 'startScan' });
+    console.log("scanAndConenct"+isDeviceConnected);
+    if(!isDeviceConnected){
+      EventRegister.emit('SCAN', { cmd: 'startScan' });
+    }else{
+      EventRegister.emit('SCAN', { cmd: 'disconnect' });
+    }
   };
-  
-  var disconnect = () => {
-    this.setState({ statusMsg: "disconnecting..." });
-    EventRegister.emit('SCAN', { cmd: 'disconnect' });
-  };
+
   return ( 
     <View style={styles.container}>
+      <View>
+        <Text style={styles.buttonText}>
+              {deviceStatus}
+        </Text>
+      </View>
         <View style={styles.buttonContainer}>
           <View style={styles.buttonStyles}>
             <TouchableOpacity 
@@ -41,7 +61,7 @@ export default function Home({navigation}){
           </View>
           <View style={styles.buttonStyles}>
             <TouchableOpacity 
-              onPress={() => navigation.navigate('Setting')} >
+              onPress={() => navigation.navigate('Settings')} >
                 <Text style={styles.buttonText}>
                   Settings
               </Text>

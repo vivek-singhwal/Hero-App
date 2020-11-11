@@ -1,46 +1,33 @@
-import React from 'react';
+import React,{useEffect,useState} from 'react';
 import { StyleSheet, Text, View, TouchableOpacity ,Image} from 'react-native';
 import { NavigationEvents } from 'react-navigation';
 import { EventRegister } from 'react-native-event-listeners';
+import BleService from '../services/BleService';
 
-export default class DeviceStatus extends React.Component {
-  static navigationOptions = {
-    title:"Device Status",
-    headerStyle: {
-      backgroundColor: '#556983',
-    },
-    headerBackTitleVisible:false,
-    headerTintColor: '#DFECF5',
-    headerTitleStyle: {
-      paddingRight:'10%',
-      textAlign:'center',
-      fontWeight: 'bold',
-    }
-  };
-  constructor() {
-    super()
-    this.state = {
-    }
-  }
-  componentDidMount() {
+export default function DeviceStatus({navigation}){
 
+  const [readData, setDeviceStatus] = useState(BleService.getData());
+  //const [isDeviceConnected, setisDeviceConnected] = useState(false);
+
+  useEffect(()=>{
+
+  return ()=>{
   }
-  componentWillUnmount() {
-  }
-  render() {
-    return ( 
+  });
+
+  return ( 
         <View style={styles.container}>
           <View style={styles.buttonContainer}>
-            <TouchableOpacity>
-              <Text style={{textAlign:'center',color: '#DFECF5'}}>
-                  Hey This is Device Status
-                </Text>
-            </TouchableOpacity>
+            <View style={{justifyContent:'center',flexDirection:'row'}}>
+                    <Text style={{fontSize:22,textAlign:'center',color: '#DFECF5'}}>
+                      Serial No :</Text>
+            <View style={{margin:'3%'}}></View>
+                  <Text style={{fontSize:22,textAlign:'center',color: '#DFECF5'}}>{readData.model} </Text>
+            </View>
           </View>
       </View>
     );
   }
-}
 const styles = StyleSheet.create({
   container: {
     height: '100%',
