@@ -1,6 +1,8 @@
 import React,{useEffect,useState} from 'react';
-import { StyleSheet, Text, Button, View, ActivityIndicator, TouchableOpacity ,Image,TouchableHighlight} from 'react-native';
+import { StyleSheet, Text, Button, View, ActivityIndicator, TouchableOpacity ,Image,TouchableHighlight, Alert} from 'react-native';
 import { EventRegister } from 'react-native-event-listeners';
+
+import {setDefaultValue,getReadOk} from '../services/BleService';
 
 export default function Home({navigation}){
   const [deviceStatus, setDeviceStatus] = useState('');
@@ -14,12 +16,14 @@ export default function Home({navigation}){
       if(data.event == "connected"){
         setisDeviceConnected(true);
         setDeviceStatus("Connected");
-      }
-      if(data.event == "scanning"){
+      }else if(data.event == "readOK"){
+        setDeviceStatus("Ready.");
+      }else if(data.event == "scanning"){
         setDeviceStatus("Scanning...");
-      }
-      if(data.event == "disconnected"){
+      }else if(data.event == "disconnected"){
+        setDefaultValue();
         setisDeviceConnected(false);
+        navigation.navigate('Home');
         setDeviceStatus("Disconnected");
         setTimeout(()=>{
           setDeviceStatus("");
@@ -30,14 +34,14 @@ export default function Home({navigation}){
     return ()=>{
       EventRegister.removeEventListener(listener);
     }
-  })
+  });
 
   var scanAndConenct = () => {
     console.log("scanAndConenct"+isDeviceConnected);
     if(!isDeviceConnected){
-      EventRegister.emit('SCAN', { cmd: 'startScan' });
+      EventRegister.emit('BLECMD', { cmd: 'startScan' });
     }else{
-      EventRegister.emit('SCAN', { cmd: 'disconnect' });
+      EventRegister.emit('BLECMD', { cmd: 'disconnect' });
     }
   };
 
@@ -55,13 +59,19 @@ export default function Home({navigation}){
                 scanAndConenct();
               }} >
                 <Text style={styles.buttonText}>
-                  Connect
+                  {!isDeviceConnected?"Connect":"Disconnect"}
               </Text>
             </TouchableOpacity>
           </View>
           <View style={styles.buttonStyles}>
             <TouchableOpacity 
-              onPress={() => navigation.navigate('Settings')} >
+              onPress={() => {
+                if(getReadOk()){
+                  navigation.navigate('Settings')
+                }else{
+                  Alert.alert("Hero App","Device is not ready. " )
+                }
+                }} >
                 <Text style={styles.buttonText}>
                   Settings
               </Text>
@@ -69,7 +79,13 @@ export default function Home({navigation}){
           </View>
           <View style={styles.buttonStyles}>
             <TouchableOpacity 
-              onPress={() => navigation.navigate('DeviceStatus')} >
+              onPress={() => {
+                if(getReadOk()){
+                  navigation.navigate('DeviceStatus')
+                }else{
+                  Alert.alert("Hero App","Device data is not ready" )
+                }
+                }} >
                 <Text style={styles.buttonText}>
                   Device Status
               </Text>

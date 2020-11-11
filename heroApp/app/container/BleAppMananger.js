@@ -3,11 +3,15 @@ import {
   StyleSheet , Text , View , TouchableHighlight , NativeEventEmitter , NativeModules , Platform , PermissionsAndroid , ScrollView , AppState , FlatList , Dimensions , Button , SafeAreaView ,Alert} from 'react-native';
 import BleManager from 'react-native-ble-manager';
 import { EventRegister } from 'react-native-event-listeners';
-import BleService from '../services/BleService';
+import BleService, {getReadOk, setReadOk , getCurrentCmd,setCurrentCmd, bleCommands,initCmdSeq,bleResults} from '../services/BleService';
 
 const window = Dimensions.get('window');
 const BleManagerModule = NativeModules.BleManager;
 const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
+var BLE_SPP_Service = BleService.bleService;
+var BLE_SPP_Notify_Characteristic = BleService.TXCharacteristic;
+var BLE_SPP_Write_Characteristic = BleService.RXCharacteristic;
+var BLE_SPP_AT_Characteristic = BleService.UART;
 
 export default class BleAppmanager extends Component {
   constructor(){
@@ -17,7 +21,6 @@ export default class BleAppmanager extends Component {
       peripherals: new Map(),
       appState: '',
     }
-
     this.handleDiscoverPeripheral = this.handleDiscoverPeripheral.bind(this);
     this.handleStopScan = this.handleStopScan.bind(this);
     this.handleUpdateValueForCharacteristic = this.handleUpdateValueForCharacteristic.bind(this);
@@ -47,20 +50,22 @@ export default class BleAppmanager extends Component {
             }
       });
     }
-    this.scanListener = EventRegister.addEventListener('SCAN', (data) => {
+    this.scanListener = EventRegister.addEventListener('BLECMD', (data) => {
       if (data.cmd == "startScan"){
         this.turnOnBle();
         this.startScan();
-      }
-      if (data.cmd == "disconnect"){
+      } else if (data.cmd == "disconnect"){
         this.test(BleService.getPeripherial());
+      } else {
+        if(bleCommands.indexOf(data.cmd) >= 0){
+          this.writeData(data.cmd);
+        }
       }
     } );
   }
 
   //not working
   BleDisconnect(){
-    console.log(">>Call BleDisconnect");
     BleManager.disconnect(BleService.getPeripherial().id)
         .then(() => {
           //bleService.setPeripheral(null);
@@ -100,9 +105,26 @@ export default class BleAppmanager extends Component {
   }
   handleUpdateValueForCharacteristic(data) {
     // this.getStringFromAscii(data.value);
-    console.log('Received data ' + data.value+' String',this.getStringFromAscii(data.value));
-    EventRegister.emit('BLE_STATUS', { event: "Data_Recieved" , value:this.getStringFromAscii(data.value)});
-    BleService.setData({model:this.getStringFromAscii(data.value)});
+    if(getCurrentCmd() !=""){
+      console.log(JSON.stringify(data))
+      bleResults[getCurrentCmd()] = this.getStringFromAscii(data.value);
+    }
+    
+    console.log("currentCMD:"+bleResults[getCurrentCmd()]);
+    if( !getReadOk() && initCmdSeq.indexOf(getCurrentCmd()) >= 0) {
+      let cmdIndex = initCmdSeq.indexOf(getCurrentCmd());
+      let nextCmd = initCmdSeq[cmdIndex +1];
+      if(nextCmd != 'done'){
+        EventRegister.emit('BLECMD', { event: "initCmdSeq" , cmd:nextCmd});
+      }else{
+        console.log('final result...');
+        setReadOk(true);
+        EventRegister.emit('BLE_STATUS', { event: "readOK" });
+        console.log(JSON.stringify(bleResults));
+      }
+    }
+    EventRegister.emit('BLE_STATUS', 
+    { event: "Data_Recieved" , value:this.getStringFromAscii(data.value)});
   }
   handleStopScan() {
     console.log('Scan is stopped');
@@ -121,6 +143,37 @@ export default class BleAppmanager extends Component {
       });
     }
   }
+  sprayDisable(){
+
+  }
+  writeData = function(writeCommand){
+   setCurrentCmd(writeCommand);
+   console.log(">>>writeCommand "+writeCommand);
+   var peripheral = BleService.getPeripherial();
+   if(writeCommand != null){
+      BleManager.retrieveServices(peripheral.id).then((peripheralInfo) => {
+        console.log(BLE_SPP_Service);
+          BleManager.startNotification(peripheral.id, BLE_SPP_Service, BLE_SPP_Notify_Characteristic).then((res) => {
+            console.log('Started notification on ' + res);
+            setTimeout(() => {
+              var asciValue =this.getAsciValue(writeCommand);
+              BleManager.write(peripheral.id, BLE_SPP_Service, BLE_SPP_Write_Characteristic,asciValue).then((resWrite) => {
+                console.log('responce ',resWrite);
+              }).catch((error)=>console.log(">>Error",error));
+            }, 200);
+          }).catch((error) => {
+            console.log('Notification error', error);
+          })
+      }).catch((error) => {
+        console.log('service error', error);
+      });
+   }else{
+     console.log("Command null");
+   }
+  }
+  sprayEnable(){
+
+  }
   turnOnBle() {
     BleManager.enableBluetooth().then(() => {
       // Success code
@@ -128,6 +181,7 @@ export default class BleAppmanager extends Component {
     }).catch((error) => {
       // Failure code
       console.log("The user refuse to enable bluetooth");
+      Alert.alert("Hero", "Please turn your bluetooth on.")
     });
   }
   retrieveConnected(){
@@ -155,7 +209,10 @@ export default class BleAppmanager extends Component {
     if (!peripheral.name) {
       peripheral.name = 'NO NAME';
     }
-    if(peripheral.name == "GhostBaster_V1"|| peripheral.name == "BlueNRG0"){
+    if(peripheral.name.startsWith("GhostBaste") || 
+      //peripheral.localName.startsWith("GhostBaste") || 
+      peripheral.name.startsWith("BlueNRG0")){
+        console.log(JSON.stringify(peripheral))
         peripherals.set(peripheral.id, peripheral);
         this.setState({ peripherals });
         this.test(peripheral);
@@ -166,7 +223,7 @@ export default class BleAppmanager extends Component {
     if (peripheral){
       if (peripheral.connected){
         BleManager.disconnect(peripheral.id);
-        //EventRegister.emit('BLE_STATUS', { event: "disconnected" });
+        EventRegister.emit('BLE_STATUS', { event: "disconnected" });
         //BleService.setPeripherial(null);
         //this.setState({peripheral:null});
       }else{
@@ -184,8 +241,8 @@ export default class BleAppmanager extends Component {
           Alert.alert("Hero", "Connected to "+peripheral.id  +"\n"+peripheral.name)
           console.log('Connected to ' + peripheral.id +"\n"+peripheral.name);
           setTimeout(() => { 
-            this.readAllData(peripheral);
-          }, 900);
+            this.writeData('getSerial');
+          }, 300);
         }).catch((error) => {
           console.log('Connection error', error);
         });
@@ -194,12 +251,7 @@ export default class BleAppmanager extends Component {
   }
 
   readAllData(peripheral){
-
     BleManager.retrieveServices(peripheral.id).then((peripheralInfo) => {
-      var BLE_SPP_Service = BleService.bleService;
-      var BLE_SPP_Notify_Characteristic = BleService.TXCharacteristic;
-      var  BLE_SPP_Write_Characteristic = BleService.RXCharacteristic;
-      var  BLE_SPP_AT_Characteristic = BleService.UART;
       console.log(BLE_SPP_Service);
         BleManager.startNotification(peripheral.id, BLE_SPP_Service, BLE_SPP_Notify_Characteristic).then((res) => {
           console.log('Started notification on ' + res);
@@ -208,7 +260,7 @@ export default class BleAppmanager extends Component {
             BleManager.write(peripheral.id, BLE_SPP_Service, BLE_SPP_Write_Characteristic,asciValue).then((resWrite) => {
               console.log('responce ',resWrite);
             }).catch((error)=>console.log(">>Error",error));
-          }, 500);
+          }, 200);
         }).catch((error) => {
           console.log('Notification error', error);
         });
@@ -225,11 +277,12 @@ export default class BleAppmanager extends Component {
 
   getStringFromAscii(value){
     var ascivalue="";
-    for(let i=0;i<value.length;i++){
+    for(let i=0; i < value.length; i++){
         ascivalue +=String.fromCharCode(value[i]);
     }
     return ascivalue;
   }
+
   renderItem(item) {
     console.log(item);
     const color = item.connected ? 'green' : '#fff';

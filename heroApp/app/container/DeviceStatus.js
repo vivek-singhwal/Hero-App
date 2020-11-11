@@ -2,28 +2,40 @@ import React,{useEffect,useState} from 'react';
 import { StyleSheet, Text, View, TouchableOpacity ,Image} from 'react-native';
 import { NavigationEvents } from 'react-navigation';
 import { EventRegister } from 'react-native-event-listeners';
-import BleService from '../services/BleService';
+import BleService, {bleResults } from '../services/BleService';
 
 export default function DeviceStatus({navigation}){
-
-  const [readData, setDeviceStatus] = useState(BleService.getData());
-  //const [isDeviceConnected, setisDeviceConnected] = useState(false);
+//const [isDeviceConnected, setisDeviceConnected] = useState(false);
 
   useEffect(()=>{
-
   return ()=>{
   }
   });
 
+  var displayList =[
+    {name:"getSerial", title:"Serial No"},
+    {name:"getModel", title:"Model No"},
+    {name:"getTotalTime", title:"Total Time"},
+    {name:"getTotalVolume", title:"Total Volume"},
+    {name:"getFirmware", title:"Firmware"},
+    {name:"getPumpState", title:"Pump State"},
+    {name:"getHVState", title:"HV"},
+    {name:"getFlow", title:"Flow"},
+    {name:"getESV", title:"ESV"},
+    {name:"getBatteryLevel", title:"Battery"},
+    {name:"getError", title:"Error"},
+  ];
   return ( 
         <View style={styles.container}>
           <View style={styles.buttonContainer}>
-            <View style={{justifyContent:'center',flexDirection:'row'}}>
-                    <Text style={{fontSize:22,textAlign:'center',color: '#DFECF5'}}>
-                      Serial No :</Text>
-            <View style={{margin:'3%'}}></View>
-                  <Text style={{fontSize:22,textAlign:'center',color: '#DFECF5'}}>{readData.model} </Text>
-            </View>
+            { displayList.map((item)=>(
+               <View key= {item.name} style={{marginLeft:'15%', flexDirection:'row'}}>
+               <Text style={{fontSize:16,textAlign:'left',color: '#DFECF5'}}>
+               {item.title} :</Text>
+              <View style={{margin:'3%'}}></View>
+                    <Text style={{fontSize:16,textAlign:'center',color: '#DFECF5'}}>{bleResults[item.name]} </Text>
+              </View>
+            ))}
           </View>
       </View>
     );
@@ -41,7 +53,8 @@ const styles = StyleSheet.create({
     width: '100%',
     height:'100%',
     alignSelf:"center",
-    justifyContent: 'center',
+    paddingTop:"10%",
+    //justifyContent: 'center',
     color: 'white',
     backgroundColor: '#0D294E',
   }

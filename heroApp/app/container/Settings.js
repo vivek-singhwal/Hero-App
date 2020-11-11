@@ -5,7 +5,6 @@ import Prompt from 'react-native-input-prompt';
 import { EventRegister } from 'react-native-event-listeners';
 
 export default function Settings({navigation}){
-
   const [sprayOnOff, setsprayOnOff] = useState(false);
   const [esvOnOff, setesvOnOff] = useState(false);
   const [sprayInOz, setsprayInOz] = useState(false);
@@ -16,7 +15,15 @@ export default function Settings({navigation}){
   return ()=>{
   }
   });
-
+    var doSprayButton = (onOff) =>{
+      if(onOff){
+        EventRegister.emit('BLECMD', { cmd:'sprayEnable'});
+        setsprayOnOff(true);
+      }else{
+        EventRegister.emit('BLECMD', { cmd:'sprayDisable'});
+        setsprayOnOff(false);
+      }
+    }
     return ( 
         <View style={styles.container}>
              <Prompt
@@ -35,7 +42,8 @@ export default function Settings({navigation}){
               <TouchableOpacity 
                         onPress={() => 
                         {
-                          setsprayOnOff(!sprayOnOff)
+                          //setsprayOnOff(!sprayOnOff);
+                          doSprayButton(!sprayOnOff)
                         }} >
                 <View style={styles.buttonStyles} >
                         <Text style={styles.buttonText}>
@@ -109,7 +117,6 @@ export default function Settings({navigation}){
               </View>
               <View style={{margin:'1%'}}></View>
               <View style={{justifyContent:'center',flexDirection:'row'}}>
-                
                     <TouchableOpacity 
                       onPress={() => navigation.navigate('Settings')}
                     >
