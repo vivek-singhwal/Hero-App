@@ -1,6 +1,5 @@
 import React,{useEffect,useState} from 'react';
 import { StyleSheet, Text, View, TouchableOpacity ,Image} from 'react-native';
-import { NavigationEvents } from 'react-navigation';
 import Prompt from 'react-native-input-prompt';
 import { EventRegister } from 'react-native-event-listeners';
 

@@ -1,8 +1,6 @@
 import React,{useEffect,useState} from 'react';
 import { StyleSheet, Text, View, TouchableOpacity ,Image} from 'react-native';
-import { NavigationEvents } from 'react-navigation';
-import { EventRegister } from 'react-native-event-listeners';
-import BleService, {bleResults } from '../services/BleService';
+import {bleResults } from '../services/BleService';
 
 export default function DeviceStatus({navigation}){
 //const [isDeviceConnected, setisDeviceConnected] = useState(false);
