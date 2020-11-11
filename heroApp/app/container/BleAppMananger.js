@@ -181,7 +181,7 @@ export default class BleAppmanager extends Component {
     }).catch((error) => {
       // Failure code
       console.log("The user refuse to enable bluetooth");
-      Alert.alert("Hero", "Please turn your bluetooth on.")
+      //Alert.alert("Hero", "Please turn your bluetooth on.")
     });
   }
   retrieveConnected(){
