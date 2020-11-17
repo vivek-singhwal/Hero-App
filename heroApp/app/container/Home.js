@@ -16,10 +16,17 @@ export default function Home({navigation}){
       if(data.event == "connected"){
         setisDeviceConnected(true);
         setDeviceStatus("Connected");
+      }else if(data.event == "reading"){
+        setDeviceStatus("Reading...");
       }else if(data.event == "readOK"){
         setDeviceStatus("Ready.");
       }else if(data.event == "scanning"){
         setDeviceStatus("Scanning...");
+        setTimeout(()=>{
+          if(deviceStatus == "Scanning..."){
+            setDeviceStatus("");
+          }
+        },10000)
       }else if(data.event == "disconnected"){
         setDefaultValue();
         setisDeviceConnected(false);

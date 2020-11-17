@@ -14,7 +14,7 @@ export default function Settings({navigation}){
   return ()=>{
   }
   });
-    var doSprayButton = (onOff) =>{
+  var doSprayButton = (onOff) =>{
       if(onOff){
         EventRegister.emit('BLECMD', { cmd:'sprayEnable'});
         setsprayOnOff(true);
@@ -22,7 +22,26 @@ export default function Settings({navigation}){
         EventRegister.emit('BLECMD', { cmd:'sprayDisable'});
         setsprayOnOff(false);
       }
+  }
+  var doESVButton = (onOff) =>{
+    if(onOff){
+      EventRegister.emit('BLECMD', { cmd:'getESVState'});
+      setesvOnOff(true);
+    }else{
+      EventRegister.emit('BLECMD', { cmd:'getESVState'});
+      setesvOnOff(false);
     }
+}
+var doOzMinButton = (onOff) =>{
+  if(onOff){
+    EventRegister.emit('BLECMD', { cmd:'setUnitName',cmdValue:'setUnitName 0\r'});
+    setsprayInOz(true);
+  }else{
+    EventRegister.emit('BLECMD', { cmd:'getUnitName',cmdValue:'getUnitName\r'});
+    setsprayInOz(false);
+  }
+}
+  //getPumpState
     return ( 
         <View style={styles.container}>
              <Prompt
@@ -54,7 +73,7 @@ export default function Settings({navigation}){
                 <View style={{margin:'5%'}}></View>
                     <TouchableOpacity 
                         onPress={() => {
-                          setesvOnOff(!esvOnOff)
+                          doESVButton(!esvOnOff)
                         }} >
                       <View style={styles.buttonStyles}>
                         <Text style={styles.buttonText}>
@@ -67,7 +86,7 @@ export default function Settings({navigation}){
               <View style={{justifyContent:'center',flexDirection:'row'}}>
                     <TouchableOpacity 
                         onPress={() => {
-                            setsprayInOz(!sprayInOz)
+                          doOzMinButton(!sprayInOz);
                         }} >
                       <View style={styles.setButtonButtonStyles}>
                         <Text style={styles.buttonText}>
