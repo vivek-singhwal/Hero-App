@@ -2,10 +2,12 @@ import * as React from 'react';
 import { View, Text,StatusBar, SafeAreaView,StyleSheet,Button} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import Home from './container/Home';
-import DeviceStatus from './container/DeviceStatus';
-import Settings from './container/Settings';
+// import Home from './container/Home';
+// import DeviceStatus from './container/DeviceStatus';
+// import Settings from './container/Settings';
+import HomePage from './container/HomePage';
 import BleAppManager from './container/BleAppMananger';
+import AwesomeIcon from 'react-native-vector-icons/FontAwesome';
 
 const Stack = createStackNavigator();
 
@@ -16,8 +18,42 @@ function App() {
     <SafeAreaView></SafeAreaView>
     <BleAppManager/>
     <NavigationContainer>
-      <Stack.Navigator>
-      <Stack.Screen name="Home" component={Home} options={{
+    <Stack.Navigator initialRouteName="HomePage">
+      <Stack.Screen name="HomePage" component={HomePage}
+        options={{
+          title: "RANGER",
+          headerTitleStyle: {fontSize:24,color:"#012554",fontWeight:"bold",fontStyle:"italic"},
+          headerLeft: (()=><AwesomeIcon 
+          onPress={()=>{
+            console.log(">>Click share")
+          }}
+          size={32}
+          // color={'#2C88D9'}
+          color='#012554'
+          style={{backgroundColor:"pink"}}
+          style={{
+            // transform: [{ rotate: '270deg'}]
+            transform: [
+              { scaleX: -1 }
+            ]
+          }} 
+          name="share-square-o"/>),
+          headerLeftContainerStyle:{paddingLeft:20},
+          headerRight:(()=><AwesomeIcon
+          onPress={()=>{
+            console.log(">>Click bluetooth")
+          }}
+          size={36}
+          // color={'#2C88D9'}
+          color='#012554'
+          style={{paddingRight:20}}
+          name="bluetooth-b"/>
+          ),
+          headerStyle:{height:80}
+        }}
+        
+      />  
+      {/* <Stack.Screen name="Home" component={Home} options={{
           headerShown: false,
         }} />
         
@@ -44,7 +80,7 @@ function App() {
             textAlign:'center',
             fontWeight: 'bold',
           }
-        }}/>
+        }}/> */}
       </Stack.Navigator>
     </NavigationContainer>
     </>

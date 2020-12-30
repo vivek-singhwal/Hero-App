@@ -331,7 +331,7 @@ export default class BleAppmanager extends Component {
           <View style={{margin: 10}}>
             <Button title="send data" onPress={() => this.sendData() } /> 
           </View>
-          <ScrollView style={styles.scroll}>
+          {/* <ScrollView style={styles.scroll}> */}
             {(list.length == 0) &&
               <View style={{flex:1, margin: 20}}>
                 <Text style={{textAlign: 'center'}}>No peripherals</Text>
@@ -343,7 +343,7 @@ export default class BleAppmanager extends Component {
               keyExtractor={item => item.id}
             />
 
-          </ScrollView>
+          {/* </ScrollView> */}
         </View>
       </SafeAreaView>
     );
