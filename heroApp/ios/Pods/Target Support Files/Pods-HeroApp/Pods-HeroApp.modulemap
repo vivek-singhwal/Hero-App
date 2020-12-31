@@ -1,6 +1,0 @@
-module Pods_heroApp {
-  umbrella header "Pods-heroApp-umbrella.h"
-
-  export *
-  module * { export * }
-}
