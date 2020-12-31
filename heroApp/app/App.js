@@ -6,6 +6,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 // import DeviceStatus from './container/DeviceStatus';
 // import Settings from './container/Settings';
 import HomePage from './container/HomePage';
+import Profile from './container/OperatorProfile';
 import BleAppManager from './container/BleAppMananger';
 import AwesomeIcon from 'react-native-vector-icons/FontAwesome';
 
@@ -18,7 +19,11 @@ function App() {
     <SafeAreaView></SafeAreaView>
     <BleAppManager/>
     <NavigationContainer>
-    <Stack.Navigator initialRouteName="HomePage">
+    <Stack.Navigator initialRouteName="Profile">
+    <Stack.Screen name="Profile" component={Profile} options={{
+          headerShown: false,
+        }} />
+
       <Stack.Screen name="HomePage" component={HomePage}
         options={{
           title: "RANGER",

@@ -5,6 +5,8 @@ import AwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import AwesomeIcon5 from 'react-native-vector-icons/FontAwesome5';
 import Feather from 'react-native-vector-icons/Ionicons';
 import Material from 'react-native-vector-icons/MaterialIcons';
+import {getReadingStatus,setReadingStatus} from '../services/DataService';
+
 export default  HomePage = ()=>{
 
   const [visible, setVisible] = useState(false);
@@ -12,12 +14,12 @@ export default  HomePage = ()=>{
   const hideModal = () => setVisible(false);
 
   const containerStyle = {backgroundColor: 'white', padding: 20};
-  const [readingStatus,setReadingStatus] = useState(false);
-    const [isSwitchEleOn, setIsSwitchEleOn] = React.useState(false);
-    const [isSwitchTrgOn, setIsSwitchTrgOn] = React.useState(false);
+  const [readingStatus,setReadStatus] = useState(getReadingStatus);
+    const [isSwitchEleOn, setIsSwitchEleOn] = useState(false);
+    const [isSwitchTrgOn, setIsSwitchTrgOn] = useState(false);
     const onToggleEleSwitch = () => setIsSwitchEleOn(!isSwitchEleOn);
     const onToggleTrgSwitch = () => setIsSwitchTrgOn(!isSwitchTrgOn);
-    const toggleSetReading = () => setReadingStatus(preState=>!preState);
+    const toggleSetReading = () => setReadStatus(preState=>!preState);
 
   const SaveModal = () => {
     const [locationText, setLocationText] = useState('');
@@ -38,14 +40,7 @@ export default  HomePage = ()=>{
               onChangeText={text => setLocationText(text)}
             />
             <Text style={{fontSize:17,color:"#4A4A4A",paddingBottom:16}}>Comments</Text>
-            {/* <TextInput
-              theme={{ colors: { primary: '#012554',underlineColor:'transparent',}}}
-              mode={'outlined'}
-              value={text}
-              multiline={true}
-              numberOfLines={20}
-              onChangeText={text => setText(text)}
-            /> */}
+           
             <TouchableOpacity
               activeOpacity={1}
               onPress={()=>this.input.focus()}>
@@ -140,6 +135,7 @@ export default  HomePage = ()=>{
             // style={[style.circle,{bottom:50}]}
             onPress={() => {
               showModal();
+              setReadingStatus(!readingStatus);
               toggleSetReading();
             }}/>
           </View>

@@ -9,10 +9,19 @@ export var setToken=(tokenData)=>{
 }
 
 var connectionStatus = false;
-export var getStatus = ()=>{
+var readingStatus = false;
+export var getConnectionStatus = ()=>{
     return connectionStatus;
 }
 
-export var setStatus=(status)=>{
+export var setConnectionStatus=(status)=>{
     return connectionStatus = status;
+}
+
+export var getReadingStatus = ()=>{
+    return readingStatus;
+}
+
+export var setReadingStatus=(status)=>{
+    return readingStatus = status;
 }
