@@ -30,7 +30,7 @@ export default class BleAppmanager extends Component {
 
   componentDidMount() {
     AppState.addEventListener('change', this.handleAppStateChange);
-    BleManager.start({showAlert: false});
+    BleManager.start({showAlert: true});
     this.handlerDiscover = bleManagerEmitter.addListener('BleManagerDiscoverPeripheral', this.handleDiscoverPeripheral );
     this.handlerStop = bleManagerEmitter.addListener('BleManagerStopScan', this.handleStopScan );
     this.handlerDisconnect = bleManagerEmitter.addListener('BleManagerDisconnectPeripheral', this.handleDisconnectedPeripheral );
@@ -151,11 +151,15 @@ export default class BleAppmanager extends Component {
     if (BleService.getPeripherial().isConnectable == undefined) {
       this.setState({ peripherals: new Map() });
       //scan for 20 seconds
-      BleManager.scan([], 4, true).then((results) => {
+      BleManager.scan([], 5, true).then((results) => {
+        // console.log(">>scan ",results)
         if (typeof (results) != undefined) { 
           EventRegister.emit('BLE_STATUS', { event: "scanning"});
           this.setState({ scanning: true 
-          }); }
+          }); 
+        }else{
+
+        }
       }).catch((error) => {
       });
     }
@@ -220,6 +224,7 @@ export default class BleAppmanager extends Component {
   }
   retrieveConnected(){
     BleManager.getConnectedPeripherals([]).then((results) => {
+      console.log(">>retrieveConnected ",results);
       if (results.length == 0) {
         console.log('No connected peripherals')
       }
@@ -237,9 +242,10 @@ export default class BleAppmanager extends Component {
  {"advertising": {"isConnectable": true, "localName": "GhostBaster_V1", "manufacturerData": {"CDVType": "ArrayBuffer", "bytes": [Array], "data": "AgEGDwlHaG9zdEJhc3Rlcl9WMQUSZADoAwIKCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="}, "serviceData": {}, "serviceUUIDs": [], "txPowerLevel": 8}, "id": "00:80:E1:00:00:AA", "name": "GhostBaster_V1", "rssi": -66}
 */
   handleDiscoverPeripheral(peripheral){
+    // console.log('Got ble peripheral', peripheral.name );
     //console.log("handleDiscoverPeripheral>>>"+peripheral.name)
     var peripherals = this.state.peripherals;
-    console.log('Got ble peripheral', peripheral.name );
+   
     if (!peripheral.name) {
       peripheral.name = 'NO NAME';
     }
@@ -248,7 +254,7 @@ export default class BleAppmanager extends Component {
       peripheral.name.startsWith("GhostBuste")||
       //peripheral.localName.startsWith("GhostBaste") || 
       peripheral.name.startsWith("BlueNRG0")){
-        //console.log(JSON.stringify(peripheral))
+        console.log(JSON.stringify(peripheral))
         peripherals.set(peripheral.id, peripheral);
         this.setState({ peripherals });
         this.test(peripheral);

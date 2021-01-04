@@ -1,7 +1,6 @@
 import React,{useEffect,useState} from 'react';
 import { StyleSheet, Text, Button, View, ActivityIndicator, TouchableOpacity ,Image,TouchableHighlight, Alert} from 'react-native';
 import { EventRegister } from 'react-native-event-listeners';
-
 import {setDefaultValue,getReadOk} from '../services/BleService';
 
 export default function Home({navigation}){

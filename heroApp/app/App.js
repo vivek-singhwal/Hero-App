@@ -6,9 +6,11 @@ import { createStackNavigator } from '@react-navigation/stack';
 // import DeviceStatus from './container/DeviceStatus';
 // import Settings from './container/Settings';
 import HomePage from './container/HomePage';
+import FirstConnection from './container/FirstimeConnection';
 import Profile from './container/OperatorProfile';
 import BleAppManager from './container/BleAppMananger';
 import AwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import { initDB } from './services/DBService';
 
 const Stack = createStackNavigator();
 
@@ -22,20 +24,22 @@ function App() {
     <Stack.Navigator initialRouteName="Profile">
     <Stack.Screen name="Profile" component={Profile} options={{
           headerShown: false,
-        }} />
-
+    }} />
+       <Stack.Screen name="FirstConnection" component={FirstConnection} options={{
+          headerShown: false,
+    }} />
       <Stack.Screen name="HomePage" component={HomePage}
         options={{
           title: "RANGER",
           headerTitleStyle: {fontSize:24,color:"#012554",fontWeight:"bold",fontStyle:"italic"},
           headerLeft: (()=><AwesomeIcon 
+          
           onPress={()=>{
             console.log(">>Click share")
           }}
           size={32}
           // color={'#2C88D9'}
-          color='#012554'
-          style={{backgroundColor:"pink"}}
+          color={'#012554'}
           style={{
             // transform: [{ rotate: '270deg'}]
             transform: [
