@@ -1,13 +1,12 @@
 import React,{useEffect,useState} from 'react';
-import { View, TextInput as Input,ScrollView, Alert } from 'react-native';
+import { View, TextInput as Input,ScrollView, Alert, KeyboardAvoidingView } from 'react-native';
 import { Avatar, Button } from 'react-native-paper';
 import AwesomeIcon5 from 'react-native-vector-icons/FontAwesome5';
 import Material from 'react-native-vector-icons/MaterialIcons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {Picker} from '@react-native-picker/picker';
 import { getOperators, initDB , addOperator,delOperator} from '../services/DBService';
-import { EventRegister } from 'react-native-event-listeners';
-import {setDefaultValue,getReadOk} from '../services/BleService';
+import { setOperatorData } from '../services/DataService';
 
 export default OperatorProfile= ({navigation}) =>{
     const [count,setCount] = useState(true);
@@ -24,83 +23,43 @@ export default OperatorProfile= ({navigation}) =>{
         if(count){
           initDB('operatorsTable').then((res)=>{
             // console.log(">>Res ",res);
-            
+            getOperators().then((result)=>{
+                // console.log(">result ",result);
+                if(result.length){
+                  setOperatorData(result[0]);
+                  navigation.navigate('FirstConnection')
+                }
+            })
           });
         setCount(false);
         }
-        
-        // var listener = EventRegister.addEventListener('BLE_STATUS', (data) => {
-        //   // console.log(">>data ",data,getReadOk());
-        //     if(data.event == "Data_Recieved"){
-        //       console.log(data.value);
-        //     }
-        //     if(data.event == "connected"){
-        //       setisDeviceConnected(true);
-        //       setDeviceStatus("Connected");
-        //     }else if(data.event == "reading"){
-        //       setDeviceStatus("Reading...");
-        //     }else if(data.event == "readOK"){
-        //       setDeviceStatus("Ready.");
-        //     }else if(data.event == "scanning"){
-        //       setDeviceStatus("Scanning...");
-        //       setTimeout(()=>{
-        //         if(deviceStatus == "Scanning..."){
-        //           setDeviceStatus("");
-        //         }
-        //       },10000)
-        //     }else if(data.event == "disconnected"){
-        //       setDefaultValue();
-        //       setisDeviceConnected(false);
-        //       // navigation.navigate('Home');
-        //       setDeviceStatus("Disconnected");
-        //       setTimeout(()=>{
-        //         setDeviceStatus("");
-        //       },500)
-        //     }
-        //   });
-        //   return ()=>{
-        //     EventRegister.removeEventListener(listener);
-        //   }  
     })
 
     var addRecord = ()=>{
+      console.log(">>name ",opName,opChem,opCompany);
+      if(opName !== "" && opChem !== "" && opCompany !== "company"){
         var opObj = {
-            name:'abc',
-            company:'xyz',
-            chemistry:'ADD',
-            serverId:'0'
-        }
-        // addOperator(opObj).then((data)=>{
-        //     console.log(">Data ",data);
-        // })
-        // getOperators().then((result)=>{
-        //     console.log(">result ",result);
-        // })
-        // delOperator(0).then((result)=>{
-        //     console.log(">result ",result);
-        // })
-        
-        // scanAndConenct();
-        
-        if(!getReadOk()){
-          navigation.navigate('FirstConnection');
-        }else{
-          Alert.alert("Hero App","Device is not ready. " )
-        }
+          name:opName,
+          company:opChem,
+          chemistry:opCompany,
+          serverId:'0'
+      }
+      // addOperator(opObj).then((data)=>{
+      //      setOperatorData(data);
+      //     navigation.navigate('FirstConnection')
+      // })
+      
+      }else{
+        Alert.alert('HeroApp','Please provide valid info.');
+      }
+       
+      
     }
-    var scanAndConenct = () => {
-        console.log("scanAndConenct "+isDeviceConnected);
-        if(!isDeviceConnected){
-          EventRegister.emit('BLECMD', { cmd: 'startScan' });
-        }else{
-          EventRegister.emit('BLECMD', { cmd: 'disconnect' });
-        }
-      };
-    
+    const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0
     return(<>
-    <View style={{marginTop:"15%"}}>
-    <ScrollView>
-      <View style={{flexDirection:"column",justifyContent:"center"}}>
+    <View style={{marginTop:"15%",height:"100%"}}>
+    {/* <ScrollView showsVerticalScrollIndicator={false}> */}
+      <KeyboardAvoidingView behavior='position' keyboardVerticalOffset={keyboardVerticalOffset} style={{flexDirection:"column",justifyContent:"center"}}>
         <Avatar.Icon 
         size={155} 
         style={{backgroundColor:'#DFE6ED',marginBottom:50,alignSelf:"center"}}
@@ -156,8 +115,8 @@ export default OperatorProfile= ({navigation}) =>{
                Connect
              </Button>
         </View>
-      </View>
-      </ScrollView>
+      </KeyboardAvoidingView>
+      {/* </ScrollView> */}
     </View>
     </>)
 }

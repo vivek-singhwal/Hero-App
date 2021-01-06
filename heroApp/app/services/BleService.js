@@ -142,8 +142,9 @@ export var initCmdSeq = [
     //'getHVState\r',
     //'getError\r',
     //'getFlow\r',
-    //'getESV\r',
+    'getFlow\r',
     'getBatteryLevel\r',
+    // "getTotalOnTime\r",
     /*
     'getSerial\r', //this must be first
     'getModel\r',

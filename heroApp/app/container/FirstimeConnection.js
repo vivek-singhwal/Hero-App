@@ -1,12 +1,14 @@
 import React,{useEffect,useState} from 'react';
-import { View , StyleSheet, Text, TextInput as Input,Image} from 'react-native';
+import { View , StyleSheet, Text, TextInput as Input,Image, Alert, BackHandler} from 'react-native';
 import Material from 'react-native-vector-icons/MaterialIcons';
 import MaterialCom from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Avatar, Button, ActivityIndicator } from 'react-native-paper';
-// import { getOperators, initDB , addOperator,delOperator} from '../services/DBService';
+import { setDeviceData } from '../services/DataService';
 import { EventRegister } from 'react-native-event-listeners';
-import {setDefaultValue,getReadOk} from '../services/BleService';
-export default FirstTimeConnection = () => {
+import {setDefaultValue,getReadOk, } from '../services/BleService';
+import {initDB} from '../services/DBService';
+
+export default FirstTimeConnection = ({navigation}) => {
     const [count,setCount] = useState(true);
     const [deviceStatus, setDeviceStatus] = useState('');
     const [isDeviceConnected, setisDeviceConnected] = useState(false);
@@ -20,13 +22,16 @@ export default FirstTimeConnection = () => {
       };
     useEffect(()=>{
         if(count){
-        //   initDB('operatorsTable').then((res)=>{
-        //     // console.log(">>Res ",res);
-            
-        //   });
+          initDB('operatorsTable').then((res)=>{
+            // console.log(">>Res ",res);
+          });
+          
         setCount(false);
-        scanAndConenct();
+        
       }
+      scanAndConenct();
+      BackHandler.addEventListener('hardwareBackPress', () => true)
+       
         var listener = EventRegister.addEventListener('BLE_STATUS', (data) => {
           console.log(">>BLE_STATUS ",data);
             if(data.event == "Data_Recieved"){
@@ -51,15 +56,19 @@ export default FirstTimeConnection = () => {
               setisDeviceConnected(false);
               // navigation.navigate('Home');
               setDeviceStatus("Disconnected");
-              setTimeout(()=>{
-                setDeviceStatus("Disconnected");
-              },500)
+            //   setTimeout(()=>{
+            //     setDeviceStatus("Disconnected");
+            //   },500)
+            }else if(data.event ==='stopScan'){
+                // Alert.alert('HeroApp','No device found.')
+                setDeviceStatus("stopScan");
             }
           });
           return ()=>{
             EventRegister.removeEventListener(listener);
+            BackHandler.removeEventListener('hardwareBackPress', () => true)
         }  
-    })
+    },[])
 
 
 return(
@@ -92,10 +101,9 @@ return(
         <Text style={styles.textStyle}>
             want to connect with.
         </Text>
-            {deviceStatus === "Connected" ||  deviceStatus === "Ready" && <MaterialCom size={150} color={'green'} style={{height:200,marginTop:20,marginBottom:40,}} name="check-bold"/>}
-           {deviceStatus === "" && deviceStatus !== "Connected" ||  deviceStatus !== "Ready" && <Image style={{height:250,width:"94%",marginTop:20,marginBottom:40,}} source={require('../asset/bluetooth-guide.jpg')}/>}
-          {/* <MaterialCom size={150} color={'green'} style={{height:200,marginTop:20,marginBottom:40,}} name="check-bold"/> */}
-        {deviceStatus === "Ready" ? 
+            {isDeviceConnected && <MaterialCom size={150} color={'green'} style={{height:200,marginTop:20,marginBottom:40,}} name="check-bold"/>}
+           { !isDeviceConnected && <Image style={{height:250,width:"94%",marginTop:20,marginBottom:40,}} source={require('../asset/bluetooth-guide.jpg')}/>}
+        { isDeviceConnected ? 
          <Button 
               color={'#012554'}
               mode={'contained'}
@@ -107,14 +115,33 @@ return(
                 color={'#fff'}
                 name="keyboard-arrow-right"/>}
               contentStyle={{flexDirection:"row-reverse",paddingTop:1,height:47,width:"90%",alignSelf:"center"}}
-            //   onPress={addRecord}
+              onPress={()=>{
+                navigation.navigate('HomePage');
+              }}
               >
                {'Begin Session'}
              </Button>:
+             deviceStatus === 'Disconnected' || (deviceStatus === 'stopScan' && !isDeviceConnected)?
+             <Button 
+                style={{flexDirection:"row",borderRadius:4,height:47,width:200,justifyContent:"center"}}
+                color={'#012554'}
+                mode={'contained'}
+                uppercase={false}
+                labelStyle={{fontSize:16}} 
+                icon={props=><MaterialCom 
+                size={25}
+                color={'#fff'}
+                name="bluetooth-connect"/>}
+                contentStyle={{flexDirection:"row-reverse",paddingTop:1,height:47,width:"90%",alignSelf:"center"}}
+                onPress={scanAndConenct}
+             >
+              {'Scan Devices'}
+            </Button>:
              <View style={{flexDirection:"row",backgroundColor:'#012554',borderRadius:4,opacity:0.5,height:47,width:200,justifyContent:"center"}}>
                 <ActivityIndicator animating={true} color={'#fff'} style={{marginRight:8}}/>
                  <Text style={{color:'#fff',alignSelf:"center",fontSize:16}}>{deviceStatus}</Text>
-         </View>} 
+            </View>
+         } 
 
     </View>
     </View>)

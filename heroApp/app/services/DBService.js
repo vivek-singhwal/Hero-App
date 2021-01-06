@@ -51,6 +51,21 @@ export var initDB = (reqTable) => {
                   // console.log("resp user table "+resp);
                   resolve(db);
                 })
+                
+                db.transaction((tx) => {
+                  tx.executeSql('CREATE TABLE IF NOT EXISTS SprayerTable (id INTEGER PRIMARY KEY AUTOINCREMENT,serverId VARCHAR(25), name VARCHAR(25),hardwareId VARCHAR(25)');
+                }).then((resp) => {
+                  // console.log("resp user table "+resp);
+                  resolve(db);
+                })
+
+                db.transaction((tx) => {
+                  tx.executeSql('CREATE TABLE IF NOT EXISTS SessionTable (id INTEGER PRIMARY KEY AUTOINCREMENT,serverId VARCHAR(25), getBatteryLevel VARCHAR(25),getESVState VARCHAR(25), getFirmware VARCHAR(25), getFlow VARCHAR(25), getFlowRate VARCHAR(25), getHWVersion VARCHAR(25), getModel VARCHAR(25), getPumpState VARCHAR(25), getPumpTime VARCHAR(25), getPumpedVolume VARCHAR(25), getSerial VARCHAR(25), getTriggerLatchMode VARCHAR(25), getUnitName VARCHAR(25), resetPump VARCHAR(25), setUnitName VARCHAR(25), updateFirmware VARCHAR(25)');
+                }).then((resp) => {
+                  // console.log("resp user table "+resp);
+                  resolve(db);
+                })
+
                 resolve(db);
                 // console.log("Database not yet ready ... populating data");
               });
@@ -89,7 +104,8 @@ export var addOperator = function (data) {
     });
     return promise;
   }
-  export var getOperators = function () {
+
+export var getOperators = function () {
     console.log("getOperators");
     let promise = new Promise((resolve, reject) => {
         db.executeSql(

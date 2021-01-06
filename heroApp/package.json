@@ -17,6 +17,7 @@
     "react": "16.13.1",
     "react-native": "0.63.3",
     "react-native-ble-manager": "^7.4.1",
+    "react-native-crypto-js": "^1.0.0",
     "react-native-event-listeners": "^1.0.7",
     "react-native-gesture-handler": "^1.8.0",
     "react-native-input-prompt": "^1.0.0",

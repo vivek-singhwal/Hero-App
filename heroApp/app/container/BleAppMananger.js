@@ -4,6 +4,7 @@ import {
 import BleManager from 'react-native-ble-manager';
 import { EventRegister } from 'react-native-event-listeners';
 import BleService, {getReadOk, setReadOk , getCurrentCmd,setCurrentCmd, bleCommands,initCmdSeq,bleResults} from '../services/BleService';
+import { sessionDataList ,DeviceHWData,setDeviceHWData} from '../services/DataService';
 
 const window = Dimensions.get('window');
 const BleManagerModule = NativeModules.BleManager;
@@ -27,7 +28,9 @@ export default class BleAppmanager extends Component {
     this.handleDisconnectedPeripheral = this.handleDisconnectedPeripheral.bind(this);
     this.handleAppStateChange = this.handleAppStateChange.bind(this);
   }
-
+  sessionData = {};
+  sessionStartTime = {};
+  sessionCounter = {};
   componentDidMount() {
     AppState.addEventListener('change', this.handleAppStateChange);
     BleManager.start({showAlert: true});
@@ -51,29 +54,35 @@ export default class BleAppmanager extends Component {
       });
     }
     this.scanListener = EventRegister.addEventListener('BLECMD', (data) => {
-      if (data.cmd == "startScan"){
-        this.turnOnBle();
-        this.startScan();
-      } else if (data.cmd == "disconnect"){
-        this.test(BleService.getPeripherial());
-      } else if(data.cmd == 'sprayEnable'){
-        this.writeSingleData('sprayEnable\r');
-      } else if(data.cmd == 'sprayDisable'){
-        this.writeSingleData('sprayDisable\r');
-
-      } else if(data.cmd == 'getESVState'){
-        this.writeSingleData('getESVState\r');
-
-      } else if(data.cmd == 'setUnitName'){
-        this.writeSingleData(data.cmdValue);
-      } else if(data.cmd == 'getUnitName'){
-        this.writeSingleData(data.cmdValue);
-
-      } else {
-        if(bleCommands.indexOf(data.cmd) >= 0){
-          this.writeData(data.cmd);
+      console.log(">>BLECMD ",data);
+      // if(data.event == 'initCmdSeq'){
+        if (data.cmd == "startScan"){
+          this.turnOnBle();
+          this.startScan();
+        } else if (data.cmd == "disconnect"){
+          this.test(BleService.getPeripherial());
+        } 
+        else if(data.cmd == 'sprayEnable'){
+          this.writeSingleData('sprayEnable\r');
+        } else if(data.cmd == 'sprayDisable'){
+          this.writeSingleData('sprayDisable\r');
+  
+        } else if(data.cmd == 'getESVState'){
+          this.writeSingleData('getESVState\r');
+  
+        } else if(data.cmd == 'setUnitName'){
+          this.writeSingleData(data.cmdValue);
+        } else if(data.cmd == 'getUnitName'){
+          this.writeSingleData(data.cmdValue);
         }
-      }
+         else {
+           console.log(">>Elsepart ",data.cmd)
+          if(bleCommands.indexOf(data.cmd) >= 0){
+            this.writeData(data.cmd);
+          }if(data.event == 'homepageEvent'){
+            setReadOk(false);
+          }
+        }
     } );
   }
 
@@ -95,6 +104,14 @@ export default class BleAppmanager extends Component {
       console.log('App has come to the foreground!')
       BleManager.getConnectedPeripherals([]).then((peripheralsArray) => {
         console.log('Connected peripherals: ' + peripheralsArray.length);
+        // var peripherals = this.state.peripherals;
+        // if(peripheralsArray.length){
+        //   peripheral.connected = true;
+        //   peripherals.set(peripheralsArray[0].id, peripheralsArray[0]);
+        //   this.setState({peripherals});
+        //   EventRegister.emit('BLE_STATUS', { event: "connected" });
+
+        // }
       });
     }
     this.setState({appState: nextAppState});
@@ -111,6 +128,7 @@ export default class BleAppmanager extends Component {
     if (peripheral) {
       peripheral.connected = false;
       peripherals.set(peripheral.id, peripheral);
+      
       this.setState({peripherals});
     }
     console.log('Disconnected from ' + data.peripheral);
@@ -118,13 +136,16 @@ export default class BleAppmanager extends Component {
   }
   handleUpdateValueForCharacteristic(data) {
     // this.getStringFromAscii(data.value);
+   
     console.log("update called >>>>"+ this.getStringFromAscii(data.value));
     if(getCurrentCmd() !=""){
       //console.log(JSON.stringify(data))
       bleResults[getCurrentCmd()] = this.getStringFromAscii(data.value);
+      this.sessionStartTime = Date.now();
+      this.sessionData[getCurrentCmd().replace(/(\r\n|\n|\r)/gm, "")] = this.getStringFromAscii(data.value).replace(/(\r\n|\n|\r)/gm, "")
     }
     
-    console.log("currentCMD:"+getCurrentCmd()+" = "+bleResults[getCurrentCmd()]);
+    console.log("currentCMD:"+ JSON.stringify(this.sessionData));
     if( !getReadOk() && initCmdSeq.indexOf(getCurrentCmd()) >= 0) {
       let cmdIndex = initCmdSeq.indexOf(getCurrentCmd());
       let nextCmd = initCmdSeq[cmdIndex +1];
@@ -135,7 +156,11 @@ export default class BleAppmanager extends Component {
       }else{
         console.log('final result...');
         setReadOk(true);
+        sessionDataList.push({startTime:this.sessionStartTime,endTime:Date.now(), data:this.sessionData});
+        this.sessionData = {};
         EventRegister.emit('BLE_STATUS', { event: "readOK" });
+        EventRegister.emit('BLE_DATA', { event: "completed" });
+        // setDeviceData(JSON.parse(JSON.stringify(bleResults)));
         console.log(JSON.stringify(bleResults));
       }
     }
@@ -144,6 +169,7 @@ export default class BleAppmanager extends Component {
   }
   handleStopScan() {
     console.log('Scan is stopped');
+    EventRegister.emit('BLE_STATUS', { event: "stopScan" });
     this.setState({ scanning: false });
   }
   startScan() {
@@ -151,7 +177,7 @@ export default class BleAppmanager extends Component {
     if (BleService.getPeripherial().isConnectable == undefined) {
       this.setState({ peripherals: new Map() });
       //scan for 20 seconds
-      BleManager.scan([], 5, true).then((results) => {
+      BleManager.scan([], 4, true).then((results) => {
         // console.log(">>scan ",results)
         if (typeof (results) != undefined) { 
           EventRegister.emit('BLE_STATUS', { event: "scanning"});
@@ -235,6 +261,7 @@ export default class BleAppmanager extends Component {
         peripheral.connected = true;
         peripherals.set(peripheral.id, peripheral);
         this.setState({ peripherals });
+        break;
       }
     });
   }
@@ -262,10 +289,12 @@ export default class BleAppmanager extends Component {
   }
   test(peripheral) {
     //console.log(peripheral)
+    var localHw = {};
     if (peripheral){
       if (peripheral.connected){
-        BleManager.disconnect(peripheral.id);
-        EventRegister.emit('BLE_STATUS', { event: "disconnected" });
+        console.log("connected",peripheral);
+        // BleManager.disconnect(peripheral.id);
+        // EventRegister.emit('BLE_STATUS', { event: "disconnected" });
         //BleService.setPeripherial(null);
         //this.setState({peripheral:null});
       }else{
@@ -281,10 +310,16 @@ export default class BleAppmanager extends Component {
           }
           EventRegister.emit('BLE_STATUS', { event: "connected" });
           Alert.alert("Hero", "Connected to "+peripheral.id  +"\n"+peripheral.name)
+          localHw.name = peripheral.name;
+          localHw.id = peripheral.id;
+          setDeviceHWData(localHw);
           console.log('Connected to ' + peripheral.id +"\n"+peripheral.name);
-          setTimeout(() => { 
-            this.writeData('getSerial\r');
-          }, 300);
+          
+          // Command initiate level
+          // setTimeout(() => { 
+          //   this.writeData('getSerial\r');
+          // }, 300);
+
         }).catch((error) => {
           console.log('Connection error', error);
         });
