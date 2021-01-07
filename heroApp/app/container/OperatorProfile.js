@@ -5,8 +5,9 @@ import AwesomeIcon5 from 'react-native-vector-icons/FontAwesome5';
 import Material from 'react-native-vector-icons/MaterialIcons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {Picker} from '@react-native-picker/picker';
-import { getOperators, initDB , addOperator,delOperator} from '../services/DBService';
-import { setOperatorData } from '../services/DataService';
+import { getOperators, initDB , addOperator,delOperator, updateServerId } from '../services/DBService';
+import { setOperatorData,getOperatorData } from '../services/DataService';
+import { getOperatorAPI,addOperatorAPI } from '../services/apiService';
 
 export default OperatorProfile= ({navigation}) =>{
     const [count,setCount] = useState(true);
@@ -21,11 +22,21 @@ export default OperatorProfile= ({navigation}) =>{
 
     useEffect(()=>{
         if(count){
-          initDB('operatorsTable').then((res)=>{
+          initDB('operators').then((res)=>{
+
+          // check and operator with api
             // console.log(">>Res ",res);
             getOperators().then((result)=>{
-                // console.log(">result ",result);
-                if(result.length){
+                console.log(">result ",result);
+                if(result.length > 0){
+                  var operatorObj = {
+                    opName:result[0].name,
+                    company:result[0].company,
+                    chemistryType:result[0].chemistry
+                  }
+                  addOperatorAPI(operatorObj).then((resOperator)=>{
+                    updateServerId('operators',resOperator.result.id)
+                  })
                   setOperatorData(result[0]);
                   navigation.navigate('FirstConnection')
                 }
@@ -36,25 +47,31 @@ export default OperatorProfile= ({navigation}) =>{
     })
 
     var addRecord = ()=>{
-      console.log(">>name ",opName,opChem,opCompany);
-      if(opName !== "" && opChem !== "" && opCompany !== "company"){
-        var opObj = {
-          name:opName,
-          company:opChem,
-          chemistry:opCompany,
-          serverId:'0'
-      }
-      // addOperator(opObj).then((data)=>{
-      //      setOperatorData(data);
-      //     navigation.navigate('FirstConnection')
+      // delOperator(4).then((data)=>{
+      //   console.log(">Data ",data);
       // })
-      
+      // getOperators().then((result)=>{
+      //   console.log(">result ",result);
+      // })
+      if(opName !== "" && opChem !== "" && opCompany !== "company"){
+        var operatorObj = {
+          opName:opName,
+          company:opChem,
+          chemistryType:opCompany
+        }
+        addOperatorAPI(operatorObj).then((resOperator)=>{
+          operatorObj.serverId = resOperator.id;
+          addOperator(operatorObj).then((data)=>{
+            console.log(">Data ",data);
+            setOperatorData(data);
+            // navigation.navigate('FirstConnection')
+        })
+        })
       }else{
         Alert.alert('HeroApp','Please provide valid info.');
       }
-       
-      
     }
+
     const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0
     return(<>
     <View style={{marginTop:"15%",height:"100%"}}>
@@ -69,7 +86,7 @@ export default OperatorProfile= ({navigation}) =>{
                     name="user-alt"/>} />
         <View style={{marginBottom:20,alignSelf:"center"}}>
         
-        <View style={{ marginBottom:40,borderColor:textFocusedName?'#012554':'gray',borderWidth:1.8,height:40,borderRadius:5,width:250,alignSelf:"center"}}>
+        <View style={{ marginBottom:40,borderColor:textFocusedName?'#012554':'gray',borderWidth:1.8,height:45,borderRadius:5,width:250,alignSelf:"center"}}>
                <Input onFocus={()=> setTextFocusedName(true)}
                         onBlur={()=> setTextFocusedName(false)}
                         placeholder={'Name'}
@@ -92,7 +109,7 @@ export default OperatorProfile= ({navigation}) =>{
                 </Picker>
                 <Entypo size={20} name="select-arrows" style={{alignSelf:"center"}}/>
             </View>
-            <View style={{marginBottom:40, borderColor:textFocusedChem?'#012554':'gray',borderWidth:1.8,height:40,borderRadius:5,width:250,alignSelf:"center"}}>
+            <View style={{marginBottom:40, borderColor:textFocusedChem?'#012554':'gray',borderWidth:1.8,height:45,borderRadius:5,width:250,alignSelf:"center"}}>
                <Input onFocus={()=> setTextFocusedChem(true)}
                         onBlur={()=> setTextFocusedChem(false)}
                         placeholder={'Chemistry'}

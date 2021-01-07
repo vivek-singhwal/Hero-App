@@ -4,7 +4,7 @@ import {
 import BleManager from 'react-native-ble-manager';
 import { EventRegister } from 'react-native-event-listeners';
 import BleService, {getReadOk, setReadOk , getCurrentCmd,setCurrentCmd, bleCommands,initCmdSeq,bleResults} from '../services/BleService';
-import { sessionDataList ,DeviceHWData,setDeviceHWData} from '../services/DataService';
+import { sessionDataList ,setDeviceHWData,currentSessionData,setCurrentSessionData} from '../services/DataService';
 
 const window = Dimensions.get('window');
 const BleManagerModule = NativeModules.BleManager;
@@ -15,8 +15,8 @@ var BLE_SPP_Write_Characteristic = BleService.RXCharacteristic;
 var BLE_SPP_AT_Characteristic = BleService.UART;
 
 export default class BleAppmanager extends Component {
-  constructor(){
-    super()
+  constructor(props){
+    super(props)
     this.state = {
       scanning:false ,
       peripherals: new Map(),
@@ -80,6 +80,7 @@ export default class BleAppmanager extends Component {
           if(bleCommands.indexOf(data.cmd) >= 0){
             this.writeData(data.cmd);
           }if(data.event == 'homepageEvent'){
+            this.sessionStartTime = Date.now();
             setReadOk(false);
           }
         }
@@ -156,8 +157,10 @@ export default class BleAppmanager extends Component {
       }else{
         console.log('final result...');
         setReadOk(true);
-        sessionDataList.push({startTime:this.sessionStartTime,endTime:Date.now(), data:this.sessionData});
+        setCurrentSessionData(this.sessionData);
+        
         this.sessionData = {};
+        // setCurrentSessionData({});
         EventRegister.emit('BLE_STATUS', { event: "readOK" });
         EventRegister.emit('BLE_DATA', { event: "completed" });
         // setDeviceData(JSON.parse(JSON.stringify(bleResults)));
@@ -207,7 +210,9 @@ export default class BleAppmanager extends Component {
              console.log('Notification error', error);
            })
        }).catch((error) => {
-         console.log('service error', error);
+        //  EventRegister.emit('BLE_DATA',{event:'error'});
+         console.log('service error writeSingleData ', error);
+         EventRegister.emit('BLE_STATUS', { event: "error"});
        });
     }else{
       console.log("Command null");
@@ -232,7 +237,8 @@ export default class BleAppmanager extends Component {
             console.log('Notification error', error);
           })
       }).catch((error) => {
-        console.log('service error', error);
+        console.log('service error writeData', error);
+        EventRegister.emit('BLE_STATUS', { event: "error"});
       });
    }else{
      console.log("Command null");
@@ -293,6 +299,10 @@ export default class BleAppmanager extends Component {
     if (peripheral){
       if (peripheral.connected){
         console.log("connected",peripheral);
+        var peripherals = this.state.peripherals;
+          peripherals.set(peripheral.id, peripheral);
+          this.setState({peripherals});
+          EventRegister.emit('BLE_STATUS', { event: "connected" });
         // BleManager.disconnect(peripheral.id);
         // EventRegister.emit('BLE_STATUS', { event: "disconnected" });
         //BleService.setPeripherial(null);
@@ -310,8 +320,8 @@ export default class BleAppmanager extends Component {
           }
           EventRegister.emit('BLE_STATUS', { event: "connected" });
           Alert.alert("Hero", "Connected to "+peripheral.id  +"\n"+peripheral.name)
-          localHw.name = peripheral.name;
-          localHw.id = peripheral.id;
+          localHw.sdName = peripheral.name;
+          localHw.hardwareId = peripheral.id;
           setDeviceHWData(localHw);
           console.log('Connected to ' + peripheral.id +"\n"+peripheral.name);
           

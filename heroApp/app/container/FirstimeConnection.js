@@ -3,10 +3,11 @@ import { View , StyleSheet, Text, TextInput as Input,Image, Alert, BackHandler} 
 import Material from 'react-native-vector-icons/MaterialIcons';
 import MaterialCom from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Avatar, Button, ActivityIndicator } from 'react-native-paper';
-import { setDeviceData } from '../services/DataService';
+import { getOperatorData, setDeviceData, getDeviceHWData, setDeviceHWData , sessionDataList } from '../services/DataService';
 import { EventRegister } from 'react-native-event-listeners';
 import {setDefaultValue,getReadOk, } from '../services/BleService';
-import {initDB} from '../services/DBService';
+import {initDB, addSprayer, getSprayers, getSprayersByHwId, delSprayer} from '../services/DBService';
+import {addSprayerAPI} from '../services/apiService';
 
 export default FirstTimeConnection = ({navigation}) => {
     const [count,setCount] = useState(true);
@@ -22,7 +23,7 @@ export default FirstTimeConnection = ({navigation}) => {
       };
     useEffect(()=>{
         if(count){
-          initDB('operatorsTable').then((res)=>{
+          initDB('sprayers').then((res)=>{
             // console.log(">>Res ",res);
           });
           
@@ -31,15 +32,20 @@ export default FirstTimeConnection = ({navigation}) => {
       }
       scanAndConenct();
       BackHandler.addEventListener('hardwareBackPress', () => true)
-       
         var listener = EventRegister.addEventListener('BLE_STATUS', (data) => {
           console.log(">>BLE_STATUS ",data);
             if(data.event == "Data_Recieved"){
               console.log(data.value);
             }
+            if(data.event == "error"){
+                setisDeviceConnected(false);
+                setDeviceStatus("Disconnected");
+                navigation.navigate('FirstConnection');
+              }
             if(data.event == "connected"){
               setisDeviceConnected(true);
               setDeviceStatus("Connected");
+            //   setSessionDataList([]); // set temp
             }else if(data.event == "reading"){
               setDeviceStatus("Reading...");
             }else if(data.event == "readOK"){
@@ -53,9 +59,11 @@ export default FirstTimeConnection = ({navigation}) => {
               },10000)
             }else if(data.event == "disconnected"){
               setDefaultValue();
+            //   setSessionDataList([]); // set temp
               setisDeviceConnected(false);
               // navigation.navigate('Home');
               setDeviceStatus("Disconnected");
+              scanAndConenct();
             //   setTimeout(()=>{
             //     setDeviceStatus("Disconnected");
             //   },500)
@@ -116,6 +124,29 @@ return(
                 name="keyboard-arrow-right"/>}
               contentStyle={{flexDirection:"row-reverse",paddingTop:1,height:47,width:"90%",alignSelf:"center"}}
               onPress={()=>{
+                var deviceObj = {
+                    sdName:getDeviceHWData().sdName,
+                    hardwareId:getDeviceHWData().hardwareId
+                }
+                if(getDeviceHWData().hardwareId != "0.0"){
+                    addSprayerAPI(deviceObj).then((result)=>{
+                        console.log(">>result ",result.result);
+                        deviceObj.serverId = result.result.id;
+                        setDeviceHWData(deviceObj);
+                        if(result.success){
+                            getSprayersByHwId(getDeviceHWData().hardwareId).then((resDevice)=>{
+                                if(resDevice.length){
+                                    console.log(">>resDevice",resDevice)
+                                }else{
+                                    deviceObj.serverId = result.result.id;
+                                    addSprayer(deviceObj).then(()=>{
+                                            
+                                    })
+                                }
+                            })
+                        }
+                     })
+                }
                 navigation.navigate('HomePage');
               }}
               >

@@ -12,7 +12,7 @@ var connectionStatus = false;
 var readingStatus = false;
 var operatorData = {};
 var deviceData = {};
-export let DeviceHWData = {id:0,name:''};
+export let DeviceHWData = {hardwareId:0,sdName:'',serverId:null};
 export var getDeviceHWData = ()=>{
     return DeviceHWData;
 }
@@ -21,10 +21,18 @@ export var setDeviceHWData=(data)=>{
     return DeviceHWData = data;
 }
 
-export var sessionList =[{sessionName:'abc',startTime:new Date(),elapseTime:new Date(),ozSparayed:12.1},{sessionName:'xyz',startTime:new Date(),elapseTime:new Date(),ozSparayed:11.1}];
+export var sessionList =[{location:'abc',comment:'',serverId:'0',startTime:Date.now(),endTime:Date.now(),ozSparayed:12.1,sessionData :{}},{location:'abc',comment:'',serverId:'0',startTime:Date.now(),endTime:Date.now(),ozSparayed:11.1,sessionData :{}}];
 
-export var sessionData = {};
+export var currentSessionData = {};
 export var sessionDataList = [];
+
+export var setCurrentSessionData=(data)=>{
+    return currentSessionData = data;
+}
+
+export var setSessionDataList=(data)=>{
+    return sessionDataList = data;
+}
 
 export var getDeviceData = ()=>{
     return deviceData;
@@ -33,6 +41,8 @@ export var getDeviceData = ()=>{
 export var setDeviceData=(data)=>{
     return deviceData = data;
 }
+
+
 
 export var getConnectionStatus = ()=>{
     return connectionStatus;

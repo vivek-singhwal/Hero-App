@@ -2,9 +2,8 @@ import React,{useEffect,useState} from 'react';
 import { View , StyleSheet, Text, TouchableOpacity, TextInput as Input,ScrollView} from 'react-native';
 import Material from 'react-native-vector-icons/MaterialIcons';
 import { Button, Switch, ProgressBar, Modal, Portal, Provider, TextInput } from 'react-native-paper';
- export default SaveModal = ({visible,hideModal,SetReadingStatus}) => {
-    const [locationText, setLocationText] = useState('');
-    const [commentText, setCommentText] = useState('');
+ export default SaveModal = ({addSessionList,setLocationText,locationText,commentText,setCommentText,visible,hideModal,SetReadingStatus}) => {
+
     const [textFocused,setTextFocused] = useState(false);
     const containerStyle = {backgroundColor: 'white', padding: 20};
     return (
@@ -17,7 +16,7 @@ import { Button, Switch, ProgressBar, Modal, Portal, Provider, TextInput } from 
               theme={{ colors: { primary: '#012554',underlineColor:'transparent',}}}
               style={{paddingBottom:20,backgroundColor:"white"}}
               mode={'outlined'}
-              value={locationText}
+              defaultValue={locationText}
               placeholder={'Where did you spray?'}
               onChangeText={text => setLocationText(text)}
             />
@@ -33,7 +32,7 @@ import { Button, Switch, ProgressBar, Modal, Portal, Provider, TextInput } from 
                         placeholder={'Notes?'}
                         style={{padding:10,marginTop:5,fontSize:16}}
                         multiline={true}
-                        value={commentText}
+                        defaultValue={commentText}
                         onChangeText={text => setCommentText(text)}
                         ref = {(input) => this.input = input}
                     />
@@ -53,8 +52,8 @@ import { Button, Switch, ProgressBar, Modal, Portal, Provider, TextInput } from 
               contentStyle={{paddingTop:1,paddingRight:5,}}
               onPress={()=>{
                 hideModal();
-                // SetReadingStatus(true);
-                SetReadingStatus(false);
+                SetReadingStatus(true);
+                // SetReadingStatus(false);
                 }}>
               Back
             </Button>
@@ -72,6 +71,7 @@ import { Button, Switch, ProgressBar, Modal, Portal, Provider, TextInput } from 
               onPress={()=>{
                 SetReadingStatus(false);
                 hideModal();
+                addSessionList(commentText,locationText);
               }}
               >
                End

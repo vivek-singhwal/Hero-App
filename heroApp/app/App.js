@@ -63,7 +63,7 @@ function App() {
     {/* <MessageModal/> */}
     <BleAppManager/>
     <NavigationContainer>
-    <Stack.Navigator initialRouteName="FirstConnection">
+    <Stack.Navigator initialRouteName="Profile">
     <Stack.Screen name="Profile" component={Profile} options={{
           headerShown: false,
     }}/>
