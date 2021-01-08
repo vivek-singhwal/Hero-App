@@ -13,12 +13,12 @@ import Profile from './container/OperatorProfile';
 import BleAppManager from './container/BleAppMananger';
 import AwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import { Text, } from 'react-native-paper';
+import { EventRegister } from 'react-native-event-listeners';
 
 const Stack = createStackNavigator();
-const MessageModal = () => {
-  const [modalVisible, setModalVisible] = React.useState(false);
+const MessageModal = ({modalVisible,setModalVisible}) => {
   return (
-    <View style={styles.centeredView}>
+  
       <Modal
         animationType="slide"
         transparent={true}
@@ -27,43 +27,62 @@ const MessageModal = () => {
           Alert.alert("Modal has been closed.");
         }}
       >
-        <View style={styles.centeredView}>
+      <View
+        style={{
+          position: 'absolute',
+          width: '100%',
+          height: '100%',
+          justifyContent: 'center',
+          backgroundColor: 'rgba(100,100,100, 0.5)',
+          padding: 40,
+        }}
+      >
           <View style={styles.modalView}>
-            <Text style={styles.modalText}>Hello World!</Text>
-
+            <Text style={styles.modalText}>Bluetooth is currently {'\n'} connected.</Text>
+            <Text style={[styles.modalText]}>Would you like to disconnect ?</Text>
+        <View style={{flexDirection:"row",justifyContent:"space-between",marginTop:35,marginBottom:15}}>
             <TouchableHighlight
-              style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
+              style={{ ...styles.openButton,backgroundColor: "#fff",marginRight:10 ,borderColor:'#012554',borderWidth:1}}
+              onPress={() => {
+                EventRegister.emit('BLECMD',{event:'disconnect'}) 
+                setModalVisible(!modalVisible);
+              }}>
+              <Text style={[styles.textStyle,{color:'#012554'}]}>Disconnect</Text>
+            </TouchableHighlight>
+            <TouchableHighlight
+              style={{ ...styles.openButton, backgroundColor: "#012554" }}
               onPress={() => {
                 setModalVisible(!modalVisible);
-              }}
-            >
-              <Text style={styles.textStyle}>Hide Modal</Text>
+              }}>
+              <Text style={styles.textStyle}>Cancel</Text>
             </TouchableHighlight>
           </View>
         </View>
-      </Modal>
+      </View>
+    </Modal>
 
-      <TouchableHighlight
-        style={styles.openButton}
-        onPress={() => {
-          setModalVisible(true);
-        }}
-      >
-        <Text style={styles.textStyle}>Show Modal</Text>
-      </TouchableHighlight>
-    </View>
+    //   <TouchableHighlight
+    //     style={styles.openButton}
+    //     onPress={() => {
+    //       setModalVisible(true);
+    //     }}
+    //   >
+    //     <Text style={styles.textStyle}>Show Modal</Text>
+    //   </TouchableHighlight>
+    // </View>
   );
 };
 function App() {
-
+  const [modalVisible, setModalVisible] = React.useState(false);
   return (
     <>
+    <MessageModal modalVisible={modalVisible} setModalVisible={setModalVisible}/>
     <StatusBar barStyle="dark-content" />
     <SafeAreaView></SafeAreaView>
     {/* <MessageModal/> */}
     <BleAppManager/>
     <NavigationContainer>
-    <Stack.Navigator initialRouteName="Profile">
+    <Stack.Navigator initialRouteName="HomePage">
     <Stack.Screen name="Profile" component={Profile} options={{
           headerShown: false,
     }}/>
@@ -75,8 +94,8 @@ function App() {
           headerTitleStyle: {fontSize:24,color:"#012554",fontWeight:"bold",fontStyle:"italic"},
           headerRight:(()=><AwesomeIcon
           onPress={()=>{
-            console.log(">>Click bluetooth")
-            Alert.alert('','Bluetooth is currently connected.\n\n Would you like to disconnect');
+            // console.log(">>Click bluetooth");
+            // EventRegister.emit('BLE_STATUS',{event:'reqDisconnect'})
           }}
           size={36}
           // color={'#2C88D9'}
@@ -111,7 +130,8 @@ function App() {
           headerLeftContainerStyle:{paddingLeft:20},
           headerRight:(()=><AwesomeIcon
           onPress={()=>{
-            console.log(">>Click bluetooth")
+            // console.log(">>Click bluetooth")
+           setModalVisible(true);
           }}
           size={36}
           // color={'#2C88D9'}
@@ -191,13 +211,16 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 22
+    marginTop: 22,
+    
   },
   modalView: {
     margin: 20,
+    backgroundColor:"black",
+   
     backgroundColor: "white",
-    borderRadius: 20,
-    padding: 35,
+    borderRadius: 4,
+    padding: 15,
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: {
@@ -210,7 +233,7 @@ const styles = StyleSheet.create({
   },
   openButton: {
     backgroundColor: "#F194FF",
-    borderRadius: 20,
+    borderRadius: 4,
     padding: 10,
     elevation: 2
   },
@@ -220,7 +243,7 @@ const styles = StyleSheet.create({
     textAlign: "center"
   },
   modalText: {
-    marginBottom: 15,
+    marginTop: 20,
     textAlign: "center"
   }
 });

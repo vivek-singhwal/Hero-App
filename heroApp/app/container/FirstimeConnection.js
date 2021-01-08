@@ -30,7 +30,7 @@ export default FirstTimeConnection = ({navigation}) => {
         setCount(false);
         
       }
-      scanAndConenct();
+      // scanAndConenct();
       BackHandler.addEventListener('hardwareBackPress', () => true)
         var listener = EventRegister.addEventListener('BLE_STATUS', (data) => {
           console.log(">>BLE_STATUS ",data);
@@ -41,6 +41,10 @@ export default FirstTimeConnection = ({navigation}) => {
                 setisDeviceConnected(false);
                 setDeviceStatus("Disconnected");
                 navigation.navigate('FirstConnection');
+              }
+              if(data.event == "reqDisconnect"){
+                console.log(">>Here")
+               Alert.alert('Are you sure')
               }
             if(data.event == "connected"){
               setisDeviceConnected(true);
@@ -63,7 +67,6 @@ export default FirstTimeConnection = ({navigation}) => {
               setisDeviceConnected(false);
               // navigation.navigate('Home');
               setDeviceStatus("Disconnected");
-              scanAndConenct();
             //   setTimeout(()=>{
             //     setDeviceStatus("Disconnected");
             //   },500)

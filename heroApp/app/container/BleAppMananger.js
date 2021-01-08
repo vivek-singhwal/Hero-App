@@ -299,12 +299,9 @@ export default class BleAppmanager extends Component {
     if (peripheral){
       if (peripheral.connected){
         console.log("connected",peripheral);
-        var peripherals = this.state.peripherals;
-          peripherals.set(peripheral.id, peripheral);
-          this.setState({peripherals});
-          EventRegister.emit('BLE_STATUS', { event: "connected" });
-        // BleManager.disconnect(peripheral.id);
-        // EventRegister.emit('BLE_STATUS', { event: "disconnected" });
+        
+        BleManager.disconnect(peripheral.id);
+        EventRegister.emit('BLE_STATUS', { event: "error" });
         //BleService.setPeripherial(null);
         //this.setState({peripheral:null});
       }else{
