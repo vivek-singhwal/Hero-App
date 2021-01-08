@@ -62,8 +62,8 @@ export default OperatorProfile= ({navigation}) =>{
         addOperatorAPI(operatorObj).then((resOperator)=>{
           operatorObj.serverId = resOperator.id;
           addOperator(operatorObj).then((data)=>{
-            console.log(">Data ",data);
-            setOperatorData(data);
+            console.log(">Data ",operatorObj,data);
+            setOperatorData(operatorObj);
             // navigation.navigate('FirstConnection')
         })
         })

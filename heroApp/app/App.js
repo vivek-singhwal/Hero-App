@@ -3,9 +3,7 @@ import { View, StatusBar, SafeAreaView,StyleSheet, Alert, TouchableHighlight,Mod
 import { NavigationContainer } from '@react-navigation/native';
 
 import { createStackNavigator } from '@react-navigation/stack';
-// import Home from './container/Home';
-// import DeviceStatus from './container/DeviceStatus';
-// import Settings from './container/Settings';
+
 import HomePage from './container/HomePage';
 import SettingPage from './container/SettingPage';
 import FirstConnection from './container/FirstimeConnection';
@@ -60,16 +58,6 @@ const MessageModal = ({modalVisible,setModalVisible}) => {
         </View>
       </View>
     </Modal>
-
-    //   <TouchableHighlight
-    //     style={styles.openButton}
-    //     onPress={() => {
-    //       setModalVisible(true);
-    //     }}
-    //   >
-    //     <Text style={styles.textStyle}>Show Modal</Text>
-    //   </TouchableHighlight>
-    // </View>
   );
 };
 function App() {
@@ -82,7 +70,7 @@ function App() {
     {/* <MessageModal/> */}
     <BleAppManager/>
     <NavigationContainer>
-    <Stack.Navigator initialRouteName="HomePage">
+    <Stack.Navigator initialRouteName="Profile">
     <Stack.Screen name="Profile" component={Profile} options={{
           headerShown: false,
     }}/>
@@ -113,7 +101,6 @@ function App() {
           headerBackTitleVisible:true,
           headerTitleStyle: {fontSize:24,color:"#012554",fontWeight:"bold",fontStyle:"italic"},
           headerLeft: (()=><AwesomeIcon 
-          
           onPress={()=>{
             console.log(">>Click share")
           }}
@@ -140,42 +127,10 @@ function App() {
           name="bluetooth-b"/>
           ),
           headerStyle:{height:80}
-        }}
-        
-      />  
-      {/* <Stack.Screen name="Home" component={Home} options={{
-          headerShown: false,
-        }} />
-        
-      <Stack.Screen name="DeviceStatus" component={DeviceStatus} options={{
-          title:"Device Status",
-          headerStyle: {
-            backgroundColor: '#556983',
-          },
-          headerBackTitleVisible:false,
-          headerTintColor: '#DFECF5',
-          headerTitleStyle: {
-            textAlign:'center',
-            fontWeight: 'bold',
-          }
-        }} />
-      <Stack.Screen name="Settings" component={Settings} options={{
-          title:"Settings",
-          headerStyle: {
-            backgroundColor: '#556983',
-          },
-          headerBackTitleVisible:false,
-          headerTintColor: '#DFECF5',
-          headerTitleStyle: {
-            textAlign:'center',
-            fontWeight: 'bold',
-          }
-        }}/> */}
+       }}/>  
       </Stack.Navigator>  
     </NavigationContainer>
-    
-    </>
-  );
+  </>);
 }
 export default App;
 

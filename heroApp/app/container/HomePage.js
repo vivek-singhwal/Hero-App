@@ -5,7 +5,7 @@ import AwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import AwesomeIcon5 from 'react-native-vector-icons/FontAwesome5';
 import Feather from 'react-native-vector-icons/Ionicons';
 import {getOperator} from '../services/apiService';
-import {getReadingStatus,setReadingStatus, sessionList, sessionDataList , getDeviceHWData,setSessionDataList,currentSessionData} from '../services/DataService';
+import {getReadingStatus,setReadingStatus, sessionDataList , getDeviceHWData,setSessionDataList,currentSessionData} from '../services/DataService';
 import SaveModal from './SaveModal';
 import { EventRegister } from 'react-native-event-listeners';
 import {initDB} from '../services/DBService';
@@ -25,6 +25,7 @@ export default  HomePage = ({navigation})=>{
     const onToggleEleSwitch = () => setIsSwitchEleOn(!isSwitchEleOn);
     const onToggleTrgSwitch = () => setIsSwitchTrgOn(!isSwitchTrgOn);
     const toggleSetReading = () => setReadStatus(preState=>!preState);
+
     function formatAMPM(date) {
       var hours = new Date(date).getHours();
       var minutes = new Date(date).getMinutes();
@@ -62,15 +63,19 @@ export default  HomePage = ({navigation})=>{
     })
     
     var stopReading=()=>{
-    
       setReadStatus(false);
       showModal();
     }
+
     var addSessionList = (comment,location)=>{
       setCommentText('');
       setLocationText('');
       // sessionDataList.push({location:'abc',comment:'',serverId:'0',startTime:this.sessionStartTime,endTime:Date.now()});
-      console.log("ADd request",commentText,locationText,currentSessionData,setStartTime,setEndTime,Math.ceil(Math.abs(new Date(setStartTime).getTime()-new Date(setEndTime).getTime()) / 1000));
+      var sessionListAr = [...sessionList];
+      sessionListAr.push({location:locationText,startTime:setStartTime,elapseTime:Math.ceil(Math.abs(new Date(setStartTime).getTime()-new Date(setEndTime).getTime()) / 1000),ozSparayed:parseInt(currentSessionData.getPumpedVolume)/29.57})
+      setSessionList(sessionListAr);
+     
+      // console.log("ADd request",commentText,locationText,currentSessionData,setStartTime,setEndTime,Math.ceil(Math.abs(new Date(setStartTime).getTime()-new Date(setEndTime).getTime()) / 1000));
       
     }
     var startReading=()=>{
@@ -128,7 +133,7 @@ export default  HomePage = ({navigation})=>{
            keyExtractor={(item, index) => String(index)}
            renderItem={({item,index})=>
             <View key={index} style={{height:100,backgroundColor:'#012554',width:"100%",borderBottomColor:'#fff',borderBottomWidth:1,padding:15}}>
-              <Text style={{color:'#fff',fontSize:20,marginStart:15,paddingBottom:4}}>{item.location}</Text>
+              <Text style={{color:'#fff',fontSize:23,fontWeight:"bold",textTransform:'capitalize',marginStart:15,paddingBottom:4}}>{item.location}</Text>
                 <View style={{justifyContent:"space-around",flexDirection:'row'}}>
                   <View>
                   <Text style={{color:'#fff'}}>Start time</Text>
@@ -136,11 +141,11 @@ export default  HomePage = ({navigation})=>{
                   </View>
                   <View>
                   <Text style={{color:'#fff'}}>Time elapsed</Text>
-                  <Text style={{color:'#fff'}}>{convertTime(Math.ceil(Math.abs(new Date(item.endTime).getTime()-new Date(item.startTime).getTime()) / 1000),)}</Text>
+                  <Text style={{color:'#fff'}}>{convertTime(item.elapseTime)}</Text>
                   </View>
                   <View>
                     <Text style={{color:'#fff'}}>Oz sprayed</Text>
-                    <Text style={{color:'#fff'}}>{item.ozSparayed} 0.0 Oz</Text>
+                    <Text style={{color:'#fff'}}>{parseFloat(item.ozSparayed).toFixed(2)} Oz</Text>
                   </View>
                 </View>
              </View>

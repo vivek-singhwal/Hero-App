@@ -24,13 +24,13 @@ export default FirstTimeConnection = ({navigation}) => {
     useEffect(()=>{
         if(count){
           initDB('sprayers').then((res)=>{
-            // console.log(">>Res ",res);
+            console.log(">>Res ",res);
           });
           
         setCount(false);
         
       }
-      // scanAndConenct();
+      scanAndConenct();
       BackHandler.addEventListener('hardwareBackPress', () => true)
         var listener = EventRegister.addEventListener('BLE_STATUS', (data) => {
           console.log(">>BLE_STATUS ",data);
@@ -41,10 +41,6 @@ export default FirstTimeConnection = ({navigation}) => {
                 setisDeviceConnected(false);
                 setDeviceStatus("Disconnected");
                 navigation.navigate('FirstConnection');
-              }
-              if(data.event == "reqDisconnect"){
-                console.log(">>Here")
-               Alert.alert('Are you sure')
               }
             if(data.event == "connected"){
               setisDeviceConnected(true);
@@ -113,7 +109,7 @@ return(
             want to connect with.
         </Text>
             {isDeviceConnected && <MaterialCom size={150} color={'green'} style={{height:200,marginTop:20,marginBottom:40,}} name="check-bold"/>}
-           { !isDeviceConnected && <Image style={{height:250,width:"94%",marginTop:20,marginBottom:40,}} source={require('../asset/bluetooth-guide.jpg')}/>}
+           {!isDeviceConnected && <Image style={{height:250,width:"94%",marginTop:20,marginBottom:40,}} source={require('../asset/bluetooth-guide.jpg')}/>}
         { isDeviceConnected ? 
          <Button 
               color={'#012554'}
