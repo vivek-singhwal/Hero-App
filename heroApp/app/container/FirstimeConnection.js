@@ -37,6 +37,7 @@ export default FirstTimeConnection = ({navigation}) => {
             if(data.event == "Data_Recieved"){
               console.log(data.value);
             }
+           
             if(data.event == "error"){
                 setisDeviceConnected(false);
                 setDeviceStatus("Disconnected");
@@ -63,6 +64,7 @@ export default FirstTimeConnection = ({navigation}) => {
               setisDeviceConnected(false);
               // navigation.navigate('Home');
               setDeviceStatus("Disconnected");
+              navigation.navigate('FirstConnection');
             //   setTimeout(()=>{
             //     setDeviceStatus("Disconnected");
             //   },500)

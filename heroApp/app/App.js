@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 
 import { createStackNavigator } from '@react-navigation/stack';
 
+import TestPage from './container/TestPage';
 import HomePage from './container/HomePage';
 import SettingPage from './container/SettingPage';
 import FirstConnection from './container/FirstimeConnection';
@@ -71,6 +72,10 @@ function App() {
     <BleAppManager/>
     <NavigationContainer>
     <Stack.Navigator initialRouteName="Profile">
+
+    {/* <Stack.Screen name="TestPage" component={TestPage} options={{
+          headerShown: false,
+    }}/> */}
     <Stack.Screen name="Profile" component={Profile} options={{
           headerShown: false,
     }}/>

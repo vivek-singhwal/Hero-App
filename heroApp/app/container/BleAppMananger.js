@@ -59,7 +59,12 @@ export default class BleAppmanager extends Component {
         if (data.cmd == "startScan"){
           this.turnOnBle();
           this.startScan();
-        } else if (data.cmd == "disconnect"){
+        } 
+        if(data.event == "test"){
+          console.log(">>Test")
+        return 'test';
+        }
+        else if (data.cmd == "disconnect"){
           this.test(BleService.getPeripherial());
         } 
         else if(data.cmd == 'sprayEnable'){

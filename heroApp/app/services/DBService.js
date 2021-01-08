@@ -66,7 +66,7 @@ export var initDB = (reqTable) => {
                 })
 
                 db.transaction((tx) => {
-                  tx.executeSql('CREATE TABLE IF NOT EXISTS sessionList (id INTEGER PRIMARY KEY AUTOINCREMENT,serverId VARCHAR(25), operatorId VARCHAR(25), sprayerId VARCHAR(25), chemistryType VARCHAR(25) ,startTime VARCHAR(25) ,endTime VARCHAR(25),sessionLocation VARCHAR(25),sessionComment VARCHAR(100),sessionData TEXT)');
+                  tx.executeSql('CREATE TABLE IF NOT EXISTS sessions (id INTEGER PRIMARY KEY AUTOINCREMENT,serverId VARCHAR(25), operatorId VARCHAR(25), sprayerId VARCHAR(25), chemistryType VARCHAR(25) ,startTime INTEGER ,endTime INTEGER,sessionLocation VARCHAR(25),sessionComment VARCHAR(100),sessionData TEXT,ozSparayed REAL)');
                 }).then((resp) => {
                   // console.log("resp user table "+resp);
                   resolve(db);
@@ -143,11 +143,61 @@ export var addOperator = function (data) {
     return promise;
   }
 
+  export var addSession = function (data) {
+    // console.log(">>data ",data)
+    let promise = new Promise((resolve, reject) => {
+        // console.log(">>addOperator ",db);
+      db.transaction((tx) => {
+        tx.executeSql(
+          'INSERT INTO sessions VALUES (?,?,?,?,?,?,?,?,?,?,?)',
+          [,data.serverId,data.operatorId,data.sprayerId,data.chemistryType,data.startTime,data.endTime,data.sessionLocation,data.sessionComment,data.sessionData,data.ozSparayed],
+          (tx, results) => {
+            // console.log('Results', results.rowsAffected);
+            var success = "true";
+            resolve(results);
+              if (results.rowsAffected > 0) {
+                resolve(success);
+              } else {
+                alert('Registration Failed');
+              }
+          }
+        );
+        // alert("Complete")
+      });
+    }).catch(error => {
+      console.log(error);
+    });;;
+    return promise;
+  }
+
 export var getOperators = function () {
     console.log("getOperators");
     let promise = new Promise((resolve, reject) => {
         db.executeSql(
             'SELECT * FROM operators ').then(
+          (results) => {
+              var records = [];
+            // console.log(">>Inside getOperators",results)
+            if(results[0].rows.length){
+                for (let i = 0; i < results[0].rows.length; ++i){
+                    records.push(results[0].rows.item(i))
+                    // console.log(">>results ",i,)
+                }
+            }
+            resolve(records);
+          }
+        )
+    }).catch(error => {
+      console.log(error);
+    });;
+    return promise;
+  }
+
+  export var getSessions = function (id) {
+    // console.log("getSessions");
+    let promise = new Promise((resolve, reject) => {
+        db.executeSql(
+            'SELECT * FROM sessions').then(
           (results) => {
               var records = [];
             // console.log(">>Inside getOperators",results)

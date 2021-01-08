@@ -5,10 +5,10 @@ import AwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import AwesomeIcon5 from 'react-native-vector-icons/FontAwesome5';
 import Feather from 'react-native-vector-icons/Ionicons';
 import {getOperator} from '../services/apiService';
-import {getReadingStatus,setReadingStatus, sessionDataList , getDeviceHWData,setSessionDataList,currentSessionData} from '../services/DataService';
+import {getReadingStatus,setReadingStatus, sessionDataList,getOperatorData , getDeviceHWData,setSessionDataList,currentSessionData} from '../services/DataService';
 import SaveModal from './SaveModal';
 import { EventRegister } from 'react-native-event-listeners';
-import {initDB} from '../services/DBService';
+import {initDB, addSession, getSessions} from '../services/DBService';
 let setStartTime ,setEndTime;
 export default  HomePage = ({navigation})=>{
 
@@ -39,8 +39,23 @@ export default  HomePage = ({navigation})=>{
     var interval ;
     useEffect(()=>{
       if(counter){
-        initDB('sessionList').then((res)=>{
-          // console.log(">>Res ",res);
+        initDB('sessions').then((res)=>{
+         
+          getSessions(getOperatorData().serverId).then((resSessions)=>{
+            console.log(">>Res ",getOperatorData().serverId,resSessions,);
+            var listSession = resSessions;
+            if(resSessions){
+              for(let i=0;i<listSession.length;i++){
+                if(listSession[i].sessionData !=undefined && listSession[i].sessionData != null){
+                  listSession[i]['sessionData'] = JSON.parse(listSession[i]['sessionData']);
+                }
+              }
+              setSessionList(listSession);
+              console.log(">>listSession ",listSession)
+              // 
+            }
+            // setSessionList(listSession);
+          })
         });
         
         setCounter(false);
@@ -48,7 +63,7 @@ export default  HomePage = ({navigation})=>{
       let listner = EventRegister.addEventListener('BLE_DATA', (value) => {
          console.log(">>BLE_STATUS ",value,readingStatus);
          if(value.event == 'completed' && readingStatus){
-
+          
           EventRegister.emit('BLECMD', { event: "homepageEvent" , cmd:'getSerial\r'})
          }
          if(value.event == 'error'){
@@ -68,13 +83,29 @@ export default  HomePage = ({navigation})=>{
     }
 
     var addSessionList = (comment,location)=>{
-      setCommentText('');
-      setLocationText('');
+     
       // sessionDataList.push({location:'abc',comment:'',serverId:'0',startTime:this.sessionStartTime,endTime:Date.now()});
       var sessionListAr = [...sessionList];
+      var sessionObj = {
+          // serverId:0,
+          operatorId: getOperatorData().serverId,
+          sprayerId: getDeviceHWData().hardwareId,
+          chemistryType: getOperatorData().opChem,
+          startTime: setStartTime,
+          ozSparayed:parseInt(currentSessionData.getPumpedVolume)/29.57,
+          endTime: setEndTime,
+          sessionLocation: locationText,
+          sessionComment: commentText,
+          sessionData: JSON.stringify(currentSessionData)
+      } 
+      addSession(sessionObj).then((res)=>{
+        console.log(">Added ",res);
+      })
+      console.log(">>sessionObj ",JSON.stringify(sessionObj))
       sessionListAr.push({location:locationText,startTime:setStartTime,elapseTime:Math.ceil(Math.abs(new Date(setStartTime).getTime()-new Date(setEndTime).getTime()) / 1000),ozSparayed:parseInt(currentSessionData.getPumpedVolume)/29.57})
       setSessionList(sessionListAr);
-     
+      setCommentText('');
+      setLocationText('');
       // console.log("ADd request",commentText,locationText,currentSessionData,setStartTime,setEndTime,Math.ceil(Math.abs(new Date(setStartTime).getTime()-new Date(setEndTime).getTime()) / 1000));
       
     }
@@ -141,7 +172,7 @@ export default  HomePage = ({navigation})=>{
                   </View>
                   <View>
                   <Text style={{color:'#fff'}}>Time elapsed</Text>
-                  <Text style={{color:'#fff'}}>{convertTime(item.elapseTime)}</Text>
+                  <Text style={{color:'#fff'}}>{convertTime(Math.ceil(Math.abs(new Date(item.startTime).getTime()-new Date(item.endTime).getTime()) / 1000))}</Text>
                   </View>
                   <View>
                     <Text style={{color:'#fff'}}>Oz sprayed</Text>
@@ -205,7 +236,7 @@ export default  HomePage = ({navigation})=>{
         </View>
       </View>
   </View>
-  <SaveModal addSessionList={addSessionList} setLocationText={setLocationText} locationText={locationText} commentText={setCommentText} setCommentText={setCommentText} visible={visible} hideModal={hideModal} SetReadingStatus={(isBack)=>{setReadStatus(isBack)}} />
+  <SaveModal addSessionList={addSessionList} setLocationText={setLocationText} locationText={locationText} commentText={commentText} setCommentText={setCommentText} visible={visible} hideModal={hideModal} SetReadingStatus={(isBack)=>{setReadStatus(isBack)}} />
     </>)
 }
 
