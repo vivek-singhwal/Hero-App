@@ -102,7 +102,7 @@ export default  HomePage = ({navigation})=>{
         console.log(">Added ",res);
       })
       console.log(">>sessionObj ",JSON.stringify(sessionObj))
-      sessionListAr.push({location:locationText,startTime:setStartTime,elapseTime:Math.ceil(Math.abs(new Date(setStartTime).getTime()-new Date(setEndTime).getTime()) / 1000),ozSparayed:parseInt(currentSessionData.getPumpedVolume)/29.57})
+      sessionListAr.push({sessionLocation:locationText,startTime:setStartTime, endTime: setEndTime,ozSparayed:parseInt(currentSessionData.getPumpedVolume)/29.57})
       setSessionList(sessionListAr);
       setCommentText('');
       setLocationText('');
@@ -164,7 +164,7 @@ export default  HomePage = ({navigation})=>{
            keyExtractor={(item, index) => String(index)}
            renderItem={({item,index})=>
             <View key={index} style={{height:100,backgroundColor:'#012554',width:"100%",borderBottomColor:'#fff',borderBottomWidth:1,padding:15}}>
-              <Text style={{color:'#fff',fontSize:23,fontWeight:"bold",textTransform:'capitalize',marginStart:15,paddingBottom:4}}>{item.location}</Text>
+              <Text style={{color:'#fff',fontSize:23,fontWeight:"bold",textTransform:'capitalize',marginStart:15,paddingBottom:4}}>{item.sessionLocation}</Text>
                 <View style={{justifyContent:"space-around",flexDirection:'row'}}>
                   <View>
                   <Text style={{color:'#fff'}}>Start time</Text>
