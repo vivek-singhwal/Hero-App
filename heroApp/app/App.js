@@ -4,7 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 
 import { createStackNavigator } from '@react-navigation/stack';
 
-import TestPage from './container/TestPage';
+//import TestPage from './container/TestPage';
 import HomePage from './container/HomePage';
 import SettingPage from './container/SettingPage';
 import FirstConnection from './container/FirstimeConnection';
@@ -17,7 +17,6 @@ import { EventRegister } from 'react-native-event-listeners';
 const Stack = createStackNavigator();
 const MessageModal = ({modalVisible,setModalVisible}) => {
   return (
-  
       <Modal
         animationType="slide"
         transparent={true}
