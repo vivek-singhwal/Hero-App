@@ -28,7 +28,7 @@ export default OperatorProfile= ({navigation}) =>{
             // console.log(">>Res ",res);
             getOperators().then((result)=>{
                 console.log(">result ",result);
-                if(result.length > 0){
+                if(result && result.length > 0){
                   var operatorObj = {
                     opName:result[0].name,
                     company:result[0].company,
@@ -40,8 +40,10 @@ export default OperatorProfile= ({navigation}) =>{
                   setOperatorData(result[0]);
                   navigation.navigate('FirstConnection')
                 }
+               
             })
           });
+        // navigation.navigate('FirstConnection')
         setCount(false);
         }
     })

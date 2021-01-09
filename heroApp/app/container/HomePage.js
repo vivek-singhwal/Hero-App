@@ -5,7 +5,7 @@ import AwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import AwesomeIcon5 from 'react-native-vector-icons/FontAwesome5';
 import Feather from 'react-native-vector-icons/Ionicons';
 import {getOperator} from '../services/apiService';
-import {getReadingStatus,setReadingStatus, sessionDataList,getOperatorData , getDeviceHWData,setSessionDataList,currentSessionData} from '../services/DataService';
+import {getReadingStatus, setReadingStatus, sessionDataList,getOperatorData , getDeviceHWData, setSessionDataList, currentSessionData} from '../services/DataService';
 import SaveModal from './SaveModal';
 import { EventRegister } from 'react-native-event-listeners';
 import {initDB, addSession, getSessions} from '../services/DBService';
