@@ -111,15 +111,11 @@ export default  HomePage = ({navigation})=>{
     }
     var startReading=()=>{
       
-        // console.log(">>inside if ",sessionDataList);
-      //  interval = setInterval(()=>{
-      //     setCounter(counter=>counter+1)
-      //   },2000)
-        // if(counter > 0){
-          EventRegister.emit('BLECMD', { event: "homepageEvent" , cmd:'getSerial\r'})
-        // }
-      
-    }
+       console.log(">>inside if ",sessionDataList);
+       interval = setInterval(()=>{
+           EventRegister.emit('BLECMD', { event: "homepageEvent" , cmd:'getSerial\r'})
+        },2000)
+     }
 
     function convertTime(sec) {
       var hours = Math.floor(sec/3600);
@@ -236,6 +232,7 @@ export default  HomePage = ({navigation})=>{
         </View>
       </View>
   </View>
+  
   <SaveModal addSessionList={addSessionList} setLocationText={setLocationText} locationText={locationText} commentText={commentText} setCommentText={setCommentText} visible={visible} hideModal={hideModal} SetReadingStatus={(isBack)=>{setReadStatus(isBack)}} />
     </>)
 }

@@ -321,7 +321,8 @@ export default class BleAppmanager extends Component {
             peripherals.set(peripheral.id, p);
           }
           EventRegister.emit('BLE_STATUS', { event: "connected" });
-          Alert.alert("Hero", "Connected to "+peripheral.id  +"\n"+peripheral.name)
+          // Alert.alert("Hero", "Connected to "+peripheral.id  +"\n"+peripheral.name)
+
           localHw.sdName = peripheral.name;
           localHw.hardwareId = peripheral.id;
           setDeviceHWData(localHw);
@@ -338,6 +339,7 @@ export default class BleAppmanager extends Component {
       }
     }
   }
+  
   getAsciValue(value){
     var ascivalue=[];
     for(let i=0;i<value.length;i++){

@@ -1,6 +1,6 @@
 import React,{useEffect,useState} from 'react';
-import { View, TextInput as Input,ScrollView, Alert, KeyboardAvoidingView } from 'react-native';
-import { Avatar, Button } from 'react-native-paper';
+import { View, TextInput as Input,ScrollView, Alert, KeyboardAvoidingView,  StyleSheet,TouchableHighlight} from 'react-native';
+import { Avatar, Button,Text ,Modal} from 'react-native-paper';
 import AwesomeIcon5 from 'react-native-vector-icons/FontAwesome5';
 import Material from 'react-native-vector-icons/MaterialIcons';
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -15,6 +15,11 @@ export default OperatorProfile= ({navigation}) =>{
     const [isDeviceConnected, setisDeviceConnected] = useState(false);
     const [textFocusedName,setTextFocusedName] = useState(false);
     const [textFocusedChem,setTextFocusedChem] = useState(false);
+    const [visible, setVisible] = React.useState(false);
+
+    const showModal = () => setVisible(true);
+    const hideModal = () => setVisible(false);
+    const containerStyle = {backgroundColor: 'white', padding: 10,width:"60%",alignSelf:"center",borderRadius:4};
 
     const [opName,setOpName] = useState('');
     const [opCompany,setOpCompany] = useState('company');
@@ -38,7 +43,6 @@ export default OperatorProfile= ({navigation}) =>{
                     updateServerId('operators',resOperator.result.id)
                   })
                   setOperatorData(result[0]);
-                  navigation.navigate('FirstConnection')
                 }
                
             })
@@ -70,7 +74,9 @@ export default OperatorProfile= ({navigation}) =>{
         })
         })
       }else{
-        Alert.alert('HeroApp','Please provide valid info.');
+        setVisible(true);
+        // Alert.alert('HeroApp','Please provide valid info.');
+
       }
     }
 
@@ -81,7 +87,7 @@ export default OperatorProfile= ({navigation}) =>{
       <KeyboardAvoidingView behavior='position' keyboardVerticalOffset={keyboardVerticalOffset} style={{flexDirection:"column",justifyContent:"center"}}>
         <Avatar.Icon 
         size={155} 
-        style={{backgroundColor:'#DFE6ED',marginBottom:50,alignSelf:"center"}}
+        style={{backgroundColor:'#DFE6ED',marginBottom:50,alignSelf:"center",}}
         icon={props=><AwesomeIcon5 
                     size={45}
                     color={'#9EADBA'}
@@ -135,7 +141,39 @@ export default OperatorProfile= ({navigation}) =>{
              </Button>
         </View>
       </KeyboardAvoidingView>
+      
+      
       {/* </ScrollView> */}
     </View>
+    <Modal visible={visible} onDismiss={hideModal} contentContainerStyle={containerStyle}>
+        <View style={{alignSelf:"center",height:100,width:"90%"}}>
+        <Text>Please provide:{}</Text>
+          {opName == "" && <Text style={{fontWeight:"bold"}}>Name</Text>}
+          {opChem == "" && <Text style={{fontWeight:"bold"}}>Chemistry</Text>}
+          
+          <TouchableHighlight
+              style={{ ...styles.openButton, backgroundColor: "#012554",width:70,alignSelf:"center",marginTop:20 }}
+              onPress={() => {
+                setVisible(false)
+              }}>
+              <Text style={styles.textStyle}>OK</Text>
+            </TouchableHighlight>
+            </View>
+        </Modal>
     </>)
 }
+
+const styles = StyleSheet.create({
+
+  textStyle: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center"
+  },
+  openButton: {
+    backgroundColor: "#F194FF",
+    borderRadius: 4,
+    padding: 10,
+    elevation: 2
+  },
+});

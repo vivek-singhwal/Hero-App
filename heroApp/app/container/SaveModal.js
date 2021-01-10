@@ -1,5 +1,5 @@
 import React,{useEffect,useState} from 'react';
-import { View , StyleSheet, Text, TouchableOpacity, TextInput as Input,ScrollView} from 'react-native';
+import { View , StyleSheet, Text, TouchableOpacity, TextInput as Input,ScrollView, Keyboard} from 'react-native';
 import Material from 'react-native-vector-icons/MaterialIcons';
 import { Button, Switch, ProgressBar, Modal, Portal, Provider, TextInput } from 'react-native-paper';
  export default SaveModal = ({addSessionList,setLocationText,locationText,commentText,setCommentText,visible,hideModal,SetReadingStatus}) => {
@@ -10,6 +10,7 @@ import { Button, Switch, ProgressBar, Modal, Portal, Provider, TextInput } from 
       <Provider>
         <Portal>
           <Modal visible={visible} dismissable={false} contentContainerStyle={containerStyle}>
+          <ScrollView keyboardShouldPersistTaps='never'>
             <View style={{flexDirection:"column"}}>
             <Text style={{fontSize:17,color:"#4A4A4A",paddingBottom:10}}>Location</Text>
             <TextInput
@@ -78,6 +79,7 @@ import { Button, Switch, ProgressBar, Modal, Portal, Provider, TextInput } from 
              </Button>
 
           </View>
+          </ScrollView>
           </Modal>
          
         </Portal>
