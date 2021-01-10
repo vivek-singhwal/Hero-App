@@ -33,9 +33,85 @@ export var getOperatorAPI = () => {
         )
 }
 
+export var getSessionAPI = () => {
+    return fetch(API_URL+'/api/sessions', {
+            method: "GET",
+            // body: JSON.stringify(data),
+            headers: { 'Content-Type': 'application/json' ,'Authorization':encryptToken()},
+        })
+        .then(res => res.json())
+        .then(
+            (result) => {
+                return result.result;
+            },
+            (error) => {
+                console.log(">>Eror ", error)
+                return error;
+            }
+        )
+}
+
+export var getSessionDataAPI = () => {
+    return fetch(API_URL+'/api/session/data', {
+            method: "GET",
+            // body: JSON.stringify(data),
+            headers: { 'Content-Type': 'application/json' ,'Authorization':encryptToken()},
+        })
+        .then(res => res.json())
+        .then(
+            (result) => {
+                return result.result;
+            },
+            (error) => {
+                console.log(">>Eror ", error)
+                return error;
+            }
+        )
+}
+
+
+
 export var addOperatorAPI = (data) => {
     console.log(">Data ",data);
     return fetch(API_URL+'/api/operators', {
+            method: "POST",
+            body: JSON.stringify(data),
+            headers: { 'Content-Type': 'application/json' ,Authorization:encryptToken()},
+        })
+        .then(res => res.json())
+        .then(
+            (result) => {
+                return result;
+            },
+            (error) => {
+                console.log(">>Eror ", error)
+                return error;
+            }
+        )
+}
+
+export var addSessionAPI = (data) => {
+    // console.log(">Data ",data);
+    return fetch(API_URL+'/api/sessions', {
+            method: "POST",
+            body: JSON.stringify(data),
+            headers: { 'Content-Type': 'application/json' ,Authorization:encryptToken()},
+        })
+        .then(res => res.json())
+        .then(
+            (result) => {
+                return result;
+            },
+            (error) => {
+                console.log(">>Eror ", error)
+                return error;
+            }
+        )
+}
+
+export var addSessionDataAPI = (data) => {
+    // console.log(">Data ",data);
+    return fetch(API_URL+'/api/session/data', {
             method: "POST",
             body: JSON.stringify(data),
             headers: { 'Content-Type': 'application/json' ,Authorization:encryptToken()},
