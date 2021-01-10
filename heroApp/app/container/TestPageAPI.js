@@ -1,8 +1,9 @@
 
 import React,{useEffect,useState} from 'react';
 import { View , StyleSheet, Text, TextInput as Input,Image, Alert, BackHandler} from 'react-native';
-import { EventRegister } from 'react-native-event-listeners';
 import { Button, Switch, ProgressBar, Modal, Portal, Provider, TextInput } from 'react-native-paper';
+import { EventRegister } from 'react-native-event-listeners';
+
 //import {getOperatorAPI, addOperatorAPI, addSessionAPI, addSessionDataAPI, addSprayerAPI} from '../services/apiService';
 
 export default TestPageAPI = () =>{
@@ -27,12 +28,18 @@ export default TestPageAPI = () =>{
   </Button>
 
   <Button style={{marginBottom:10}}  icon="card-bulleted-outline" mode="contained" 
-  onPress={() => console.log('Pressed')}>
+  onPress={() => {
+      console.log('StartInterval');
+      EventRegister.emit('StartInterval', 'data..');
+    }}>
     Start session (10 sec Interval)
   </Button>
 
   <Button style={{marginBottom:10}}  icon="card-bulleted-outline" mode="contained" 
-  onPress={() => console.log('Pressed')}>
+  onPress={() => {
+    console.log('Stop Interval');
+      EventRegister.emit('StopInterval', 'stop data..');
+    }}>
     Stop session (stop Interval)
   </Button>
 

@@ -79,6 +79,13 @@ export var getSessionDataAPI = () => {
 }
 
 export var addOperatorAPI = (data) => {
+    /*
+        {
+        "opName": "Gil",
+        "chemistryType": "Lithium",
+        "company": "Kesem"
+        }
+    */
     return fetch(apiEndPoint+'/api/operators', {
             method: "POST",
             body: JSON.stringify(data),
