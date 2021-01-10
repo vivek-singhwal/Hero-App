@@ -70,11 +70,9 @@ function App() {
     {/* <MessageModal/> */}
     <BleAppManager/>
     <NavigationContainer>
-    <Stack.Navigator initialRouteName="Profile">
 
-    <Stack.Screen name="TestPageAPI" component={TestPageAPI} options={{
-          headerShown: false,
-    }}/>
+    <Stack.Navigator initialRouteName="TestPageAPI">
+    <Stack.Screen name="TestPageAPI" component={TestPageAPI} options={{headerShown: false}}/>
     <Stack.Screen name="Profile" component={Profile} options={{
           headerShown: false,
     }}/>
@@ -131,8 +129,8 @@ function App() {
           name="bluetooth-b"/>
           ),
           headerStyle:{height:80}
-       }}/>  
-      </Stack.Navigator>  
+       }}/>
+        </Stack.Navigator>  
     </NavigationContainer>
   </>);
 }

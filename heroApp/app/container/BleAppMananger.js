@@ -12,7 +12,7 @@ const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
 var BLE_SPP_Service = BleService.bleService;
 var BLE_SPP_Notify_Characteristic = BleService.TXCharacteristic;
 var BLE_SPP_Write_Characteristic = BleService.RXCharacteristic;
-var BLE_SPP_AT_Characteristic = BleService.UART;
+//var BLE_SPP_AT_Characteristic = BleService.UART;
 
 export default class BleAppmanager extends Component {
   constructor(props){
@@ -21,6 +21,7 @@ export default class BleAppmanager extends Component {
       scanning:false ,
       peripherals: new Map(),
       appState: '',
+      readInterval:0
     }
     this.handleDiscoverPeripheral = this.handleDiscoverPeripheral.bind(this);
     this.handleStopScan = this.handleStopScan.bind(this);
@@ -31,6 +32,7 @@ export default class BleAppmanager extends Component {
   sessionData = {};
   sessionStartTime = {};
   sessionCounter = {};
+
   componentDidMount() {
     AppState.addEventListener('change', this.handleAppStateChange);
     BleManager.start({showAlert: true});
@@ -38,7 +40,21 @@ export default class BleAppmanager extends Component {
     this.handlerStop = bleManagerEmitter.addListener('BleManagerStopScan', this.handleStopScan );
     this.handlerDisconnect = bleManagerEmitter.addListener('BleManagerDisconnectPeripheral', this.handleDisconnectedPeripheral );
     this.handlerUpdate = bleManagerEmitter.addListener('BleManagerDidUpdateValueForCharacteristic', this.handleUpdateValueForCharacteristic );
-    if (Platform.OS === 'android' && Platform.Version >= 23) {
+    if (Platform.OS === 'android' && Platform.Version >= 29) {
+      PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((result) => {
+          if (result) {
+            console.log("Permission is OK");
+          } else {
+            PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((result) => {
+              if (result) {
+                console.log("User accept");
+              } else {
+                console.log("User refuse");
+              }
+            });
+          }
+    });
+  } else if (Platform.OS === 'android' && Platform.Version >= 23) {
         PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION).then((result) => {
             if (result) {
               console.log("Permission is OK");
@@ -53,8 +69,20 @@ export default class BleAppmanager extends Component {
             }
       });
     }
+    this.startInterval = EventRegister.addEventListener('StartInterval', ()=>{
+      //clear OLD interval if pending
+      clearInterval(this.readInterval);
+      this.readInterval = setInterval(()=>{
+        //TODO: read session Data
+        //TODO: upload session Data
+        console.log("Request call ::"+Date.now());
+      },10000) //every 10 seconds
+    });
+    this.stopInterval = EventRegister.addEventListener('StopInterval', ()=>{
+      //clear interval
+      clearInterval(this.readInterval);
+    });
     this.scanListener = EventRegister.addEventListener('BLECMD', (data) => {
-      console.log(">>BLECMD ",data);
       // if(data.event == 'initCmdSeq'){
         if (data.cmd == "startScan"){
           this.turnOnBle();

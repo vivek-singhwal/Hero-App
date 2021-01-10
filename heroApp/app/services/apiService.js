@@ -1,7 +1,7 @@
 import {getDeviceHWData} from '../services/DataService';
 import CryptoJS from "react-native-crypto-js";
 
-const API_URL = "https://hero-api.kesemsolutions.com";
+const apiEndPoint = "https://hero-api.kesemsolutions.com";
 const IV = "5183555c72eec9e4"; // set random initialisation vector
 
 var currentMonth = new Date().getMonth();
@@ -9,14 +9,25 @@ var MONTH = currentMonth > 9? currentMonth.toString() :String("0"+ (currentMonth
 var DAY = new Date().getDate() > 9?new Date().getDate().toString():"0"+new Date().getDate();
 var YEAR = new Date().getFullYear().toString();
 var token = YEAR+''+MONTH+''+DAY+'-'+getDeviceHWData().hardwareId+'-heroApp?'
-
+var currentOperatorId = "";
+var currentSessionId = "";
+var currentDeviceId = "";
 
 var encryptToken = () => {
     return CryptoJS.AES.encrypt(token, IV).toString();
 };
 
+export var setOperatorId = (operatorId) => {
+    currentOperatorId = operatorId;
+}
+export var setDeviceId = (deviceId) => {
+    currentDeviceId = deviceId;
+}
+export var setSessionId = (sessionId) => {
+    currentSessionId = sessionId;
+}
 export var getOperatorAPI = () => {
-    return fetch(API_URL+'/api/operators', {
+    return fetch(apiEndPoint+'/api/operators', {
             method: "GET",
             // body: JSON.stringify(data),
             headers: { 'Content-Type': 'application/json' ,'Authorization':encryptToken()},
@@ -34,9 +45,8 @@ export var getOperatorAPI = () => {
 }
 
 export var getSessionAPI = () => {
-    return fetch(API_URL+'/api/sessions', {
+    return fetch(apiEndPoint+'/api/sessions', {
             method: "GET",
-            // body: JSON.stringify(data),
             headers: { 'Content-Type': 'application/json' ,'Authorization':encryptToken()},
         })
         .then(res => res.json())
@@ -52,9 +62,8 @@ export var getSessionAPI = () => {
 }
 
 export var getSessionDataAPI = () => {
-    return fetch(API_URL+'/api/session/data', {
+    return fetch(apiEndPoint+'/api/session/data', {
             method: "GET",
-            // body: JSON.stringify(data),
             headers: { 'Content-Type': 'application/json' ,'Authorization':encryptToken()},
         })
         .then(res => res.json())
@@ -69,11 +78,8 @@ export var getSessionDataAPI = () => {
         )
 }
 
-
-
 export var addOperatorAPI = (data) => {
-    console.log(">Data ",data);
-    return fetch(API_URL+'/api/operators', {
+    return fetch(apiEndPoint+'/api/operators', {
             method: "POST",
             body: JSON.stringify(data),
             headers: { 'Content-Type': 'application/json' ,Authorization:encryptToken()},
@@ -91,8 +97,7 @@ export var addOperatorAPI = (data) => {
 }
 
 export var addSessionAPI = (data) => {
-    // console.log(">Data ",data);
-    return fetch(API_URL+'/api/sessions', {
+    return fetch(apiEndPoint+'/api/sessions', {
             method: "POST",
             body: JSON.stringify(data),
             headers: { 'Content-Type': 'application/json' ,Authorization:encryptToken()},
@@ -110,8 +115,7 @@ export var addSessionAPI = (data) => {
 }
 
 export var addSessionDataAPI = (data) => {
-    // console.log(">Data ",data);
-    return fetch(API_URL+'/api/session/data', {
+    return fetch(apiEndPoint+'/api/session/data', {
             method: "POST",
             body: JSON.stringify(data),
             headers: { 'Content-Type': 'application/json' ,Authorization:encryptToken()},
@@ -129,8 +133,7 @@ export var addSessionDataAPI = (data) => {
 }
 
 export var addSprayerAPI = (data) => {
-    console.log(">addSprayerAPI ",data);
-    return fetch(API_URL+'/api/sprays', {
+    return fetch(apiEndPoint+'/api/sprays', {
             method: "POST",
             body: JSON.stringify(data),
             headers: { 'Content-Type': 'application/json' ,Authorization:encryptToken()},
