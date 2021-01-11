@@ -84,7 +84,6 @@ export default  HomePage = ({navigation})=>{
     var addSessionList = (comment,location)=>{
       disableInterval();
       EventRegister.emit('StopInterval');
-      return;
       // sessionDataList.push({location:'abc',comment:'',serverId:'0',startTime:this.sessionStartTime,endTime:Date.now()});
       var sessionListAr = [...sessionList];
       var sessionObj = {
@@ -102,7 +101,6 @@ export default  HomePage = ({navigation})=>{
       addSession(sessionObj).then((res)=>{
         console.log(">Added ",res);
       })
-      console.log(">>sessionObj ",JSON.stringify(sessionObj));
       var sessionObjApi =  getSessionObjApiData();
       sessionObjApi.sessionLocation = locationText;
       sessionObjApi.endTime = setEndTime;
