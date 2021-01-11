@@ -9,6 +9,8 @@ import {getReadingStatus, setSessionObjApiData,getSessionObjApiData,setCurrentSe
 import SaveModal from './SaveModal';
 import { EventRegister } from 'react-native-event-listeners';
 import {initDB, addSession, getSessions} from '../services/DBService';
+import {enableInterval,disableInterval} from '../services/BleService';
+
 let setStartTime ,setEndTime;
 export default  HomePage = ({navigation})=>{
 
@@ -40,9 +42,8 @@ export default  HomePage = ({navigation})=>{
     useEffect(()=>{
       if(counter){
         initDB('sessions').then((res)=>{
-         
           getSessions(getOperatorData().serverId).then((resSessions)=>{
-            console.log(">>Res ",getOperatorData().serverId,resSessions,);
+            //console.log(">>Res ",getOperatorData().serverId,resSessions,);
             var listSession = resSessions;
             if(resSessions){
               for(let i=0;i<listSession.length;i++){
@@ -51,8 +52,6 @@ export default  HomePage = ({navigation})=>{
                 }
               }
               setSessionList(listSession);
-              console.log(">>listSession ",listSession)
-              // 
             }
             // setSessionList(listSession);
           })
@@ -72,10 +71,9 @@ export default  HomePage = ({navigation})=>{
         });
 
       return ()=>{
-        clearInterval(interval);
         EventRegister.removeEventListener(listner);
     }  
-    })
+    },[]);
     
     var stopReading=()=>{
     
@@ -84,7 +82,9 @@ export default  HomePage = ({navigation})=>{
     }
 
     var addSessionList = (comment,location)=>{
+      disableInterval();
       EventRegister.emit('StopInterval');
+      return;
       // sessionDataList.push({location:'abc',comment:'',serverId:'0',startTime:this.sessionStartTime,endTime:Date.now()});
       var sessionListAr = [...sessionList];
       var sessionObj = {
@@ -133,14 +133,10 @@ export default  HomePage = ({navigation})=>{
      addSessionAPI(sessionsObjAPI).then((respData)=>{
        console.log(">>respData ",JSON.stringify(respData));
        if(respData.success){
+        setSessionId(respData.result.id);
+        enableInterval();
         EventRegister.emit('StartInterval')
-           setSessionId(respData.result.id);
-        // if(respData){
-         
-        // }
        }
-     
-     
       console.log("Request call ::"+JSON.stringify(respData),new Date(Date.now()));
     }) 
      }

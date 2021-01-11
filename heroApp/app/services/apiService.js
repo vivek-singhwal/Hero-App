@@ -150,6 +150,7 @@ export var addSessionDataAPI = (data) => {
         .then(res => res.json())
         .then(
             (result) => {
+                // console.log(">>result ", result)
                 return result;
             },
             (error) => {

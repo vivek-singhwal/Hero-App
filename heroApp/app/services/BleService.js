@@ -2,9 +2,6 @@ var service = {};
 
 let peripherial = {};
 let currentCommand = "";
-
-//service.deviceName = 'GhostBaster_V1';
-
 service.bleService = "d973f2e0-b19e-11e2-9e96-0800200c9a66";
 service.TXCharacteristic = "d973f2e1-b19e-11e2-9e96-0800200c9a66";
 service.RXCharacteristic = "d973f2e2-b19e-11e2-9e96-0800200c9a66";
@@ -107,7 +104,6 @@ export var setDefaultValue = ()=>{
     isReadOk = false;
 }
 
-
 export var getCurrentCmd = ()=>{
     return currentCommand;
 }
@@ -185,6 +181,17 @@ export var dataCmdSeq = [
     'getFlow\r',
     'done'
 ];
+var isIntervalActive = false;
+export var getInterval = () => {
+    return isIntervalActive;
+}
+
+export var enableInterval = () => {
+    isIntervalActive = true;
+}
+export var disableInterval = () => {
+    isIntervalActive = false;
+}
 
 var isReadOk = false;
 export var getReadOk = () => {
