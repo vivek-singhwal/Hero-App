@@ -3,9 +3,9 @@ import {
   StyleSheet , Text , View , TouchableHighlight , NativeEventEmitter , NativeModules , Platform , PermissionsAndroid , ScrollView , AppState , FlatList , Dimensions , Button , SafeAreaView ,Alert} from 'react-native';
 import BleManager from 'react-native-ble-manager';
 import { EventRegister } from 'react-native-event-listeners';
-import BleService, {getReadOk, setReadOk , getCurrentCmd,setCurrentCmd, bleCommands,initCmdSeq,bleResults} from '../services/BleService';
-import { sessionDataList ,setDeviceHWData,currentSessionData,setCurrentSessionData} from '../services/DataService';
-
+import BleService, {getReadOk, setReadOk , getCurrentCmd,setCurrentCmd, bleCommands,initCmdSeq,bleResults, dataCmdSeq} from '../services/BleService';
+import { sessionDataList ,setDeviceHWData,currentSessionData,setCurrentSessionData, getSessionId, setSecondRead,secondRead} from '../services/DataService';
+import { addSessionDataAPI,addSessionAPI } from '../services/apiService';
 const window = Dimensions.get('window');
 const BleManagerModule = NativeModules.BleManager;
 const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
@@ -31,7 +31,7 @@ export default class BleAppmanager extends Component {
   }
   sessionData = {};
   sessionStartTime = {};
-  sessionCounter = {};
+  // firstTimeRead = false;
 
   componentDidMount() {
     AppState.addEventListener('change', this.handleAppStateChange);
@@ -69,18 +69,79 @@ export default class BleAppmanager extends Component {
             }
       });
     }
+
     this.startInterval = EventRegister.addEventListener('StartInterval', ()=>{
       //clear OLD interval if pending
       clearInterval(this.readInterval);
-      this.readInterval = setInterval(()=>{
-        //TODO: read session Data
-        //TODO: upload session Data
-        console.log("Request call ::"+Date.now());
-      },10000) //every 10 seconds
+      setSecondRead(true);
+      this.writeData('getPumpTime\r');
+      console.log(">>firstTimeRead ",getReadOk(),currentSessionData)
+      if(getReadOk()){
+        // this.writeData('getSerial\r');
+        this.readInterval = setInterval(()=>{
+          var sessionObjApi = {
+            "batteryLevel": currentSessionData.getBatteryLevel == undefined ? '': currentSessionData.getBatteryLevel, // not frequently required
+            "esvStatusState":  currentSessionData.getESVState,
+            "firmware": currentSessionData.getFirmware, // not frequently required
+            "flow": currentSessionData.getFlow == undefined ? '': currentSessionData.getFlow,
+            "flowRate":  parseInt(currentSessionData.getFlowRate),
+            "HWVersion": currentSessionData.getHWVersion, // not frequently required
+            "model": currentSessionData.getModel, // not frequently required
+            "pumpStatus": currentSessionData.getPumpState == undefined ? '': currentSessionData.getPumpState,
+            "pumpStatusTime": currentSessionData.getPumpTime,
+            // "triggerLatchStatusState": "this.sessionData.getTriggerLatchState",
+            triggerLatchStatusState:"TBD",
+            "pumpedVolume": currentSessionData.getPumpedVolume == undefined ? '': currentSessionData.getPumpedVolume,
+            "serial": currentSessionData.getSerial, // not frequently required
+            "triggerLatchMode": currentSessionData.getTriggerLatchMode,
+            "unitName": currentSessionData.getUnitName,
+            "resetPump": currentSessionData.resetPump, // not frequently required
+            // "setUnitName": this.sessionData.setUnitName,
+            "updateFirmware": currentSessionData.updateFirmware, // not frequently required
+            "totalOnTime": currentSessionData.getTotalOnTime == undefined ? '':  currentSessionData.getTotalOnTime,
+            "rinseCycles": currentSessionData.getRinseCycles,
+          }
+          sessionObjApi.timeStamp = Date.now();
+          sessionObjApi.sessionId = getSessionId();
+          //TODO: read session Data
+        //   this.sessionData = {
+        //     "getBatteryLevel": "000",
+        //     "getESVState": "On",
+        //     "getFirmware": "1.20",
+        //     "getFlow": "00000000",
+        //     "getFlowRate": "00000000",
+        //     "getHWVersion": "Alpha0001",
+        //     "getModel": "V2020-SEP",
+        //     "getPumpState": "Off",
+        //     "getPumpTime": "00000000",
+        //     "getPumpedVolume": "00000360",
+        //     "getSerial": "2020-000001",
+        //     "getTriggerLatchMode": "Under Development",
+        //     "getUnitName": "2020-000001",
+        //     "resetPump": "OK",
+        //     "setUnitName": "OK",
+        //      "getTriggerLatchState":"TBD",
+        //     "updateFirmware": "Under Development"
+        // }
+          
+        console.log(">>sessionData ---=> ",sessionObjApi)
+        // EventRegister.emit('BLECMD', { event: "homepageEvent" , cmd:'getSerial\r'})
+        // TODO: upload session Data
+        // addSessionDataAPI(sessionObjApi).then((respData)=>{
+        //   console.log("Request call ::"+JSON.stringify(respData),new Date(Date.now()));
+        // })  
+       },5000) //every 10 seconds
+      }
+       
+      
     });
+
     this.stopInterval = EventRegister.addEventListener('StopInterval', ()=>{
       //clear interval
       clearInterval(this.readInterval);
+      setReadOk(false);
+      setSecondRead(false);
+      // this.firstTimeRead = false;
     });
     this.scanListener = EventRegister.addEventListener('BLECMD', (data) => {
       // if(data.event == 'initCmdSeq'){
@@ -110,11 +171,15 @@ export default class BleAppmanager extends Component {
         }
          else {
            console.log(">>Elsepart ",data.cmd)
-          if(bleCommands.indexOf(data.cmd) >= 0){
+          if(bleCommands.indexOf(data.cmd) >= 0 && data.event == 'initCmdSeq'){
             this.writeData(data.cmd);
           }if(data.event == 'homepageEvent'){
+            // clearInterval(this.readInterval);
             this.sessionStartTime = Date.now();
             setReadOk(false);
+          }
+          if(data.event  == "secCmdSec"){
+            this.writeData(data.cmd);
           }
         }
     } );
@@ -138,14 +203,16 @@ export default class BleAppmanager extends Component {
       console.log('App has come to the foreground!')
       BleManager.getConnectedPeripherals([]).then((peripheralsArray) => {
         console.log('Connected peripherals: ' + peripheralsArray.length);
-        // var peripherals = this.state.peripherals;
-        // if(peripheralsArray.length){
-        //   peripheral.connected = true;
-        //   peripherals.set(peripheralsArray[0].id, peripheralsArray[0]);
-        //   this.setState({peripherals});
-        //   EventRegister.emit('BLE_STATUS', { event: "connected" });
-
-        // }
+        var peripherals = this.state.peripherals;
+        if(peripheralsArray.length){
+          peripherals.connected = true;
+          peripherals.set(peripheralsArray[0].id, peripheralsArray[0]);
+          this.setState({peripherals});
+          EventRegister.emit('BLE_STATUS', { event: "connected" });
+          setTimeout(() => { 
+            this.writeData('getSerial\r');
+          }, 300);
+        }
       });
     }
     this.setState({appState: nextAppState});
@@ -171,7 +238,7 @@ export default class BleAppmanager extends Component {
   handleUpdateValueForCharacteristic(data) {
     // this.getStringFromAscii(data.value);
    
-    console.log("update called >>>>"+ this.getStringFromAscii(data.value));
+    // console.log("update called >>>>"+ this.getStringFromAscii(data.value));
     if(getCurrentCmd() !=""){
       //console.log(JSON.stringify(data))
       bleResults[getCurrentCmd()] = this.getStringFromAscii(data.value);
@@ -179,8 +246,8 @@ export default class BleAppmanager extends Component {
       this.sessionData[getCurrentCmd().replace(/(\r\n|\n|\r)/gm, "")] = this.getStringFromAscii(data.value).replace(/(\r\n|\n|\r)/gm, "")
     }
     
-    console.log("currentCMD:"+ JSON.stringify(this.sessionData));
-    if( !getReadOk() && initCmdSeq.indexOf(getCurrentCmd()) >= 0) {
+    console.log("currentCMD: "+ getCurrentCmd(),initCmdSeq.indexOf(getCurrentCmd()));
+    if( !getReadOk() && initCmdSeq.indexOf(getCurrentCmd()) >= 0 && !secondRead) {
       let cmdIndex = initCmdSeq.indexOf(getCurrentCmd());
       let nextCmd = initCmdSeq[cmdIndex +1];
       
@@ -190,8 +257,34 @@ export default class BleAppmanager extends Component {
       }else{
         console.log('final result...');
         setReadOk(true);
+        // firstTimeRead =true;
         setCurrentSessionData(this.sessionData);
+        // clearInterval(this.readInterval);
+        // EventRegister.emit('StartInterval');
         
+        this.sessionData = {};
+        // setCurrentSessionData({});
+        EventRegister.emit('BLE_STATUS', { event: "readOK" });
+        EventRegister.emit('BLE_DATA', { event: "completed" });
+        // setDeviceData(JSON.parse(JSON.stringify(bleResults)));
+        console.log(JSON.stringify(bleResults));
+      }
+    } console.log(">secondRead >",secondRead ,dataCmdSeq.indexOf(getCurrentCmd()),getCurrentCmd()) 
+    if(secondRead && dataCmdSeq.indexOf(getCurrentCmd() >= 0)){
+     // console.log(">secondRead >",dataCmdSeq.indexOf(getCurrentCmd()),getCurrentCmd())
+      let cmdIndex = dataCmdSeq.indexOf(getCurrentCmd());
+      let nextCmd = dataCmdSeq[cmdIndex +1];
+      if(nextCmd != 'done'){
+        EventRegister.emit('BLE_STATUS', { event: "reading" });
+        EventRegister.emit('BLECMD', { event: "secCmdSec" , cmd:nextCmd});
+      }else{
+        console.log('final result...');
+        setReadOk(true);
+       
+        // firstTimeRead =true;
+        setCurrentSessionData(this.sessionData);
+        // clearInterval(this.readInterval);
+        // EventRegister.emit('StartInterval');
         this.sessionData = {};
         // setCurrentSessionData({});
         EventRegister.emit('BLE_STATUS', { event: "readOK" });
@@ -213,7 +306,7 @@ export default class BleAppmanager extends Component {
     if (BleService.getPeripherial().isConnectable == undefined) {
       this.setState({ peripherals: new Map() });
       //scan for 20 seconds
-      BleManager.scan([], 4, true).then((results) => {
+      BleManager.scan([], 10, true).then((results) => {
         // console.log(">>scan ",results)
         if (typeof (results) != undefined) { 
           EventRegister.emit('BLE_STATUS', { event: "scanning"});
@@ -357,9 +450,9 @@ export default class BleAppmanager extends Component {
           console.log('Connected to ' + peripheral.id +"\n"+peripheral.name);
           
           // Command initiate level
-          // setTimeout(() => { 
-          //   this.writeData('getSerial\r');
-          // }, 300);
+          setTimeout(() => { 
+            this.writeData('getSerial\r');
+          }, 300);
 
         }).catch((error) => {
           console.log('Connection error', error);

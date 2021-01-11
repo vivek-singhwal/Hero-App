@@ -4,8 +4,8 @@ import { Button, Switch, ProgressBar, Modal, Portal, Provider, TextInput } from 
 import AwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import AwesomeIcon5 from 'react-native-vector-icons/FontAwesome5';
 import Feather from 'react-native-vector-icons/Ionicons';
-import {getOperator} from '../services/apiService';
-import {getReadingStatus, setReadingStatus, sessionDataList,getOperatorData , getDeviceHWData, setSessionDataList, currentSessionData} from '../services/DataService';
+import {getOperator,addSessionAPI, updateSessionAPI} from '../services/apiService';
+import {getReadingStatus, setSessionObjApiData,getSessionObjApiData,setCurrentSessionData, setReadingStatus,setSessionId, sessionDataList,getOperatorData , getDeviceHWData, setSessionDataList, currentSessionData, getSessionId} from '../services/DataService';
 import SaveModal from './SaveModal';
 import { EventRegister } from 'react-native-event-listeners';
 import {initDB, addSession, getSessions} from '../services/DBService';
@@ -63,11 +63,11 @@ export default  HomePage = ({navigation})=>{
       let listner = EventRegister.addEventListener('BLE_DATA', (value) => {
          console.log(">>BLE_STATUS ",value,readingStatus);
          if(value.event == 'completed' && readingStatus){
-          
-          EventRegister.emit('BLECMD', { event: "homepageEvent" , cmd:'getSerial\r'})
+          // EventRegister.emit('StopInterval');
+          // EventRegister.emit('BLECMD', { event: "homepageEvent" , cmd:'getSerial\r'})
          }
          if(value.event == 'error'){
-          EventRegister.emit('BLE_STATUS', { event: "disconnected" })
+            EventRegister.emit('BLE_STATUS', { event: "disconnected" })
          }
         });
 
@@ -78,21 +78,22 @@ export default  HomePage = ({navigation})=>{
     })
     
     var stopReading=()=>{
+    
       setReadStatus(false);
       showModal();
     }
 
     var addSessionList = (comment,location)=>{
-     
+      EventRegister.emit('StopInterval');
       // sessionDataList.push({location:'abc',comment:'',serverId:'0',startTime:this.sessionStartTime,endTime:Date.now()});
       var sessionListAr = [...sessionList];
       var sessionObj = {
           // serverId:0,
           operatorId: getOperatorData().serverId,
-          sprayerId: getDeviceHWData().hardwareId,
-          chemistryType: getOperatorData().opChem,
+          sprayerId: getDeviceHWData().serverId,
+          chemistryType: getOperatorData().chemistryType,
           startTime: setStartTime,
-          ozSparayed:parseInt(currentSessionData.getPumpedVolume)/29.57,
+          ozSparayed:parseInt(currentSessionData.getFlowRate)/29.57,
           endTime: setEndTime,
           sessionLocation: locationText,
           sessionComment: commentText,
@@ -101,20 +102,47 @@ export default  HomePage = ({navigation})=>{
       addSession(sessionObj).then((res)=>{
         console.log(">Added ",res);
       })
-      console.log(">>sessionObj ",JSON.stringify(sessionObj))
+      console.log(">>sessionObj ",JSON.stringify(sessionObj));
+      var sessionObjApi =  getSessionObjApiData();
+      sessionObjApi.sessionLocation = locationText;
+      sessionObjApi.endTime = setEndTime;
+      sessionObjApi.id = getSessionId();
+      updateSessionAPI(sessionObjApi).then((resp)=>{
+        console.log(">>Resp success",resp)
+      })
       sessionListAr.push({sessionLocation:locationText,startTime:setStartTime, endTime: setEndTime,ozSparayed:parseInt(currentSessionData.getPumpedVolume)/29.57})
       setSessionList(sessionListAr);
       setCommentText('');
       setLocationText('');
       // console.log("ADd request",commentText,locationText,currentSessionData,setStartTime,setEndTime,Math.ceil(Math.abs(new Date(setStartTime).getTime()-new Date(setEndTime).getTime()) / 1000));
-      
+     
     }
     var startReading=()=>{
-      
-       console.log(">>inside if ",sessionDataList);
-       interval = setInterval(()=>{
-           EventRegister.emit('BLECMD', { event: "homepageEvent" , cmd:'getSerial\r'})
-        },2000)
+      var sessionsObjAPI = {
+        "startTime": Date.now().toString(),
+        // "endTime":"1609248424619",
+        "appVersion": "1.0.1",
+        // "sessionLocation": "location1",
+        operatorId: getOperatorData().serverId,
+        sprayerId: getDeviceHWData().serverId,
+        chemistryType: getOperatorData().chemistryType,
+        // "sessionComment": "first comment"
+    }
+    setSessionObjApiData(sessionsObjAPI)
+    // console.log(">>sessions ", sessions,getOperatorData());
+     addSessionAPI(sessionsObjAPI).then((respData)=>{
+       console.log(">>respData ",JSON.stringify(respData));
+       if(respData.success){
+        EventRegister.emit('StartInterval')
+           setSessionId(respData.result.id);
+        // if(respData){
+         
+        // }
+       }
+     
+     
+      console.log("Request call ::"+JSON.stringify(respData),new Date(Date.now()));
+    }) 
      }
 
     function convertTime(sec) {

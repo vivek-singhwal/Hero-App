@@ -34,43 +34,64 @@ export default OperatorProfile= ({navigation}) =>{
             getOperators().then((result)=>{
                 console.log(">result ",result);
                 if(result && result.length > 0){
+                 
+                  var operatorDat =  JSON.parse(JSON.stringify(result[0]));
+                  // console.log("addOperatorAPI" ,operatorDat.name, result[0].opName);
                   var operatorObj = {
-                    opName:result[0].name,
-                    company:result[0].company,
-                    chemistryType:result[0].chemistry
+                    opName: operatorDat.opName,
+                    company: operatorDat.company,
+                    chemistryType: operatorDat.chemistryType
                   }
-                  addOperatorAPI(operatorObj).then((resOperator)=>{
-                    updateServerId('operators',resOperator.result.id)
-                  })
-                  setOperatorData(result[0]);
+                  if(result[0].serverId == null){
+                    
+                    addOperatorAPI(operatorObj).then((resOperator)=>{
+                    
+                      if(resOperator.result){
+                       
+                        updateServerId('operators',resOperator.result.id).then((setOpData)=>{
+                          var opObj = {"chemistryType": operatorDat.chemistryType, "company": operatorDat.company, "opName": operatorDat.opName, "serverId": resOperator.result.serverId}
+                          setOperatorData(opObj);
+                          // navigation.navigate('FirstConnection')
+                        })
+                      }
+                    
+                    })
+                  }
+                  // console.log("addOperatorAPI" ,operatorDat.name, result[0].opName);
+                  var opObj = {"chemistryType": operatorDat.chemistryType, "company": operatorDat.company, "opName": operatorDat.opName, "serverId": operatorDat.serverId}
+                  setOperatorData(opObj);
+                  // console.log(getOperatorData())
+                  navigation.navigate('FirstConnection')
                 }
                
             })
           });
-        // navigation.navigate('FirstConnection')
+       
         setCount(false);
         }
     })
 
     var addRecord = ()=>{
-      // delOperator(4).then((data)=>{
+      // delOperator(0).then((data)=>{
       //   console.log(">Data ",data);
       // })
       // getOperators().then((result)=>{
       //   console.log(">result ",result);
       // })
-      if(opName !== "" && opChem !== "" && opCompany !== "company"){
+      if(opName !== "" && opChem !== ""){
         var operatorObj = {
           opName:opName,
-          company:opChem,
-          chemistryType:opCompany
+          company:opCompany,
+          chemistryType:opChem
         }
+        console.log(">>opName ",opChem,opName,opCompany)
         addOperatorAPI(operatorObj).then((resOperator)=>{
           operatorObj.serverId = resOperator.id;
           addOperator(operatorObj).then((data)=>{
             console.log(">Data ",operatorObj,data);
-            setOperatorData(operatorObj);
-            // navigation.navigate('FirstConnection')
+            var opObj = {"chemistryType": opChem, "company": opCompany, "opName": opName, "serverId": data.result.id}
+            setOperatorData(opObj);
+            navigation.navigate('FirstConnection')
         })
         })
       }else{

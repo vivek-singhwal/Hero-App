@@ -86,7 +86,27 @@ export var addOperatorAPI = (data) => {
         "company": "Kesem"
         }
     */
+   console.log(">>addOperatorAPI1 ", data)
     return fetch(apiEndPoint+'/api/operators', {
+            method: "POST",
+            body: JSON.stringify(data),
+            headers: { 'Content-Type': 'application/json' ,Authorization:encryptToken()},
+        })
+        .then(res => res.json())
+        .then(
+            (result) => {
+                console.log(">>addOperatorAPI ", result)
+                return result;
+            },
+            (error) => {
+                console.log(">>Eror ", error)
+                return error;
+            }
+        )
+}
+
+export var addSessionAPI = (data) => {
+    return fetch(apiEndPoint+'/api/sessions', {
             method: "POST",
             body: JSON.stringify(data),
             headers: { 'Content-Type': 'application/json' ,Authorization:encryptToken()},
@@ -103,9 +123,9 @@ export var addOperatorAPI = (data) => {
         )
 }
 
-export var addSessionAPI = (data) => {
+export var updateSessionAPI = (data) => {
     return fetch(apiEndPoint+'/api/sessions', {
-            method: "POST",
+            method: "PUT",
             body: JSON.stringify(data),
             headers: { 'Content-Type': 'application/json' ,Authorization:encryptToken()},
         })

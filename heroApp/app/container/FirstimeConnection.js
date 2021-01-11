@@ -22,6 +22,7 @@ export default FirstTimeConnection = ({navigation}) => {
         }
       };
     useEffect(()=>{
+      console.log(">>getOperatorData ",getOperatorData())
         if(count){
           initDB('sprayers').then((res)=>{
             console.log(">>Res ",res);
@@ -112,7 +113,7 @@ return(
         </Text>
             {isDeviceConnected && <MaterialCom size={150} color={'green'} style={{height:200,marginTop:20,marginBottom:40,}} name="check-bold"/>}
            {!isDeviceConnected && <Image style={{height:250,width:"94%",marginTop:20,marginBottom:40,}} source={require('../asset/bluetooth-guide.jpg')}/>}
-        { isDeviceConnected ? 
+        { deviceStatus === "Ready" ? 
          <Button 
               color={'#012554'}
               mode={'contained'}

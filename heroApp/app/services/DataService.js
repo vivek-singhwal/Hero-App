@@ -10,8 +10,35 @@ export var setToken=(tokenData)=>{
 
 var connectionStatus = false;
 var readingStatus = false;
-var operatorData = {};
+var operatorData = {opName:'',chemistryType:'',serverId:null,company:''};
 var deviceData = {};
+
+var sessionId = "";
+export var getSessionId = ()=>{
+    return sessionId;
+}
+
+export var setSessionId=(data)=>{
+    return sessionId = data;
+}
+
+var sessionsObjAPI = {
+    "startTime": '',
+    "endTime":'',
+     "appVersion": "1.0.1",
+    "sessionLocation": '',
+    operatorId: '',
+    sprayerId: '',
+    chemistryType: '',
+}
+export var getSessionObjApiData = ()=>{
+    return sessionsObjAPI;
+}
+
+export var setSessionObjApiData=(data)=>{
+    return sessionsObjAPI = data;
+}
+
 export let DeviceHWData = {hardwareId:0,sdName:'',serverId:null};
 export var getDeviceHWData = ()=>{
     return DeviceHWData;
@@ -66,4 +93,10 @@ export var getReadingStatus = ()=>{
 
 export var setReadingStatus=(status)=>{
     return readingStatus = status;
+}
+
+export var secondRead = false;
+
+export var setSecondRead=(data)=>{
+    return secondRead = data;
 }

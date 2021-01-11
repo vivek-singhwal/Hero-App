@@ -18,7 +18,7 @@ let defaultBleResults = {
     'getUnitName\r' : "",
     'getHWVersion\r' : "",
     'setUnitName\r' : "",
-    'getTriggerLatchState\r' : "",
+    // 'getTriggerLatchState\r' : "",
     'getTriggerLatchMode\r' : "",
     'resetPump\r' : "",
     'getESVState\r' : "",
@@ -58,7 +58,7 @@ export var bleCommands = [
     'getUnitName\r' ,
     'getHWVersion\r' ,
     'setUnitName\r' ,
-    'getTriggerLatchState\r' ,
+    'getRinseCycles\r' ,
     'getTriggerLatchMode\r' ,
     'resetPump\r' ,
     'getESVState\r' ,
@@ -83,10 +83,10 @@ export var bleResults = {
     'getPumpedVolume\r' : "",
     'getUnitName\r' : "",
     'getHWVersion\r' : "",
-    'setUnitName\r' : "",
-    'getTriggerLatchState\r' : "",
+    // 'setUnitName\r' : "",
+    'getRinseCycles\r' : "",
     'getTriggerLatchMode\r' : "",
-    'resetPump\r' : "",
+    // 'resetPump\r' : "",
     'getESVState\r' : "",
     'getFlowRate\r' : "",
     'getFirmware\r' : "",
@@ -129,7 +129,8 @@ export var initCmdSeq = [
     'getUnitName\r' ,
     'getHWVersion\r' ,
     'setUnitName\r' ,
-    //'getTriggerLatchState\r' ,
+    // 'getTriggerLatchState\r' ,
+    'getRinseCycles\r',
     'getTriggerLatchMode\r' ,
     'resetPump\r' ,
     'getESVState\r' ,
@@ -169,6 +170,19 @@ export var initCmdSeq = [
     'getESVState\r',
     'getPumpState\r',
     'getFlowRate\r',*/
+    'done'
+];
+export var dataCmdSeq = [
+    'getPumpTime\r' ,
+    'getPumpedVolume\r' ,
+    'getUnitName\r' ,
+    'getRinseCycles\r',
+    'getTriggerLatchMode\r' ,
+    'getESVState\r' ,
+    'getFlowRate\r' ,
+    'getFirmware\r' ,
+    'getPumpState\r',
+    'getFlow\r',
     'done'
 ];
 
