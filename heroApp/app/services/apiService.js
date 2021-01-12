@@ -97,7 +97,7 @@ export var addOperatorAPI = (data) => {
         .then(
             (result) => {
                 console.log(">>addOperatorAPI ", result)
-                return result;
+                return result.result;
             },
             (error) => {
                 console.log(">>Eror ", error)
@@ -107,6 +107,15 @@ export var addOperatorAPI = (data) => {
 }
 
 export var addSessionAPI = (data) => {
+     /*
+       {
+            "appVersion": "1.0.1",
+            "chemistryType": "NaDCC",
+            "operatorId": "82b269e6-1e87-478a-8cbb-e6ea894ceda8",
+            "sprayerId": "3208a1f0-5257-4d4d-8869-0853a8707197",
+            "startTime": "1610451005260"
+        }
+    */
     return fetch(apiEndPoint+'/api/sessions', {
             method: "POST",
             body: JSON.stringify(data),

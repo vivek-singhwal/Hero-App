@@ -272,7 +272,7 @@ export default class BleAppmanager extends Component {
         EventRegister.emit('BLE_STATUS', { event: "readOK" });
         EventRegister.emit('BLE_DATA', { event: "completed" });
         // setDeviceData(JSON.parse(JSON.stringify(bleResults)));
-        // console.log(JSON.stringify(bleResults));
+        console.log(JSON.stringify(bleResults));
       }
     }
     //  console.log(">secondRead >",secondRead ,dataCmdSeq.indexOf(getCurrentCmd()),getCurrentCmd()) 

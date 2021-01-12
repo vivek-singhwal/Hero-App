@@ -103,7 +103,7 @@ export default OperatorProfile= ({navigation}) =>{
           operatorObj.serverId = resOperator.id;
           addOperator(operatorObj).then((data)=>{
             console.log(">Data ",operatorObj,data);
-            var opObj = {"chemistryType": opChem, "company": opCompany, "opName": opName, "serverId": data.result.id}
+            var opObj = {"chemistryType": opChem, "company": opCompany, "opName": opName, "serverId": data.id}
             setOperatorData(opObj);
            
         })

@@ -132,7 +132,7 @@ export default  HomePage = ({navigation})=>{
         // "sessionComment": "first comment"
     }
     setSessionObjApiData(sessionsObjAPI)
-    // console.log(">>sessions ", sessions,getOperatorData());
+    console.log(">>sessions ", sessionsObjAPI);
      addSessionAPI(sessionsObjAPI).then((respData)=>{
        console.log(">>respData ",JSON.stringify(respData));
        if(respData.success){
@@ -249,12 +249,12 @@ export default  HomePage = ({navigation})=>{
             
           </View>
           <View style={{marginTop:"10%",width:"30%"}}>
-            {readingStatus? <View/>:
+            {/* {readingStatus? <View/>:
             <Button
               icon={props=><AwesomeIcon5 
                               size={35}
                               color={'#2C88D9'}
-                              name="recycle"/>}/>}
+                              name="recycle"/>}/>} */}
             </View>
         </View>
       </View>
