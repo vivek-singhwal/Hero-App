@@ -1,5 +1,5 @@
 import React,{useEffect,useState} from 'react';
-import { View, TextInput as Input,ScrollView, Alert, KeyboardAvoidingView,  StyleSheet,TouchableHighlight} from 'react-native';
+import { View, TextInput as Input,ScrollView, Alert, KeyboardAvoidingView,  StyleSheet,TouchableHighlight, Keyboard} from 'react-native';
 import { Avatar, Button,Text ,Modal} from 'react-native-paper';
 import AwesomeIcon5 from 'react-native-vector-icons/FontAwesome5';
 import Material from 'react-native-vector-icons/MaterialIcons';
@@ -8,8 +8,12 @@ import {Picker} from '@react-native-picker/picker';
 import { getOperators, initDB , addOperator,delOperator, updateServerId } from '../services/DBService';
 import { setOperatorData,getOperatorData } from '../services/DataService';
 import { getOperatorAPI,addOperatorAPI } from '../services/apiService';
+import NetInfo,{useNetInfo} from "@react-native-community/netinfo";
 
 export default OperatorProfile= ({navigation}) =>{
+  
+    const netInfo = useNetInfo();
+
     const [count,setCount] = useState(true);
     const [deviceStatus, setDeviceStatus] = useState('');
     const [isDeviceConnected, setisDeviceConnected] = useState(false);
@@ -19,20 +23,26 @@ export default OperatorProfile= ({navigation}) =>{
 
     const showModal = () => setVisible(true);
     const hideModal = () => setVisible(false);
-    const containerStyle = {backgroundColor: 'white', padding: 10,width:"60%",alignSelf:"center",borderRadius:4};
+    const containerStyle = {backgroundColor: 'white', padding: 10,width:"70%",alignSelf:"center",borderRadius:4};
 
     const [opName,setOpName] = useState('');
-    const [opCompany,setOpCompany] = useState('company');
-    const [opChem,setOpChem] = useState('');
+    const [opCompany,setOpCompany] = useState('');
+    const [opChem,setOpChem] = useState('NaDCC');
+    const [loading,setLoading] = useState(false);
 
     useEffect(()=>{
+      const unsubscribe = NetInfo.addEventListener(state => {
+        console.log("Connection type", state.type);
+        console.log("Is connected?", state.isConnected);
+        console.log("Is isInternetReachable?", state.isInternetReachable);
+      })
         if(count){
           initDB('operators').then((res)=>{
 
           // check and operator with api
             // console.log(">>Res ",res);
             getOperators().then((result)=>{
-                console.log(">result ",result);
+                console.log(">result ", netInfo.isInternetReachable,netInfo.isConnected);
                 if(result && result.length > 0){
                  
                   var operatorDat =  JSON.parse(JSON.stringify(result[0]));
@@ -42,8 +52,8 @@ export default OperatorProfile= ({navigation}) =>{
                     company: operatorDat.company,
                     chemistryType: operatorDat.chemistryType
                   }
-                  if(result[0].serverId == null){
-                    
+                  if(operatorDat.serverId == null && netInfo.isInternetReachable){
+                  
                     addOperatorAPI(operatorObj).then((resOperator)=>{
                     
                       if(resOperator.result){
@@ -69,16 +79,20 @@ export default OperatorProfile= ({navigation}) =>{
        
         setCount(false);
         }
-    })
+        return()=>{
+          unsubscribe();
+        }
+    },[])
 
     var addRecord = ()=>{
+      setLoading(true);
       // delOperator(0).then((data)=>{
       //   console.log(">Data ",data);
       // })
       // getOperators().then((result)=>{
       //   console.log(">result ",result);
       // })
-      if(opName !== "" && opChem !== ""){
+      if(opName !== "" && opCompany !== ""){
         var operatorObj = {
           opName:opName,
           company:opCompany,
@@ -91,20 +105,23 @@ export default OperatorProfile= ({navigation}) =>{
             console.log(">Data ",operatorObj,data);
             var opObj = {"chemistryType": opChem, "company": opCompany, "opName": opName, "serverId": data.result.id}
             setOperatorData(opObj);
-            navigation.navigate('FirstConnection')
+           
         })
+        setLoading(false);
+          navigation.navigate('FirstConnection')
         })
       }else{
         setVisible(true);
+        setLoading(false);
         // Alert.alert('HeroApp','Please provide valid info.');
 
       }
     }
 
-    const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0
+    const keyboardVerticalOffset = Platform.OS === 'ios' ? 100 : 0
     return(<>
     <View style={{marginTop:"15%",height:"100%"}}>
-    {/* <ScrollView showsVerticalScrollIndicator={false}> */}
+    <ScrollView keyboardShouldPersistTaps='never'>
       <KeyboardAvoidingView behavior='position' keyboardVerticalOffset={keyboardVerticalOffset} style={{flexDirection:"column",justifyContent:"center"}}>
         <Avatar.Icon 
         size={155} 
@@ -117,7 +134,7 @@ export default OperatorProfile= ({navigation}) =>{
         
         <View style={{ marginBottom:40,borderColor:textFocusedName?'#012554':'gray',borderWidth:1.8,height:45,borderRadius:5,width:250,alignSelf:"center"}}>
                <Input onFocus={()=> setTextFocusedName(true)}
-                        onBlur={()=> setTextFocusedName(false)}
+                        onBlur={()=> {setTextFocusedName(false);Keyboard.dismiss()}}
                         placeholder={'Name'}
                         style={{padding:10,marginTop:1,fontSize:20}}
                         value={opName}
@@ -125,8 +142,7 @@ export default OperatorProfile= ({navigation}) =>{
                     />
             </View>
             <View style={{marginBottom:40,borderColor:'#012554',borderWidth:1.8,borderRadius:5,width:250,alignSelf:"center",flexDirection:"row"}}>
-            
-            <Picker
+            {/* <Picker
                 selectedValue={opCompany}
                 mode={'dialog'}
                 itemStyle={{height:41,width:200,textAlign:"left",marginLeft:15,fontSize:18,color:"black"}}
@@ -136,17 +152,45 @@ export default OperatorProfile= ({navigation}) =>{
                 <Picker.Item label="Company" value="company" />
                 <Picker.Item label="Lighthouse" value="lighthouse" />
                 </Picker>
-                <Entypo size={20} name="select-arrows" style={{alignSelf:"center"}}/>
+                <Entypo size={20} name="select-arrows" style={{alignSelf:"center"}}/> */}
+                <Input onFocus={()=> setTextFocusedChem(true)}
+                        onBlur={()=> setTextFocusedChem(false)}
+                        placeholder={'Company'}
+                        style={{padding:10,marginTop:1,fontSize:20}}
+                        value={opCompany}
+                        onChangeText={text => setOpCompany(text)}/>
             </View>
-            <View style={{marginBottom:40, borderColor:textFocusedChem?'#012554':'gray',borderWidth:1.8,height:45,borderRadius:5,width:250,alignSelf:"center"}}>
-               <Input onFocus={()=> setTextFocusedChem(true)}
+            <View style={{flexDirection:"row",marginBottom:40, borderColor:textFocusedChem?'#012554':'gray',borderWidth:1.8,height:45,borderRadius:5,width:250,alignSelf:"center"}}>
+               {/* <Input onFocus={()=> setTextFocusedChem(true)}
                         onBlur={()=> setTextFocusedChem(false)}
                         placeholder={'Chemistry'}
                         style={{padding:10,marginTop:1,fontSize:20}}
                         value={opChem}
-                        onChangeText={text => setOpChem(text)}/>
+                        onChangeText={text => setOpChem(text)}/> */}
+              <Picker
+                selectedValue={opChem}
+                mode={'dialog'}
+                itemStyle={{height:41,width:200,textAlign:"left",marginLeft:15,fontSize:18,color:"black"}}
+                style={{fontSize:16}}
+                onValueChange={(itemValue, itemIndex) =>setOpChem(itemValue)
+                }>
+                <Picker.Item label="NaDCC" value="NaDCC" />
+                <Picker.Item label="AHP" value="AHP" />
+                </Picker>
+                <Entypo size={20} name="select-arrows" style={{alignSelf:"center"}}/>
             </View>
-            <Button 
+           {loading?
+           <Button 
+           mode={'contained'}
+           disabled={true}
+           labelStyle={{fontSize:16}} 
+            uppercase={false}
+           contentStyle={{flexDirection:"row-reverse",paddingTop:1,height:47}}
+          //  onPress={addRecord}
+           >
+            Please wait..
+          </Button>
+           :<Button 
               color={'#012554'}
               mode={'contained'}
             //   disabled={opChem && opCompany && opName && opName !== "" && opChem !== "" && opCompany !== "company"?false:true}
@@ -159,18 +203,17 @@ export default OperatorProfile= ({navigation}) =>{
               onPress={addRecord}
               >
                Connect
-             </Button>
+             </Button>} 
+
         </View>
       </KeyboardAvoidingView>
-      
-      
-      {/* </ScrollView> */}
+    </ScrollView>
     </View>
     <Modal visible={visible} onDismiss={hideModal} contentContainerStyle={containerStyle}>
-        <View style={{alignSelf:"center",height:100,width:"90%"}}>
-        <Text>Please provide:{}</Text>
-          {opName == "" && <Text style={{fontWeight:"bold"}}>Name</Text>}
-          {opChem == "" && <Text style={{fontWeight:"bold"}}>Chemistry</Text>}
+        <View style={{alignSelf:"center",height:130,width:"95%"}}>
+        <Text>Please minimum 3 characters in below fields: </Text>
+          {opName.length < 3 && <Text style={{fontWeight:"bold",paddingTop:4,paddingBottom:3}}>Name</Text>}
+          {opCompany.length < 3 && <Text style={{fontWeight:"bold"}}>Chemistry</Text>}
           
           <TouchableHighlight
               style={{ ...styles.openButton, backgroundColor: "#012554",width:70,alignSelf:"center",marginTop:20 }}

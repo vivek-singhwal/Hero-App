@@ -5,7 +5,9 @@ import AwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import AwesomeIcon5 from 'react-native-vector-icons/FontAwesome5';
 import Feather from 'react-native-vector-icons/Ionicons';
 import {getOperator,addSessionAPI, updateSessionAPI} from '../services/apiService';
-import {getReadingStatus, setSessionObjApiData,getSessionObjApiData,setCurrentSessionData, setReadingStatus,setSessionId, sessionDataList,getOperatorData , getDeviceHWData, setSessionDataList, currentSessionData, getSessionId} from '../services/DataService';
+import {getReadingStatus, setSessionObjApiData,getSessionObjApiData,getDeviceData, 
+        setReadingStatus,setSessionId, sessionDataList,getOperatorData , getDeviceHWData, 
+        setSessionDataList, currentSessionData, getSessionId} from '../services/DataService';
 import SaveModal from './SaveModal';
 import { EventRegister } from 'react-native-event-listeners';
 import {initDB, addSession, getSessions} from '../services/DBService';
@@ -14,6 +16,7 @@ import {enableInterval,disableInterval} from '../services/BleService';
 let setStartTime ,setEndTime;
 export default  HomePage = ({navigation})=>{
 
+    const [deviceData] = useState(getDeviceData());
     const [counter,setCounter] = useState(true);
     const [visible, setVisible] = useState(false);
     const [locationText, setLocationText] = useState('');
@@ -110,7 +113,7 @@ export default  HomePage = ({navigation})=>{
       updateSessionAPI(sessionObjApi).then((resp)=>{
         console.log(">>Resp success",resp)
       })
-      sessionListAr.push({sessionLocation:locationText,startTime:setStartTime, endTime: setEndTime,ozSparayed:parseInt(currentSessionData.getPumpedVolume)/29.57})
+      sessionListAr.push({sessionLocation:locationText, startTime:setStartTime, endTime: setEndTime, ozSparayed:parseInt(currentSessionData.getPumpedVolume)/29.57})
       setSessionList(sessionListAr);
       setCommentText('');
       setLocationText('');
@@ -174,9 +177,9 @@ export default  HomePage = ({navigation})=>{
                </View>
                <View style={{flexDirection:"row",justifyContent:"space-between",paddingBottom:20}}>
                 <Text style={{fontSize:20,}}>Battery</Text>
-                <Text style={{fontSize:18,}}>90%</Text>
+                <Text style={{fontSize:18,}}>{isNaN(parseInt(deviceData["getBatteryLevel\r"]))?'0':parseInt(deviceData["getBatteryLevel\r"])} %</Text>
                </View>
-               <ProgressBar style={{height:10}} progress={0.8} color={'#012554'} />
+               <ProgressBar style={{height:10}} progress={parseInt(deviceData["getBatteryLevel\r"])/100} color={'#012554'} />
             </View>:  
           <FlatList
            data={sessionList}

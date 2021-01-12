@@ -1,8 +1,9 @@
 import {getDeviceHWData} from '../services/DataService';
 import CryptoJS from "react-native-crypto-js";
+import {apiEndPoint,IV} from './constants';
 
-const apiEndPoint = "https://hero-api.kesemsolutions.com";
-const IV = "5183555c72eec9e4"; // set random initialisation vector
+// const apiEndPoint = "https://hero-api.kesemsolutions.com";
+// const IV = "5183555c72eec9e4"; // set random initialisation vector
 
 var currentMonth = new Date().getMonth();
 var MONTH = currentMonth > 9? currentMonth.toString() :String("0"+ (currentMonth+1));

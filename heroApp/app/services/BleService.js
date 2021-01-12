@@ -96,7 +96,8 @@ export var bleResults = {
     'getFlow\r':"",
     'getESV\r':"",
     'getBatteryLevel\r':"",
-    'getTotalOnTime\r':""
+    'getTotalOnTime\r':"",
+    'getTriggerLatchState\r':""
     //bleResults
 }
 
@@ -182,6 +183,7 @@ export var dataCmdSeq = [
     'getFlow\r',
     'getTotalOnTime\r',
     'getBatteryLevel\r',
+    'getTriggerLatchState\r' ,
     'done'
 ];
 var isIntervalActive = false;

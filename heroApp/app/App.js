@@ -3,7 +3,6 @@ import { View, StatusBar, SafeAreaView,StyleSheet, Alert, TouchableHighlight,Mod
 import { NavigationContainer } from '@react-navigation/native';
 
 import { createStackNavigator } from '@react-navigation/stack';
-
 import TestPageAPI from './container/TestPageAPI';
 import HomePage from './container/HomePage';
 import SettingPage from './container/SettingPage';
@@ -13,6 +12,8 @@ import BleAppManager from './container/BleAppMananger';
 import AwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import { Text, } from 'react-native-paper';
 import { EventRegister } from 'react-native-event-listeners';
+
+import {apiEndPoint} from './services/constants';
 
 const Stack = createStackNavigator();
 const MessageModal = ({modalVisible,setModalVisible}) => {
@@ -42,7 +43,7 @@ const MessageModal = ({modalVisible,setModalVisible}) => {
             <TouchableHighlight
               style={{ ...styles.openButton,backgroundColor: "#fff",marginRight:10 ,borderColor:'#012554',borderWidth:1}}
               onPress={() => {
-                EventRegister.emit('BLECMD',{event:'disconnect'}) 
+                EventRegister.emit('BLECMD',{cmd:'disconnect'}) 
                 setModalVisible(!modalVisible);
               }}>
               <Text style={[styles.textStyle,{color:'#012554'}]}>Disconnect</Text>
@@ -70,7 +71,7 @@ function App() {
     {/* <MessageModal/> */}
     <BleAppManager/>
     <NavigationContainer>
-
+    {/* <NetAsyncManager/>   */}
     <Stack.Navigator initialRouteName="Profile">
     <Stack.Screen name="TestPageAPI" component={TestPageAPI} options={{headerShown: false}}/>
     <Stack.Screen name="Profile" component={Profile} options={{
