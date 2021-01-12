@@ -7,7 +7,7 @@ import Feather from 'react-native-vector-icons/Ionicons';
 import {getOperator,addSessionAPI, updateSessionAPI} from '../services/apiService';
 import {getReadingStatus, setSessionObjApiData,getSessionObjApiData,getDeviceData, 
         setReadingStatus,setSessionId, sessionDataList,getOperatorData , getDeviceHWData, 
-        setSessionDataList, currentSessionData, getSessionId} from '../services/DataService';
+        setSessionDataList, currentSessionData, getSessionId, predefinedSessionData} from '../services/DataService';
 import SaveModal from './SaveModal';
 import { EventRegister } from 'react-native-event-listeners';
 import {initDB, addSession, getSessions} from '../services/DBService';
@@ -109,7 +109,20 @@ export default  HomePage = ({navigation})=>{
       sessionObjApi.endTime = setEndTime;
       sessionObjApi.id = getSessionId();
       sessionObjApi.sessionComment = commentText;
-      // console.log(">>sessionObjApi ",sessionObjApi)
+
+      // firmware
+      sessionObjApi.firmware = predefinedSessionData.getSerial
+      // HWversion
+      sessionObjApi.HWVersion = predefinedSessionData.getHWVersion
+      // modal
+      sessionObjApi.model = predefinedSessionData.getModel
+      // serial
+      sessionObjApi.serial = predefinedSessionData.getSerial
+      // unitname
+      sessionObjApi.unitName = predefinedSessionData.getModel
+
+      console.log(">>sessionObjApi ",sessionObjApi);
+      
       updateSessionAPI(sessionObjApi).then((resp)=>{
         console.log(">>Resp success",resp)
       })
@@ -124,7 +137,7 @@ export default  HomePage = ({navigation})=>{
       var sessionsObjAPI = {
         "startTime": setStartTime.toString(),
         // "endTime":"1609248424619",
-        "appVersion": "1.0.1",
+        "appVersion": "1.0.2",
         // "sessionLocation": "location1",
         operatorId: getOperatorData().serverId,
         sprayerId: getDeviceHWData().serverId,
