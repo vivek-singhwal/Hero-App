@@ -8,18 +8,38 @@ import { EventRegister } from 'react-native-event-listeners';
 import {setDefaultValue,getReadOk, } from '../services/BleService';
 import {initDB, addSprayer, getSprayers, getSprayersByHwId, delSprayer} from '../services/DBService';
 import {addSprayerAPI} from '../services/apiService';
+import { useBluetoothStatus ,BluetoothStatus} from 'react-native-bluetooth-status';
+
 
 export default FirstTimeConnection = ({navigation}) => {
+  const [btStatus, isPending, setBluetooth] = useBluetoothStatus();
     const [count,setCount] = useState(true);
+    const [btStatusState,setBtStatusState] = useState(!btStatus);
     const [deviceStatus, setDeviceStatus] = useState('');
     const [isDeviceConnected, setisDeviceConnected] = useState(false);
+   
+    var  getBluetoothState=async()=> {
+      return await BluetoothStatus.state();
+    }
     var scanAndConenct = () => {
-        console.log("scanAndConenct "+isDeviceConnected);
-        if(!isDeviceConnected){
-          EventRegister.emit('BLECMD', { cmd: 'startScan' });
-        }else{
-          EventRegister.emit('BLECMD', { cmd: 'disconnect' });
-        }
+        getBluetoothState().then((state)=>{
+          console.log(">getBluetoothState ",state);
+          if(state != false){
+             if(!isDeviceConnected){
+              EventRegister.emit('BLECMD', { cmd: 'startScan' });
+            }else{
+              EventRegister.emit('BLECMD', { cmd: 'disconnect' });
+            }
+          }else{
+            setDeviceStatus('BT Enable..');
+            setBluetooth(true);
+            setDeviceStatus('Scanning...');
+            EventRegister.emit('BLECMD', { cmd: 'startScan' });
+          }
+          // console.log(">>scanAndConenct ",state)
+        })
+        // console.log("scanAndConenct "+isDeviceConnected,isEnabled);
+       
       };
     useEffect(()=>{
       console.log(">>getOperatorData ",getOperatorData())
@@ -131,7 +151,8 @@ return(
                     sdName:getDeviceHWData().sdName,
                     hardwareId:getDeviceHWData().hardwareId
                 }
-                if(getDeviceHWData().hardwareId != "0.0"){
+                console.log(">>getDeviceHWData() ",getDeviceHWData())
+                if(getDeviceHWData().hardwareId != 0){
                     addSprayerAPI(deviceObj).then((result)=>{
                         console.log(">>result ",result.result);
                         if(result.result){
@@ -152,13 +173,14 @@ return(
                         }
                         
                      })
+                    navigation.navigate('HomePage');
                 }
-                navigation.navigate('HomePage');
+               
               }}
               >
                {'Begin Session'}
              </Button>:
-             deviceStatus === 'Disconnected' || (deviceStatus === 'stopScan' && !isDeviceConnected)?
+            deviceStatus === 'Disconnected' || (deviceStatus === 'stopScan' && !isDeviceConnected)?
              <Button 
                 style={{flexDirection:"row",borderRadius:4,height:47,width:200,justifyContent:"center"}}
                 color={'#012554'}

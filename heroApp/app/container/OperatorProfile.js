@@ -31,13 +31,9 @@ export default OperatorProfile= ({navigation}) =>{
     const [loading,setLoading] = useState(false);
 
     useEffect(()=>{
-      const unsubscribe = NetInfo.addEventListener(state => {
-        console.log("Connection type", state.type);
-        console.log("Is connected?", state.isConnected);
-        console.log("Is isInternetReachable?", state.isInternetReachable);
-      })
+     
         if(count){
-          initDB('operators').then((res)=>{
+          initDB('sessions').then((res)=>{
 
           // check and operator with api
             // console.log(">>Res ",res);
@@ -80,7 +76,7 @@ export default OperatorProfile= ({navigation}) =>{
         setCount(false);
         }
         return()=>{
-          unsubscribe();
+          // unsubscribe();
         }
     },[])
 
@@ -103,7 +99,7 @@ export default OperatorProfile= ({navigation}) =>{
           operatorObj.serverId = resOperator.id;
           addOperator(operatorObj).then((data)=>{
             console.log(">Data ",operatorObj,data);
-            var opObj = {"chemistryType": opChem, "company": opCompany, "opName": opName, "serverId": data.id}
+            var opObj = {"chemistryType": operatorObj.chemistryType, "company": operatorObj.company, "opName": operatorObj.opName, "serverId": data.id}
             setOperatorData(opObj);
            
         })

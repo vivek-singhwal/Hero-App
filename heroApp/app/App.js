@@ -5,6 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import TestPageAPI from './container/TestPageAPI';
 import HomePage from './container/HomePage';
+import OfflineSync from './container/OfflineSync';
 import SettingPage from './container/SettingPage';
 import FirstConnection from './container/FirstimeConnection';
 import Profile from './container/OperatorProfile';
@@ -12,8 +13,10 @@ import BleAppManager from './container/BleAppMananger';
 import AwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import { Text, } from 'react-native-paper';
 import { EventRegister } from 'react-native-event-listeners';
+import NetInfo,{useNetInfo} from "@react-native-community/netinfo";
+import {internetConnection,setInternetConnection} from './services/DataService'
 
-import {apiEndPoint} from './services/constants';
+
 
 const Stack = createStackNavigator();
 const MessageModal = ({modalVisible,setModalVisible}) => {
@@ -24,8 +27,8 @@ const MessageModal = ({modalVisible,setModalVisible}) => {
         visible={modalVisible}
         onRequestClose={() => {
           Alert.alert("Modal has been closed.");
-        }}
-      >
+        }}>
+
       <View
         style={{
           position: 'absolute',
@@ -34,8 +37,8 @@ const MessageModal = ({modalVisible,setModalVisible}) => {
           justifyContent: 'center',
           backgroundColor: 'rgba(100,100,100, 0.5)',
           padding: 40,
-        }}
-      >
+        }}>
+
           <View style={styles.modalView}>
             <Text style={styles.modalText}>Bluetooth is currently {'\n'} connected.</Text>
             <Text style={[styles.modalText]}>Would you like to disconnect ?</Text>
@@ -61,17 +64,74 @@ const MessageModal = ({modalVisible,setModalVisible}) => {
     </Modal>
   );
 };
+
+// const ConnectionStatus = () => {
+//   return (
+//       <Modal
+//         animationType="slide"
+//         transparent={true}
+//         visible={internetConnection}
+//         onRequestClose={() => {
+//           Alert.alert("Modal has been closed.");
+//         }}>
+
+//       <View
+//         style={{
+//           position: 'absolute',
+//           width: '100%',
+//           height: '100%',
+//           justifyContent: 'center',
+//           backgroundColor: 'rgba(100,100,100, 0.5)',
+//           padding: 40,
+//         }}>
+
+//           <View style={styles.modalView}>
+//             <Text style={styles.modalText}>Internet connection lost...</Text>
+//         <View style={{flexDirection:"row",justifyContent:"space-between",marginTop:35,marginBottom:15}}>
+//             {/* <TouchableHighlight
+//               style={{ ...styles.openButton,backgroundColor: "#fff",marginRight:10 ,borderColor:'#012554',borderWidth:1}}
+//               onPress={() => {
+//                 EventRegister.emit('BLECMD',{cmd:'disconnect'}) 
+//                 setModalVisible(!modalVisible);
+//               }}>
+//               <Text style={[styles.textStyle,{color:'#012554'}]}>Disconnect</Text>
+//             </TouchableHighlight> */}
+//             <TouchableHighlight
+//               style={{ ...styles.openButton, backgroundColor: "#012554" }}
+//               onPress={() => {
+//                 NetInfo.fetch().then(state => {
+//                   console.log("Connection type", state.type);
+//                   console.log("Is connected?", state.isConnected);
+//                   console.log("Is isInternetReachable", state.isInternetReachable);
+//                   if(state.isInternetReachable){
+//                     setInternetConnection(false);
+//                   }
+                 
+//                 });
+//               }}>
+//               <Text style={styles.textStyle}>Try again</Text>
+//             </TouchableHighlight>
+//           </View>
+//         </View>
+//       </View>
+//     </Modal>
+//   );
+// };
+
 function App() {
   const [modalVisible, setModalVisible] = React.useState(false);
+  const [connectionModalVisible, setConnectionModalVisible] = React.useState(false);
+  
   return (
     <>
     <MessageModal modalVisible={modalVisible} setModalVisible={setModalVisible}/>
+    {/* <ConnectionStatus/> */}
     <StatusBar barStyle="dark-content" />
     <SafeAreaView></SafeAreaView>
     {/* <MessageModal/> */}
     <BleAppManager/>
     <NavigationContainer>
-    {/* <NetAsyncManager/>   */}
+    <OfflineSync/>  
     <Stack.Navigator initialRouteName="Profile">
     <Stack.Screen name="TestPageAPI" component={TestPageAPI} options={{headerShown: false}}/>
     <Stack.Screen name="Profile" component={Profile} options={{

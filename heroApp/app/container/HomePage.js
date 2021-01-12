@@ -110,17 +110,6 @@ export default  HomePage = ({navigation})=>{
       sessionObjApi.id = getSessionId();
       sessionObjApi.sessionComment = commentText;
 
-      // firmware
-      sessionObjApi.firmware = predefinedSessionData.getSerial
-      // HWversion
-      sessionObjApi.HWVersion = predefinedSessionData.getHWVersion
-      // modal
-      sessionObjApi.model = predefinedSessionData.getModel
-      // serial
-      sessionObjApi.serial = predefinedSessionData.getSerial
-      // unitname
-      sessionObjApi.unitName = predefinedSessionData.getModel
-
       console.log(">>sessionObjApi ",sessionObjApi);
       
       updateSessionAPI(sessionObjApi).then((resp)=>{
@@ -142,6 +131,10 @@ export default  HomePage = ({navigation})=>{
         operatorId: getOperatorData().serverId,
         sprayerId: getDeviceHWData().serverId,
         chemistryType: getOperatorData().chemistryType,
+        HWVersion:predefinedSessionData.getHWVersion,
+        firmware:predefinedSessionData.getFirmware,
+        serial: predefinedSessionData.getSerial,
+        unitName: predefinedSessionData.getModel
         // "sessionComment": "first comment"
     }
     setSessionObjApiData(sessionsObjAPI)

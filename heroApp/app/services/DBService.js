@@ -42,6 +42,35 @@ export var initDB = (reqTable) => {
               // console.log("Database OPEN");
               db.executeSql('SELECT * FROM ' + reqTable + ' LIMIT 1').then((result) => {
                 console.log("Database is ready ... executing query ...",reqTable);
+                if(reqTable === 'sessions'){
+                  db.executeSql(
+                    'SELECT appVersion,isSync FROM sessions').then(
+                  (results) => {
+                      if(results[0].rows.length == 0){
+                          console.log(">>No data found")
+                      }
+                  }
+                ).catch(error => {
+                  // db.transaction((tx) => {
+                  //   tx.executeSql(
+                  //     'INSERT INTO sessions VALUES (?,?,?,?,?,?,?,?,?,?,?)',
+                  //     [,data.serverId,data.operatorId,data.sprayerId,data.chemistryType,data.startTime,data.endTime,data.sessionLocation,data.sessionComment,data.sessionData,data.ozSparayed],
+                  //     (tx, results) => {
+                  //       // console.log('Results', results.rowsAffected);
+                  //       var success = "true";
+                  //       resolve(results);
+                  //         if (results.rowsAffected > 0) {
+                  //           resolve(success);
+                  //         } else {
+                  //           alert('Registration Failed');
+                  //         }
+                  //     }
+                  //   );
+                  //   // alert("Complete")
+                  // });
+                 console.log(error);
+            })
+                }
                 // db.transaction((tx) => {
                 //   tx.executeSql('DROP TABLE '+reqTable);
                 // }).then((resp) => {

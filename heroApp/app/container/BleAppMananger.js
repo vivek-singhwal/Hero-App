@@ -4,8 +4,12 @@ import {
 import BleManager from 'react-native-ble-manager';
 import { EventRegister } from 'react-native-event-listeners';
 import BleService, {getInterval, getReadOk, setReadOk , getCurrentCmd,setCurrentCmd, bleCommands,initCmdSeq,bleResults, dataCmdSeq} from '../services/BleService';
-import { predefinedSessionData,setPredefinedessionData ,setDeviceHWData,currentSessionData,setCurrentSessionData, getSessionId, setSecondRead,secondRead} from '../services/DataService';
+import { predefinedSessionData,setPredefinedessionData ,
+        setDeviceHWData,currentSessionData,setCurrentSessionData,
+         getSessionId, setSecondRead,secondRead, setInternetConnection} from '../services/DataService';
 import { addSessionDataAPI,addSessionAPI } from '../services/apiService';
+import NetInfo,{useNetInfo} from "@react-native-community/netinfo";
+import { BluetoothStatus } from 'react-native-bluetooth-status';
 const window = Dimensions.get('window');
 const BleManagerModule = NativeModules.BleManager;
 const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
@@ -22,7 +26,8 @@ export default class BleAppmanager extends Component {
       peripherals: new Map(),
       appState: '',
       readInterval:0,
-      readSessionData:0
+      readSessionData:0,
+      btStatus:true
     }
     this.handleDiscoverPeripheral = this.handleDiscoverPeripheral.bind(this);
     this.handleStopScan = this.handleStopScan.bind(this);
@@ -33,8 +38,26 @@ export default class BleAppmanager extends Component {
   sessionData = {};
   sessionStartTime = {};
   // firstTimeRead = false;
-
+  
+  //  unsubscribe = NetInfo.addEventListener(state => {
+  //   console.log("Connection type", state.type);
+  //   console.log("Is connected?", state.isConnected);
+  //   console.log("Is isInternetReachable?", state.isInternetReachable);
+  //   if(state.isInternetReachable == false){
+  //     setInternetConnection(true);
+  //   }
+  // })
+  
   componentDidMount() {
+
+    NetInfo.configure({
+      reachabilityUrl: 'https://hero-api.kesemsolutions.com',
+      reachabilityTest: async (response) => response.status === 204,
+      reachabilityLongTimeout: 60 * 1000, // 60s
+      reachabilityShortTimeout: 5 * 1000, // 5s
+      reachabilityRequestTimeout: 15 * 1000, // 15s
+    });
+
     AppState.addEventListener('change', this.handleAppStateChange);
     BleManager.start({showAlert: true});
     this.handlerDiscover = bleManagerEmitter.addListener('BleManagerDiscoverPeripheral', this.handleDiscoverPeripheral );
@@ -143,6 +166,7 @@ export default class BleAppmanager extends Component {
       }
     });
 
+    
     this.stopInterval = EventRegister.addEventListener('StopInterval', ()=>{
       //clear interval
       clearInterval(this.readInterval);
@@ -227,6 +251,8 @@ export default class BleAppmanager extends Component {
     this.handlerStop.remove();
     this.handlerDisconnect.remove();
     this.handlerUpdate.remove();
+    // this.unsubscribe();
+
   }
   handleDisconnectedPeripheral(data) {
     let peripherals = this.state.peripherals;
@@ -354,7 +380,8 @@ export default class BleAppmanager extends Component {
    setCurrentCmd(writeCommand);
   //  console.log(">>>writeCommand "+writeCommand);
    var peripheral = BleService.getPeripherial();
-   if(writeCommand != null){
+   if(this.state.btStatus){
+    if(writeCommand != null){
       BleManager.retrieveServices(peripheral.id).then((peripheralInfo) => {
         //console.log(BLE_SPP_Service);
           BleManager.startNotification(peripheral.id, BLE_SPP_Service, BLE_SPP_Notify_Characteristic).then((res) => {
@@ -375,6 +402,11 @@ export default class BleAppmanager extends Component {
    }else{
      console.log("Command null");
    }
+   }else{
+     console.log(">>Bt not connected.")
+      // EventRegister.emit('BLE_STATUS', { event: "error"});
+   }
+   
   }
   turnOnBle() {
     BleManager.enableBluetooth().then(() => {

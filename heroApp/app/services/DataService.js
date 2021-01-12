@@ -106,3 +106,9 @@ export var secondRead = false;
 export var setSecondRead=(data)=>{
     return secondRead = data;
 }
+
+export var internetConnection = false;
+
+export var setInternetConnection=(data)=>{
+    return internetConnection = data;
+}
