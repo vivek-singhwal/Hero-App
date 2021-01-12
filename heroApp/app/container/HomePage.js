@@ -145,6 +145,8 @@ export default  HomePage = ({navigation})=>{
         setSessionId(respData.result.id);
         enableInterval();
         EventRegister.emit('StartInterval')
+       }else{
+         setReadStatus(false);
        }
       console.log("Request call ::"+JSON.stringify(respData),new Date(Date.now()));
     }) 
