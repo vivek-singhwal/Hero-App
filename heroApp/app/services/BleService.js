@@ -95,7 +95,8 @@ export var bleResults = {
     'getError\r':"",
     'getFlow\r':"",
     'getESV\r':"",
-    'getBatteryLevel\r':""
+    'getBatteryLevel\r':"",
+    'getTotalOnTime\r':""
     //bleResults
 }
 
@@ -140,7 +141,7 @@ export var initCmdSeq = [
     //'getError\r',
     //'getFlow\r',
     'getFlow\r',
-    'getBatteryLevel\r',
+    // 'getBatteryLevel\r',
     // "getTotalOnTime\r",
     /*
     'getSerial\r', //this must be first
@@ -179,6 +180,8 @@ export var dataCmdSeq = [
     'getFirmware\r' ,
     'getPumpState\r',
     'getFlow\r',
+    'getTotalOnTime\r',
+    'getBatteryLevel\r',
     'done'
 ];
 var isIntervalActive = false;

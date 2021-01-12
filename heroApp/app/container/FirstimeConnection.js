@@ -48,6 +48,7 @@ export default FirstTimeConnection = ({navigation}) => {
               setisDeviceConnected(true);
               setDeviceStatus("Connected");
             //   setSessionDataList([]); // set temp
+
             }else if(data.event == "reading"){
               setDeviceStatus("Reading...");
             }else if(data.event == "readOK"){
@@ -133,20 +134,23 @@ return(
                 if(getDeviceHWData().hardwareId != "0.0"){
                     addSprayerAPI(deviceObj).then((result)=>{
                         console.log(">>result ",result.result);
-                        deviceObj.serverId = result.result.id;
-                        setDeviceHWData(deviceObj);
-                        if(result.success){
-                            getSprayersByHwId(getDeviceHWData().hardwareId).then((resDevice)=>{
-                                if(resDevice.length){
-                                    console.log(">>resDevice",resDevice)
-                                }else{
-                                    deviceObj.serverId = result.result.id;
-                                    addSprayer(deviceObj).then(()=>{
-                                            
-                                    })
-                                }
-                            })
+                        if(result.result){
+                          deviceObj.serverId = result.result.id;
+                          setDeviceHWData(deviceObj);
+                          if(result.success){
+                              getSprayersByHwId(getDeviceHWData().hardwareId).then((resDevice)=>{
+                                  if(resDevice.length){
+                                      console.log(">>resDevice",resDevice)
+                                  }else{
+                                      deviceObj.serverId = result.result.id;
+                                      addSprayer(deviceObj).then(()=>{
+                                              
+                                      })
+                                  }
+                              })
+                          }
                         }
+                        
                      })
                 }
                 navigation.navigate('HomePage');

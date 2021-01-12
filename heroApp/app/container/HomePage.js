@@ -105,6 +105,8 @@ export default  HomePage = ({navigation})=>{
       sessionObjApi.sessionLocation = locationText;
       sessionObjApi.endTime = setEndTime;
       sessionObjApi.id = getSessionId();
+      sessionObjApi.sessionComment = commentText;
+      // console.log(">>sessionObjApi ",sessionObjApi)
       updateSessionAPI(sessionObjApi).then((resp)=>{
         console.log(">>Resp success",resp)
       })
@@ -117,7 +119,7 @@ export default  HomePage = ({navigation})=>{
     }
     var startReading=()=>{
       var sessionsObjAPI = {
-        "startTime": Date.now().toString(),
+        "startTime": setStartTime.toString(),
         // "endTime":"1609248424619",
         "appVersion": "1.0.1",
         // "sessionLocation": "location1",

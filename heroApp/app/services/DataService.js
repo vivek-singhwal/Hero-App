@@ -50,6 +50,12 @@ export var setDeviceHWData=(data)=>{
 
 export var sessionList =[{location:'abc',comment:'',serverId:'0',startTime:Date.now(),endTime:Date.now(),ozSparayed:12.1,sessionData :{}},{location:'abc',comment:'',serverId:'0',startTime:Date.now(),endTime:Date.now(),ozSparayed:11.1,sessionData :{}}];
 
+export var predefinedSessionData = {};
+
+export var setPredefinedessionData=(data)=>{
+    return predefinedSessionData = data;
+}
+
 export var currentSessionData = {};
 export var sessionDataList = [];
 
