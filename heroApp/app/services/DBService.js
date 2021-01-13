@@ -117,6 +117,31 @@ export var initDB = (reqTable) => {
     });;
   };
 
+  export var deleteAllOperator = function () {
+    // console.log(">>data ",data)
+    let promise = new Promise((resolve, reject) => {
+        // console.log(">>addOperator ",db);
+      db.transaction((tx) => {
+        tx.executeSql(
+          '"delete from operators',
+          (tx, results) => {
+            // console.log('Results', results.rowsAffected);
+            var success = "true";
+            resolve(results);
+              if (results.rowsAffected > 0) {
+                resolve(success);
+              } else {
+                alert('Delete Failed');
+              }
+          }
+        );
+        // alert("Complete")
+      });
+    }).catch(error => {
+      console.log(error);
+    });;;
+    return promise;
+  }
 
 export var addOperator = function (data) {
     // console.log(">>data ",data)
