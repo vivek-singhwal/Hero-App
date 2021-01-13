@@ -9,6 +9,7 @@ import { getOperators, initDB , addOperator,delOperator, updateServerId } from '
 import { setOperatorData,getOperatorData } from '../services/DataService';
 import { getOperatorAPI,addOperatorAPI } from '../services/apiService';
 import NetInfo,{useNetInfo} from "@react-native-community/netinfo";
+import RNPickerSelect from 'react-native-picker-select';
 
 export default OperatorProfile= ({navigation}) =>{
   
@@ -82,6 +83,8 @@ export default OperatorProfile= ({navigation}) =>{
 
     var addRecord = ()=>{
       setLoading(true);
+      console.log(">>opName ",opChem,opName,opCompany)
+      // return;
       // delOperator(0).then((data)=>{
       //   console.log(">Data ",data);
       // })
@@ -128,7 +131,7 @@ export default OperatorProfile= ({navigation}) =>{
                     name="user-alt"/>} />
         <View style={{marginBottom:20,alignSelf:"center"}}>
         
-        <View style={{ marginBottom:40,borderColor:textFocusedName?'#012554':'gray',borderWidth:1.8,height:45,borderRadius:5,width:250,alignSelf:"center"}}>
+        <View style={{ marginBottom:20,borderColor:textFocusedName?'#012554':'gray',borderWidth:1.8,height:45,borderRadius:5,width:250,alignSelf:"center"}}>
                <Input onFocus={()=> setTextFocusedName(true)}
                         onBlur={()=> {setTextFocusedName(false);Keyboard.dismiss()}}
                         placeholder={'Name'}
@@ -156,25 +159,62 @@ export default OperatorProfile= ({navigation}) =>{
                         value={opCompany}
                         onChangeText={text => setOpCompany(text)}/>
             </View>
-            <View style={{flexDirection:"row",marginBottom:40, borderColor:textFocusedChem?'#012554':'gray',borderWidth:1.8,height:45,borderRadius:5,width:250,alignSelf:"center"}}>
+            {/* <View style={{flexDirection:"row",marginBottom:40, borderColor:textFocusedChem?'#012554':'gray',borderWidth:1.8,height:45,borderRadius:5,width:250,justifyContent:"center"}}> */}
+           
                {/* <Input onFocus={()=> setTextFocusedChem(true)}
                         onBlur={()=> setTextFocusedChem(false)}
                         placeholder={'Chemistry'}
                         style={{padding:10,marginTop:1,fontSize:20}}
                         value={opChem}
                         onChangeText={text => setOpChem(text)}/> */}
-              <Picker
+              {/* <Picker
                 selectedValue={opChem}
-                mode={'dialog'}
-                itemStyle={{height:41,width:200,textAlign:"left",marginLeft:15,fontSize:18,color:"black"}}
-                style={{fontSize:16}}
+                mode={'dropdown'}
+                itemStyle={{height:41,textAlign:"left",fontSize:18,color:"black",width:230}}
+                style={{fontSize:16,justifyContent:"flex-start",}}
                 onValueChange={(itemValue, itemIndex) =>setOpChem(itemValue)
                 }>
                 <Picker.Item label="NaDCC" value="NaDCC" />
                 <Picker.Item label="AHP" value="AHP" />
                 </Picker>
-                <Entypo size={20} name="select-arrows" style={{alignSelf:"center"}}/>
-            </View>
+                <Entypo size={20} name="select-arrows" style={{alignSelf:"center"}}/> */}
+                <RNPickerSelect
+                    // icon={<Entypo size={20} name="select-arrows" style={{alignSelf:"center"}}/>}
+                    value={opChem}
+                    style={{
+                      inputIOS:{
+                        bottom:20,
+                        marginBottom:10,
+                        paddingStart:10,
+                        fontSize:16,
+                        borderRadius:4,
+                        borderColor:textFocusedChem?'#012554':'gray',borderWidth:1.8,
+                        height:45,
+                      },
+                      inputAndroid: {
+                        backgroundColor: 'transparent',
+                      },
+                      iconContainer: {
+                        // top: 5,
+                        right: 15,
+                        bottom:42,
+                        // marginBottom:10
+                      },
+                      
+                    }}
+                   
+                    textInputProps={{ underlineColor: 'yellow' }}
+                    // useNativeAndroidPickerStyle={false}
+                    onValueChange={(value) => setOpChem(value)}
+                    Icon={() => {
+                      return <Entypo size={20} name="select-arrows" style={{alignSelf:"center"}}/>;
+                    }}
+                    items={[
+                        { label: 'NaDCC', value: 'NaDCC' },
+                        { label: 'AHP', value: 'AHP' }
+                      ]}
+                />
+            {/* </View> */}
            {loading?
            <Button 
            mode={'contained'}
