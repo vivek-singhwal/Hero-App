@@ -183,7 +183,7 @@ export default class BleAppmanager extends Component {
         return 'test';
         }
         else if (data.cmd == "disconnect"){
-          this.test(BleService.getPeripherial());
+          this.connect(BleService.getPeripherial());
         } 
         else if(data.cmd == 'sprayEnable'){
           this.writeSingleData('sprayEnable\r');
@@ -459,10 +459,10 @@ export default class BleAppmanager extends Component {
       peripheral.name.startsWith("Blue")){
         peripherals.set(peripheral.id, peripheral);
         this.setState({ peripherals });
-        this.test(peripheral);
+        this.connect(peripheral);
     }
   }
-  test(peripheral) {
+  connect(peripheral) {
     //console.log(peripheral)
     var localHw = {};
     if (peripheral){
@@ -522,7 +522,7 @@ export default class BleAppmanager extends Component {
     //console.log(item);
     const color = item.connected ? 'green' : '#fff';
     return (
-      <TouchableHighlight onPress={() => this.test(item) }>
+      <TouchableHighlight onPress={() => this.connect(item) }>
         <View style={[styles.row, {backgroundColor: color}]}>
           <Text style={{fontSize: 12, textAlign: 'center', color: '#333333', padding: 10}}>{item.name}</Text>
           <Text style={{fontSize: 10, textAlign: 'center', color: '#333333', padding: 2}}>RSSI: {item.rssi}</Text>
