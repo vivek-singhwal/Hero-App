@@ -325,12 +325,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_TEAM = Q84D6WC89F;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = heroApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.05;
+				MARKETING_VERSION = 1.08;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -340,6 +340,7 @@
 				PRODUCT_NAME = heroApp;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -350,11 +351,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_TEAM = Q84D6WC89F;
 				INFOPLIST_FILE = heroApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.05;
+				MARKETING_VERSION = 1.08;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -363,6 +364,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.kesemsolutions.heroapp;
 				PRODUCT_NAME = heroApp;
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
