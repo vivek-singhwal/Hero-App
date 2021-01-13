@@ -97,14 +97,13 @@ export default OperatorProfile= ({navigation}) =>{
           company:opCompany,
           chemistryType:opChem
         }
-        console.log(">>opName ",opChem,opName,opCompany)
+        // console.log(">>opName ",opChem,opName,opCompany)
         addOperatorAPI(operatorObj).then((resOperator)=>{
           operatorObj.serverId = resOperator.id;
           addOperator(operatorObj).then((data)=>{
             console.log(">Data ",operatorObj,data);
-            var opObj = {"chemistryType": operatorObj.chemistryType, "company": operatorObj.company, "opName": operatorObj.opName, "serverId": data.id}
+            var opObj = {"chemistryType": operatorObj.chemistryType, "company": operatorObj.company, "opName": operatorObj.opName, "serverId": data.result.id}
             setOperatorData(opObj);
-           
         })
         setLoading(false);
           navigation.navigate('FirstConnection')
