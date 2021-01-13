@@ -5,7 +5,7 @@ import AwesomeIcon5 from 'react-native-vector-icons/FontAwesome5';
 import Material from 'react-native-vector-icons/MaterialIcons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {Picker} from '@react-native-picker/picker';
-import { getOperators, initDB , addOperator,delOperator, updateServerId } from '../services/DBService';
+import { getOperators, initDB , addOperator,delOperator, updateServerId, deleteAllOperator } from '../services/DBService';
 import { setOperatorData,getOperatorData } from '../services/DataService';
 import { getOperatorAPI,addOperatorAPI } from '../services/apiService';
 import NetInfo,{useNetInfo} from "@react-native-community/netinfo";
@@ -100,11 +100,14 @@ export default OperatorProfile= ({navigation}) =>{
         // console.log(">>opName ",opChem,opName,opCompany)
         addOperatorAPI(operatorObj).then((resOperator)=>{
           operatorObj.serverId = resOperator.id;
-          addOperator(operatorObj).then((data)=>{
-            console.log(">Data ",operatorObj,data);
-            var opObj = {"chemistryType": operatorObj.chemistryType, "company": operatorObj.company, "opName": operatorObj.opName, "serverId": data.result.id}
-            setOperatorData(opObj);
-        })
+          // deleteAllOperator().then(()=>{
+            addOperator(operatorObj).then((data)=>{
+              // console.log(">addOperator ",operatorObj,JSON.stringify(data));
+             
+            })
+          // })
+          var opObj = {"chemistryType": operatorObj.chemistryType, "company": operatorObj.company, "opName": operatorObj.opName, "serverId": operatorObj.serverId}
+          setOperatorData(opObj);
         setLoading(false);
           navigation.navigate('FirstConnection')
         })
