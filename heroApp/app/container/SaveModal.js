@@ -15,7 +15,7 @@ import { Button, Switch, ProgressBar, Modal, Portal, Provider, TextInput } from 
             <Text style={{fontSize:17,color:"#4A4A4A",paddingBottom:10}}>Location</Text>
             <TextInput
               theme={{ colors: { primary: '#012554',underlineColor:'transparent',}}}
-              style={{paddingBottom:20,backgroundColor:"white"}}
+              style={{paddingBottom:20,backgroundColor:"white",color:"black"}}
               mode={'outlined'}
               defaultValue={locationText}
               placeholder={'Where did you spray?'}
