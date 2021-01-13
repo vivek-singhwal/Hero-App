@@ -1,5 +1,5 @@
 import React,{useEffect,useState} from 'react';
-import { View , StyleSheet, Text, TouchableOpacity, TextInput as Input,ScrollView,FlatList,TouchableHighlight} from 'react-native';
+import { View , StyleSheet, Text, TouchableOpacity, TextInput as Input,ScrollView,FlatList,TouchableHighlight, Alert} from 'react-native';
 import { Button, Switch, ProgressBar, Modal, Portal, Provider, TextInput } from 'react-native-paper';
 import AwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import AwesomeIcon5 from 'react-native-vector-icons/FontAwesome5';
@@ -146,6 +146,7 @@ export default  HomePage = ({navigation})=>{
         enableInterval();
         EventRegister.emit('StartInterval')
        }else{
+         Alert.alert('HeroApp','Server Error.')
          setReadStatus(false);
        }
       console.log("Request call ::"+JSON.stringify(respData),new Date(Date.now()));
