@@ -366,6 +366,7 @@ export default class BleAppmanager extends Component {
              }, 20);
            }).catch((error) => {
              console.log('Notification error', error);
+            //  EventRegister.emit('BLE_STATUS', { event: "error"});
            })
        }).catch((error) => {
         //  EventRegister.emit('BLE_DATA',{event:'error'});
@@ -442,23 +443,24 @@ export default class BleAppmanager extends Component {
     
     //console.log("handleDiscoverPeripheral>>>"+peripheral.name)
     var peripherals = this.state.peripherals;
-   if(peripheral.name){
-    // console.log('Got ble peripheral', peripheral.name );
-    // console.log(JSON.stringify(peripheral))
-    peripherals.set(peripheral.id, peripheral);
-    this.setState({ peripherals });
-    this.test(peripheral);
-   }
+  //  if(peripheral.name){
+  //   // console.log('Got ble peripheral', peripheral.name );
+  //   // console.log(JSON.stringify(peripheral))
+   
+  //  }
     if (!peripheral.name) {
       peripheral.name = 'NO NAME';
     }
     //console.log(peripheral.name.startsWith("GhostBaste"));
-    // if(peripheral.name.startsWith("GhostBaste") || 
-    //   peripheral.name.startsWith("GhostBuste")||
-    //   //peripheral.localName.startsWith("GhostBaste") || 
-    //   peripheral.name.startsWith("BlueNRG0")){
-       
-    // }
+    if(peripheral.name.startsWith("Ghost") || 
+      peripheral.name.startsWith("ES")||
+      peripheral.name.startsWith("es") ||
+      //peripheral.localName.startsWith("GhostBaste") || 
+      peripheral.name.startsWith("Blue")){
+        peripherals.set(peripheral.id, peripheral);
+        this.setState({ peripherals });
+        this.test(peripheral);
+    }
   }
   test(peripheral) {
     //console.log(peripheral)
@@ -468,6 +470,7 @@ export default class BleAppmanager extends Component {
         console.log("connected",peripheral);
         
         BleManager.disconnect(peripheral.id);
+        EventRegister.emit('BLE_STATUS', { event: "error" });
         EventRegister.emit('BLE_STATUS', { event: "error" });
         //BleService.setPeripherial(null);
         //this.setState({peripheral:null});
