@@ -439,23 +439,26 @@ export default class BleAppmanager extends Component {
  {"advertising": {"isConnectable": true, "localName": "GhostBaster_V1", "manufacturerData": {"CDVType": "ArrayBuffer", "bytes": [Array], "data": "AgEGDwlHaG9zdEJhc3Rlcl9WMQUSZADoAwIKCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="}, "serviceData": {}, "serviceUUIDs": [], "txPowerLevel": 8}, "id": "00:80:E1:00:00:AA", "name": "GhostBaster_V1", "rssi": -66}
 */
   handleDiscoverPeripheral(peripheral){
-    // console.log('Got ble peripheral', peripheral.name );
+    
     //console.log("handleDiscoverPeripheral>>>"+peripheral.name)
     var peripherals = this.state.peripherals;
-   
+   if(peripheral.name){
+    // console.log('Got ble peripheral', peripheral.name );
+    // console.log(JSON.stringify(peripheral))
+    peripherals.set(peripheral.id, peripheral);
+    this.setState({ peripherals });
+    this.test(peripheral);
+   }
     if (!peripheral.name) {
       peripheral.name = 'NO NAME';
     }
     //console.log(peripheral.name.startsWith("GhostBaste"));
-    if(peripheral.name.startsWith("GhostBaste") || 
-      peripheral.name.startsWith("GhostBuste")||
-      //peripheral.localName.startsWith("GhostBaste") || 
-      peripheral.name.startsWith("BlueNRG0")){
-        console.log(JSON.stringify(peripheral))
-        peripherals.set(peripheral.id, peripheral);
-        this.setState({ peripherals });
-        this.test(peripheral);
-    }
+    // if(peripheral.name.startsWith("GhostBaste") || 
+    //   peripheral.name.startsWith("GhostBuste")||
+    //   //peripheral.localName.startsWith("GhostBaste") || 
+    //   peripheral.name.startsWith("BlueNRG0")){
+       
+    // }
   }
   test(peripheral) {
     //console.log(peripheral)
