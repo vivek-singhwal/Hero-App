@@ -2,8 +2,9 @@ import React,{useEffect,useState} from 'react';
 import { View , StyleSheet, Text, TouchableOpacity, TextInput as Input,ScrollView, Keyboard} from 'react-native';
 import Material from 'react-native-vector-icons/MaterialIcons';
 import { Button, Switch, ProgressBar, Modal, Portal, Provider, TextInput } from 'react-native-paper';
- export default SaveModal = ({addSessionList,setLocationText,locationText,commentText,setCommentText,visible,hideModal,SetReadingStatus}) => {
 
+ export default SaveModal = ({addSessionList,setLocationText,locationText,commentText,setCommentText,visible,hideModal,SetReadingStatus}) => {
+  var inputBox;
     const [textFocused,setTextFocused] = useState(false);
     const containerStyle = {backgroundColor: 'white', padding: 20};
     return (
@@ -13,19 +14,28 @@ import { Button, Switch, ProgressBar, Modal, Portal, Provider, TextInput } from 
           <ScrollView keyboardShouldPersistTaps='never'>
             <View style={{flexDirection:"column"}}>
             <Text style={{fontSize:17,color:"#4A4A4A",paddingBottom:10}}>Location</Text>
-            <TextInput
+            {/* <TextInput
               theme={{ colors: { primary: '#012554',underlineColor:'transparent',}}}
-              style={{paddingBottom:20,backgroundColor:"white",color:"black"}}
+              style={{paddingBottom:20}}
               mode={'outlined'}
               defaultValue={locationText}
               placeholder={'Where did you spray?'}
               onChangeText={text => setLocationText(text)}
-            />
+            /> */}
+            <Input
+                        onFocus={()=> setTextFocused(true)}
+                        onBlur={()=> setTextFocused(false)}
+                        placeholder={'Where did you spray?'}
+                        style={{padding:10,marginTop:5,fontSize:16,borderWidth:1,paddingRight:10,borderColor:'#012554',borderRadius:4}}
+                        // multiline={true}
+                        defaultValue={locationText}
+                        onChangeText={text => setLocationText(text)}
+                        // ref = {(input) => this.input = input}
+                    />
             <Text style={{fontSize:17,color:"#4A4A4A",paddingBottom:16}}>Comments</Text>
-           
             <TouchableOpacity
               activeOpacity={1}
-              onPress={()=>this.input.focus()}>
+              onPress={()=>inputBox.focus()}>
               <View style={{borderColor:textFocused?'#012554':'gray',borderWidth:1.8,height:200,borderRadius:5}}>
                     <Input
                         onFocus={()=> setTextFocused(true)}
@@ -35,11 +45,10 @@ import { Button, Switch, ProgressBar, Modal, Portal, Provider, TextInput } from 
                         multiline={true}
                         defaultValue={commentText}
                         onChangeText={text => setCommentText(text)}
-                        ref = {(input) => this.input = input}
+                        ref = {(input) => inputBox = input}
                     />
               </View>
             </TouchableOpacity>
-            
           </View>
           <View style={{flexDirection:"row",justifyContent:"space-around",marginTop: 30,}}>
               <Button 

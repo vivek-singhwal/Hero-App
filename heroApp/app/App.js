@@ -65,58 +65,7 @@ const MessageModal = ({modalVisible,setModalVisible}) => {
   );
 };
 
-// const ConnectionStatus = () => {
-//   return (
-//       <Modal
-//         animationType="slide"
-//         transparent={true}
-//         visible={internetConnection}
-//         onRequestClose={() => {
-//           Alert.alert("Modal has been closed.");
-//         }}>
 
-//       <View
-//         style={{
-//           position: 'absolute',
-//           width: '100%',
-//           height: '100%',
-//           justifyContent: 'center',
-//           backgroundColor: 'rgba(100,100,100, 0.5)',
-//           padding: 40,
-//         }}>
-
-//           <View style={styles.modalView}>
-//             <Text style={styles.modalText}>Internet connection lost...</Text>
-//         <View style={{flexDirection:"row",justifyContent:"space-between",marginTop:35,marginBottom:15}}>
-//             {/* <TouchableHighlight
-//               style={{ ...styles.openButton,backgroundColor: "#fff",marginRight:10 ,borderColor:'#012554',borderWidth:1}}
-//               onPress={() => {
-//                 EventRegister.emit('BLECMD',{cmd:'disconnect'}) 
-//                 setModalVisible(!modalVisible);
-//               }}>
-//               <Text style={[styles.textStyle,{color:'#012554'}]}>Disconnect</Text>
-//             </TouchableHighlight> */}
-//             <TouchableHighlight
-//               style={{ ...styles.openButton, backgroundColor: "#012554" }}
-//               onPress={() => {
-//                 NetInfo.fetch().then(state => {
-//                   console.log("Connection type", state.type);
-//                   console.log("Is connected?", state.isConnected);
-//                   console.log("Is isInternetReachable", state.isInternetReachable);
-//                   if(state.isInternetReachable){
-//                     setInternetConnection(false);
-//                   }
-                 
-//                 });
-//               }}>
-//               <Text style={styles.textStyle}>Try again</Text>
-//             </TouchableHighlight>
-//           </View>
-//         </View>
-//       </View>
-//     </Modal>
-//   );
-// };
 
 function App() {
   const [modalVisible, setModalVisible] = React.useState(false);

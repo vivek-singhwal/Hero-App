@@ -98,19 +98,30 @@ export default OperatorProfile= ({navigation}) =>{
           chemistryType:opChem
         }
         // console.log(">>opName ",opChem,opName,opCompany)
-        addOperatorAPI(operatorObj).then((resOperator)=>{
-          operatorObj.serverId = resOperator.id;
-          // deleteAllOperator().then(()=>{
-            addOperator(operatorObj).then((data)=>{
-              // console.log(">addOperator ",operatorObj,JSON.stringify(data));
-             
-            })
-          // })
-          var opObj = {"chemistryType": operatorObj.chemistryType, "company": operatorObj.company, "opName": operatorObj.opName, "serverId": operatorObj.serverId}
-          setOperatorData(opObj);
-        setLoading(false);
-          navigation.navigate('FirstConnection')
-        })
+        if(netInfo.isInternetReachable){
+          addOperatorAPI(operatorObj).then((resOperator)=>{
+            if(resOperator){
+              console.log(">>resOperator ",resOperator);
+  
+              operatorObj.serverId = resOperator.id;
+              // deleteAllOperator().then(()=>{
+                addOperator(operatorObj).then((data)=>{
+                  // console.log(">addOperator ",operatorObj,JSON.stringify(data));
+                 
+                })
+              // })
+              var opObj = {"chemistryType": operatorObj.chemistryType, "company": operatorObj.company, "opName": operatorObj.opName, "serverId": operatorObj.serverId}
+              setOperatorData(opObj);
+            setLoading(false);
+            }
+           
+            navigation.navigate('FirstConnection')
+          })
+        }else{
+          Alert.alert('HeroApp','Internet connectivity issue found.');
+          setLoading(false);
+        }
+        
       }else{
         setVisible(true);
         setLoading(false);

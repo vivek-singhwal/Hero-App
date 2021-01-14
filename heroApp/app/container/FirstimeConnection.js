@@ -180,7 +180,8 @@ return(
               >
                {'Begin Session'}
              </Button>:
-            deviceStatus === 'Disconnected' || (deviceStatus === 'stopScan' && !isDeviceConnected)?
+            deviceStatus === 'Disconnected' || (deviceStatus === 'stopScan')?
+            // deviceStatus === 'Disconnected' || (deviceStatus === 'stopScan' && !isDeviceConnected)?
              <Button 
                 style={{flexDirection:"row",borderRadius:4,height:47,width:200,justifyContent:"center"}}
                 color={'#012554'}

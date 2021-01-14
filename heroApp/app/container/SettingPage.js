@@ -1,11 +1,11 @@
 import React,{useEffect,useState} from 'react';
 import { View , Text , TextInput as Input,ScrollView} from 'react-native';
 import { Button, Switch, ProgressBar, Modal, Portal, Provider, TextInput } from 'react-native-paper';
-import {getOperatorData,getDeviceData} from '../services/DataService';
+import {getOperatorData,getDeviceData,getDeviceHWData} from '../services/DataService';
 import Material from 'react-native-vector-icons/Ionicons';
 
 export default SettingPage = () => {
-    console.log(">>Data ",getOperatorData(),JSON.stringify(getDeviceData()))
+    console.log(">>Data ",getOperatorData(),JSON.stringify(getDeviceHWData()))
     const [deviceData] = useState(getDeviceData());
     const [isSwitchEleOn, setIsSwitchEleOn] = useState(false);
     const [isSwitchTrgOn, setIsSwitchTrgOn] = useState(false);
@@ -34,11 +34,11 @@ export default SettingPage = () => {
                    </View>
                    <View style={{flexDirection:"row",justifyContent:"space-between",paddingTop:10}}>
                     <Text style={{fontSize:20}}>Operator:</Text>
-                    <Text style={{fontSize:18,}}>{getOperatorData().name}</Text>
+                    <Text style={{fontSize:18,}}>{getOperatorData().opName}</Text>
                    </View>
                    <View style={{flexDirection:"row",justifyContent:"space-between",paddingTop:10}}>
                     <Text style={{fontSize:20}}>Sprayer:</Text>
-                    <Text style={{fontSize:18,}}>{'GhostBuster'}</Text>
+                    <Text style={{fontSize:18,}}>{getDeviceHWData().sdName}</Text>
                    </View>
                    <View style={{flexDirection:"row",justifyContent:"space-between",paddingTop:10}}>
                     <Text style={{fontSize:20}}>Area Sprayed:</Text>
