@@ -22,6 +22,15 @@ export var setSessionId=(data)=>{
     return sessionId = data;
 }
 
+var localSessionId = "";
+export var getLocalSessionId = ()=>{
+    return localSessionId;
+}
+
+export var setLocalSessionId=(data)=>{
+    return localSessionId = data;
+}
+
 var sessionsObjAPI = {
     "startTime": '',
     "endTime":'',
@@ -58,6 +67,11 @@ export var setPredefinedessionData=(data)=>{
 
 export var currentSessionData = {};
 export var sessionDataList = [];
+export var currentReadData = [];
+
+export var setCurrentReadData=(data)=>{
+    return currentReadData = data;
+}
 
 export var setCurrentSessionData=(data)=>{
     return currentSessionData = data;

@@ -43,34 +43,144 @@ export var initDB = (reqTable) => {
               db.executeSql('SELECT * FROM ' + reqTable + ' LIMIT 1').then((result) => {
                 console.log("Database is ready ... executing query ...",reqTable);
                 if(reqTable === 'sessions'){
+                    db.executeSql(
+                      'SELECT isSync FROM sessions').then(
+                    (results) => {
+                        if(results[0].rows.length == 0){
+                            // console.log(">>No data found")
+                        }
+                    }
+                  ).catch(error => {
+                    db.executeSql(
+                      'ALTER TABLE sessions ADD COLUMN isSync boolean not null default 0').then(
+                    (results) => {
+                        if(results[0].rows.length == 0){
+                            // console.log(">>No data found")
+                        }
+                    }
+                  ).catch(error => {
+              
+                  console.log(error);
+                  })
+
+                  console.log(error);
+                  })
+                  
                   db.executeSql(
-                    'SELECT appVersion,isSync FROM sessions').then(
+                    'SELECT appVersion FROM sessions').then(
                   (results) => {
                       if(results[0].rows.length == 0){
-                          console.log(">>No data found")
+                          // console.log(">>No data found")
                       }
                   }
                 ).catch(error => {
-                  // db.transaction((tx) => {
-                  //   tx.executeSql(
-                  //     'INSERT INTO sessions VALUES (?,?,?,?,?,?,?,?,?,?,?)',
-                  //     [,data.serverId,data.operatorId,data.sprayerId,data.chemistryType,data.startTime,data.endTime,data.sessionLocation,data.sessionComment,data.sessionData,data.ozSparayed],
-                  //     (tx, results) => {
-                  //       // console.log('Results', results.rowsAffected);
-                  //       var success = "true";
-                  //       resolve(results);
-                  //         if (results.rowsAffected > 0) {
-                  //           resolve(success);
-                  //         } else {
-                  //           alert('Registration Failed');
-                  //         }
-                  //     }
-                  //   );
-                  //   // alert("Complete")
-                  // });
-                 console.log(error);
-            })
+                  db.executeSql(
+                    'ALTER TABLE sessions ADD COLUMN appVersion text not null default "1.0"').then(
+                  (results) => {
+                      if(results[0].rows.length == 0){
+                          // console.log(">>No data found")
+                      }
+                  }
+                ).catch(error => {
+            
+                console.log(error);
+                })
+                    console.log(error);
+                    })
+
+                    db.executeSql(
+                      'SELECT isRinse FROM sessions').then(
+                    (results) => {
+                        if(results[0].rows.length == 0){
+                            // console.log(">>No data found")
+                        }
+                    }
+                  ).catch(error => {
+                    db.executeSql(
+                      'ALTER TABLE sessions ADD COLUMN isRinse boolean not null default 0').then(
+                    (results) => {
+                        if(results[0].rows.length == 0){
+                            // console.log(">>No data found")
+                        }
+                    }
+                  ).catch(error => {
+              
+                  console.log(error);
+                  })
+                  console.log(error);
+                  })
+
+                  db.executeSql(
+                    'SELECT isFinished FROM sessions').then(
+                  (results) => {
+                      if(results[0].rows.length == 0){
+                          // console.log(">>No data found")
+                      }
+                  }
+                ).catch(error => {
+                  db.executeSql(
+                    'ALTER TABLE sessions ADD COLUMN isFinished boolean not null default 0').then(
+                  (results) => {
+                      if(results[0].rows.length == 0){
+                          // console.log(">>No data found")
+                      }
+                  }
+                ).catch(error => {
+            
+                console.log(error);
+                })
+                console.log(error);
+                })
+                
                 }
+                if(reqTable === 'operators'){
+                  db.executeSql(
+                    'SELECT isSync FROM operators').then(
+                  (results) => {
+                      if(results[0].rows.length == 0){
+                          // console.log(">>No data found")
+                      }
+                  }
+                ).catch(error => {
+                  db.executeSql(
+                    'ALTER TABLE operators ADD COLUMN isSync boolean not null default 0').then(
+                  (results) => {
+                      if(results[0].rows.length == 0){
+                          // console.log(">>No data found")
+                      }
+                  }
+                ).catch(error => {
+            
+                console.log(error);
+                })
+
+                console.log(error);
+                })
+              }
+              if(reqTable === 'sprayers'){
+                db.executeSql(
+                  'SELECT isSync FROM sprayers').then(
+                (results) => {
+                    if(results[0].rows.length == 0){
+                        // console.log(">>No data found")
+                    }
+                }
+              ).catch(error => {
+                db.executeSql(
+                  'ALTER TABLE sprayers ADD COLUMN isSync boolean not null default 0').then(
+                (results) => {
+                    if(results[0].rows.length == 0){
+                        // console.log(">>No data found")
+                    }
+                }
+              ).catch(error => {
+          
+              console.log(error);
+              })
+
+              console.log(error);
+              })
+            }
                 // db.transaction((tx) => {
                 //   tx.executeSql('DROP TABLE '+reqTable);
                 // }).then((resp) => {
@@ -81,21 +191,28 @@ export var initDB = (reqTable) => {
               }).catch((error) => {
                 console.log("Received error: ", error);
                 db.transaction((tx) => {
-                  tx.executeSql('CREATE TABLE IF NOT EXISTS operators (id INTEGER PRIMARY KEY AUTOINCREMENT,serverId VARCHAR(25), opName VARCHAR(25),company VARCHAR(25),chemistryType VARCHAR(25))');
+                  tx.executeSql('CREATE TABLE IF NOT EXISTS operators (id INTEGER PRIMARY KEY AUTOINCREMENT,serverId VARCHAR(25), opName VARCHAR(25),company VARCHAR(25),chemistryType VARCHAR(25),isSync boolean not null default 0)');
                 }).then((resp) => {
                   console.log("resp operators "+resp);
                   resolve(db);
                 })
                 
                 db.transaction((tx) => {
-                  tx.executeSql('CREATE TABLE IF NOT EXISTS sprayers (id INTEGER PRIMARY KEY AUTOINCREMENT,serverId VARCHAR(25), sdName VARCHAR(25),hardwareId VARCHAR(50))');
+                  tx.executeSql('CREATE TABLE IF NOT EXISTS sprayers (id INTEGER PRIMARY KEY AUTOINCREMENT,serverId VARCHAR(25), sdName VARCHAR(25),hardwareId VARCHAR(50),isSync boolean not null default 0)');
                 }).then((resp) => {
                   console.log("resp sprayers "+resp);
                   resolve(db);
                 })
 
                 db.transaction((tx) => {
-                  tx.executeSql('CREATE TABLE IF NOT EXISTS sessions (id INTEGER PRIMARY KEY AUTOINCREMENT,serverId VARCHAR(25), operatorId VARCHAR(25), sprayerId VARCHAR(25), chemistryType VARCHAR(25) ,startTime INTEGER ,endTime INTEGER,sessionLocation VARCHAR(25),sessionComment VARCHAR(100),sessionData TEXT,ozSparayed REAL)');
+                  tx.executeSql('CREATE TABLE IF NOT EXISTS sessions (id INTEGER PRIMARY KEY AUTOINCREMENT,serverId VARCHAR(25), operatorId VARCHAR(25), sprayerId VARCHAR(25), chemistryType VARCHAR(25) ,startTime INTEGER ,endTime INTEGER,sessionLocation VARCHAR(25),sessionComment VARCHAR(100),sessionData TEXT,ozSparayed REAL,isSync boolean not null default 0,isFinished boolean not null default 0,isRinse boolean not null default 0,appVersion boolean not null default 0)');
+                }).then((resp) => {
+                  // console.log("resp user table "+resp);
+                  resolve(db);
+                })
+
+                db.transaction((tx) => {
+                  tx.executeSql('CREATE TABLE IF NOT EXISTS sessionData (id INTEGER PRIMARY KEY AUTOINCREMENT,serverId VARCHAR(25), sessionId VARCHAR(25), serverSessionId VARCHAR(25), sessionData TEXT, isSync boolean not null default 0, isFinished boolean not null default 0)');
                 }).then((resp) => {
                   // console.log("resp user table "+resp);
                   resolve(db);
@@ -149,8 +266,8 @@ export var addOperator = function (data) {
         // console.log(">>addOperator ",db);
       db.transaction((tx) => {
         tx.executeSql(
-          'INSERT INTO operators VALUES (?,?, ?, ?, ?)',
-          [,data.serverId,data.opName,data.company,data.chemistryType],
+          'INSERT INTO operators VALUES (?,?, ?, ?, ?,?)',
+          [,data.serverId,data.opName,data.company,data.chemistryType,data.isSync],
           (tx, results) => {
             // console.log('Results', results.rowsAffected);
             var success = "true";
@@ -176,8 +293,8 @@ export var addOperator = function (data) {
         // console.log(">>addOperator ",db);
       db.transaction((tx) => {
         tx.executeSql(
-          'INSERT INTO sprayers VALUES (?,?,?,?)',
-          [,data.serverId,data.sdName,data.hardwareId],
+          'INSERT INTO sprayers VALUES (?,?,?,?,?)',
+          [,data.serverId,data.sdName,data.hardwareId,data.isSync],
           (tx, results) => {
             // console.log('Results', results.rowsAffected);
             var success = "true";
@@ -203,8 +320,35 @@ export var addOperator = function (data) {
         // console.log(">>addOperator ",db);
       db.transaction((tx) => {
         tx.executeSql(
-          'INSERT INTO sessions VALUES (?,?,?,?,?,?,?,?,?,?,?)',
-          [,data.serverId,data.operatorId,data.sprayerId,data.chemistryType,data.startTime,data.endTime,data.sessionLocation,data.sessionComment,data.sessionData,data.ozSparayed],
+          'INSERT INTO sessions VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+          [,data.serverId,data.operatorId,data.sprayerId,data.chemistryType,data.startTime,data.endTime,data.sessionLocation,data.sessionComment,data.sessionData,data.ozSparayed,data.isSync,data.isFinished,data.isRinse,data.appVersion],
+          (tx, results) => {
+            // console.log('Results', results.rowsAffected);
+            var success = "true";
+            resolve(results);
+              if (results.rowsAffected > 0) {
+                resolve(success);
+              } else {
+                alert('Registration Failed');
+              }
+          }
+        );
+        // alert("Complete")
+      });
+    }).catch(error => {
+      console.log(error);
+    });;;
+    return promise;
+  }
+
+  export var addSessionDataDB = function (data) {
+    // console.log(">>data ",data)
+    let promise = new Promise((resolve, reject) => {
+        // console.log(">>addOperator ",db);
+      db.transaction((tx) => {
+        tx.executeSql(
+          'INSERT INTO sessionData VALUES (?,?,?,?,?,?,?)',
+          [,data.serverId,data.sessionId,data.serverSessionId,data.sessionData,data.isSync,data.isFinished],
           (tx, results) => {
             // console.log('Results', results.rowsAffected);
             var success = "true";
@@ -247,11 +391,172 @@ export var getOperators = function () {
     return promise;
   }
 
+  export var getOperatorAPISync = function () {
+    console.log("getOperatorAPISync");
+    let promise = new Promise((resolve, reject) => {
+        db.executeSql(
+            'SELECT * FROM operators where isSync=0 OR serverId=null').then(
+          (results) => {
+              var records = [];
+            // console.log(">>Inside getOperators",results)
+            if(results[0].rows.length){
+                for (let i = 0; i < results[0].rows.length; ++i){
+                    records.push(results[0].rows.item(i))
+                    // console.log(">>results ",i,)
+                }
+            }
+            resolve(records);
+          }
+        )
+    }).catch(error => {
+      console.log(error);
+    });;
+    return promise;
+  }
+
+  export var getSprayerAPISync = function () {
+    console.log("getSprayerAPISync");
+    let promise = new Promise((resolve, reject) => {
+        db.executeSql(
+            'SELECT * FROM sprayers where isSync=0 OR serverId=null').then(
+          (results) => {
+              var records = [];
+            // console.log(">>Inside getOperators",results)
+            if(results[0].rows.length){
+                for (let i = 0; i < results[0].rows.length; ++i){
+                    records.push(results[0].rows.item(i))
+                    // console.log(">>results ",i,)
+                }
+            }
+            resolve(records);
+          }
+        )
+    }).catch(error => {
+      console.log(error);
+    });;
+    return promise;
+  }
+  
+  export var getSessionAPISync = function () {
+    console.log("getOperators");
+    let promise = new Promise((resolve, reject) => {
+        db.executeSql(
+            'SELECT * FROM sessions where isSync=0 OR serverId=null').then(
+          (results) => {
+              var records = [];
+            // console.log(">>Inside getOperators",results)
+            if(results[0].rows.length){
+                for (let i = 0; i < results[0].rows.length; ++i){
+                    records.push(results[0].rows.item(i))
+                    // console.log(">>results ",i,)
+                }
+            }
+            resolve(records);
+          }
+        )
+    }).catch(error => {
+      console.log(error);
+    });;
+    return promise;
+  }
+  
+  export var getSessionByIdSync = function (id) {
+    console.log("getOperators");
+    let promise = new Promise((resolve, reject) => {
+        db.executeSql(
+            'SELECT * FROM sessions where id=?',[id]).then(
+          (results) => {
+              var records = [];
+            // console.log(">>Inside getOperators",results)
+            if(results[0].rows.length){
+                for (let i = 0; i < results[0].rows.length; ++i){
+                    records.push(results[0].rows.item(i))
+                    // console.log(">>results ",i,)
+                }
+            }
+            resolve(records);
+          }
+        )
+    }).catch(error => {
+      console.log(error);
+    });;
+    return promise;
+  }
+
+  export var getSessionDataAPISync = function () {
+    console.log("getOperators");
+    let promise = new Promise((resolve, reject) => {
+        db.executeSql(
+            'SELECT * FROM sessionData where isSync=0 OR serverId=null').then(
+          (results) => {
+              var records = [];
+            // console.log(">>Inside getOperators",results)
+            if(results[0].rows.length){
+                for (let i = 0; i < results[0].rows.length; ++i){
+                    records.push(results[0].rows.item(i))
+                    // console.log(">>results ",i,)
+                }
+            }
+            resolve(records);
+          }
+        )
+    }).catch(error => {
+      console.log(error);
+    });;
+    return promise;
+  }
+
+  export var updateSessions = function (objSession) {
+    console.log("getOperators");
+    let promise = new Promise((resolve, reject) => {
+        db.executeSql(
+            'UPDATE sessions SET endTime=?,sessionLocation=?,sessionComment=?,isSync=? where id=?',[objSession.endTime,objSession.sessionLocation,objSession.sessionComment,objSession.isSync,objSession.id]).then(
+          (results) => {
+              var records = [];
+            // console.log(">>Inside getOperators",results)
+            if(results[0].rows.length){
+                for (let i = 0; i < results[0].rows.length; ++i){
+                    records.push(results[0].rows.item(i))
+                    // console.log(">>results ",i,)
+                }
+            }
+            resolve(records);
+          }
+        )
+    }).catch(error => {
+      console.log(error);
+    });;
+    return promise;
+  }
+
   export var getSessions = function (id) {
     // console.log("getSessions");
     let promise = new Promise((resolve, reject) => {
         db.executeSql(
             'SELECT * FROM sessions').then(
+          (results) => {
+              var records = [];
+            // console.log(">>Inside getOperators",results)
+            if(results[0].rows.length){
+                for (let i = 0; i < results[0].rows.length; ++i){
+                    records.push(results[0].rows.item(i))
+                    // console.log(">>results ",i,)
+                }
+            }
+            resolve(records);
+          }
+        )
+    }).catch(error => {
+      console.log(error);
+    });;
+    return promise;
+  }
+
+  export var getSessionWithParam = function (field,data) {
+    // console.log("getSessions");
+    let promise = new Promise((resolve, reject) => {
+        db.executeSql(
+            'SELECT * FROM sessions where '+field+'='+data).then(
           (results) => {
               var records = [];
             // console.log(">>Inside getOperators",results)
@@ -350,12 +655,29 @@ export var getOperators = function () {
     return promise;
   }
 
-  export var updateServerId = function (tableName,id) {
+  export var updateServerId = function (tableName,id,tableId) {
     let promise = new Promise((resolve, reject) => {
       db.transaction((tx) => {
         tx.executeSql(
-          'UPDATE '+tableName+' SET serverId=?',
-          [id],
+          'UPDATE '+tableName+' SET serverId=?,isSync=1 where id=?',
+          [id,tableId],
+          (tx, results) => {
+            console.log('Results', results.rowsAffected);
+            resolve(results);
+          })
+      })
+    }).catch(error => {
+      console.log(error);
+    });;
+    return promise;
+  }
+
+  export var updateServerForSessionDataId = function (id,serverId,severSessionId) {
+    let promise = new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        tx.executeSql(
+          'UPDATE sessionData SET serverId=?,serverSessionId=?,isSync=1 where id=?',
+          [serverId,severSessionId,id],
           (tx, results) => {
             console.log('Results', results.rowsAffected);
             resolve(results);

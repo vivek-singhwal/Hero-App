@@ -15,7 +15,7 @@ import { Text, } from 'react-native-paper';
 import { EventRegister } from 'react-native-event-listeners';
 import NetInfo,{useNetInfo} from "@react-native-community/netinfo";
 import {internetConnection,setInternetConnection} from './services/DataService'
-
+import { initDB } from './services/DBService';
 
 
 const Stack = createStackNavigator();
@@ -70,6 +70,13 @@ const MessageModal = ({modalVisible,setModalVisible}) => {
 function App() {
   const [modalVisible, setModalVisible] = React.useState(false);
   const [connectionModalVisible, setConnectionModalVisible] = React.useState(false);
+  React.useEffect(()=>{
+  
+      initDB('sessions').then((res)=>{
+        
+      });
+      initDB('sprayers').then((res)=>{});
+  })
   
   return (
     <>

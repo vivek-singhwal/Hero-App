@@ -34,36 +34,36 @@ export default OperatorProfile= ({navigation}) =>{
     useEffect(()=>{
      
         if(count){
-          initDB('sessions').then((res)=>{
+          initDB('operators').then((res)=>{
 
           // check and operator with api
             // console.log(">>Res ",res);
             getOperators().then((result)=>{
-                console.log(">result ", netInfo.isInternetReachable,netInfo.isConnected);
+                console.log(">result ", result);
                 if(result && result.length > 0){
                  
                   var operatorDat =  JSON.parse(JSON.stringify(result[0]));
                   // console.log("addOperatorAPI" ,operatorDat.name, result[0].opName);
-                  var operatorObj = {
-                    opName: operatorDat.opName,
-                    company: operatorDat.company,
-                    chemistryType: operatorDat.chemistryType
-                  }
-                  if(operatorDat.serverId == null && netInfo.isInternetReachable){
+                  // var operatorObj = {
+                  //   opName: operatorDat.opName,
+                  //   company: operatorDat.company,
+                  //   chemistryType: operatorDat.chemistryType
+                  // }
+                  // if(operatorDat.serverId == null && netInfo.isConnected){
                   
-                    addOperatorAPI(operatorObj).then((resOperator)=>{
+                    // addOperatorAPI(operatorObj).then((resOperator)=>{
                     
-                      if(resOperator.result){
+                    //   if(resOperator.result){
                        
-                        updateServerId('operators',resOperator.result.id).then((setOpData)=>{
-                          var opObj = {"chemistryType": operatorDat.chemistryType, "company": operatorDat.company, "opName": operatorDat.opName, "serverId": resOperator.result.serverId}
-                          setOperatorData(opObj);
-                          // navigation.navigate('FirstConnection')
-                        })
-                      }
+                        // updateServerId('operators',resOperator.result.id).then((setOpData)=>{
+                        //   var opObj = {"chemistryType": operatorDat.chemistryType, "company": operatorDat.company, "opName": operatorDat.opName, "serverId": resOperator.result.serverId}
+                        //   setOperatorData(opObj);
+                        //   // navigation.navigate('FirstConnection')
+                        // })
+                    //   }
                     
-                    })
-                  }
+                    // })
+                  // }
                   // console.log("addOperatorAPI" ,operatorDat.name, result[0].opName);
                   var opObj = {"chemistryType": operatorDat.chemistryType, "company": operatorDat.company, "opName": operatorDat.opName, "serverId": operatorDat.serverId}
                   setOperatorData(opObj);
@@ -83,7 +83,7 @@ export default OperatorProfile= ({navigation}) =>{
 
     var addRecord = ()=>{
       setLoading(true);
-      console.log(">>opName ",opChem,opName,opCompany)
+      console.log(">result ", netInfo.isInternetReachable,netInfo.isConnected,netInfo.isWifiEnabled,netInfo.type);
       // return;
       // delOperator(0).then((data)=>{
       //   console.log(">Data ",data);
@@ -93,34 +93,30 @@ export default OperatorProfile= ({navigation}) =>{
       // })
       if(opName !== "" && opCompany !== ""){
         var operatorObj = {
-          opName:opName,
-          company:opCompany,
-          chemistryType:opChem
+          opName: opName,
+          company: opCompany,
+          chemistryType: opChem,
+          isSync:false
         }
         // console.log(">>opName ",opChem,opName,opCompany)
-        if(netInfo.isInternetReachable){
-          addOperatorAPI(operatorObj).then((resOperator)=>{
-            if(resOperator){
-              console.log(">>resOperator ",resOperator);
-  
-              operatorObj.serverId = resOperator.id;
-              // deleteAllOperator().then(()=>{
-                addOperator(operatorObj).then((data)=>{
+        if(netInfo.isConnected){
+          // addOperatorAPI(operatorObj).then((resOperator)=>{
+            // if(resOperator){
+              // console.log(">>resOperator ",resOperator);  
+              // operatorObj.serverId = resOperator.id;
+              addOperator(operatorObj).then((data)=>{
                   // console.log(">addOperator ",operatorObj,JSON.stringify(data));
-                 
-                })
-              // })
-              var opObj = {"chemistryType": operatorObj.chemistryType, "company": operatorObj.company, "opName": operatorObj.opName, "serverId": operatorObj.serverId}
+              })
+              var opObj = {"chemistryType": operatorObj.chemistryType, "company": operatorObj.company, "opName": operatorObj.opName, "serverId":null,}
               setOperatorData(opObj);
-            setLoading(false);
-            }
-           
+              setLoading(false);
+          }
             navigation.navigate('FirstConnection')
-          })
-        }else{
-          Alert.alert('HeroApp','Internet connectivity issue found.');
-          setLoading(false);
-        }
+          // })
+        // }else{
+        //   Alert.alert('HeroApp','Internet connectivity issue found.');
+        //   setLoading(false);
+        // }
         
       }else{
         setVisible(true);

@@ -6,10 +6,12 @@ import { EventRegister } from 'react-native-event-listeners';
 import BleService, {getInterval, getReadOk, setReadOk , getCurrentCmd,setCurrentCmd, bleCommands,initCmdSeq,bleResults, dataCmdSeq} from '../services/BleService';
 import { predefinedSessionData,setPredefinedessionData ,
         setDeviceHWData,currentSessionData,setCurrentSessionData,
-         getSessionId, setSecondRead,secondRead, setInternetConnection} from '../services/DataService';
+        getLocalSessionId,
+         getSessionId, setSecondRead,secondRead, setInternetConnection,currentReadData,setCurrentReadData} from '../services/DataService';
 import { addSessionDataAPI,addSessionAPI } from '../services/apiService';
-import NetInfo,{useNetInfo} from "@react-native-community/netinfo";
-import { BluetoothStatus } from 'react-native-bluetooth-status';
+import NetInfo from "@react-native-community/netinfo";
+import { addSessionDataDB } from '../services/DBService';
+
 const window = Dimensions.get('window');
 const BleManagerModule = NativeModules.BleManager;
 const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
@@ -36,6 +38,7 @@ export default class BleAppmanager extends Component {
     this.handleAppStateChange = this.handleAppStateChange.bind(this);
   }
   sessionData = {};
+  currentReadData=[]
   sessionStartTime = {};
   // firstTimeRead = false;
   
@@ -124,7 +127,7 @@ export default class BleAppmanager extends Component {
             "pumpedVolume": currentSessionData.getPumpedVolume ,
             "serial": predefinedSessionData.getSerial, // not frequently required
             "triggerLatchMode": currentSessionData.getTriggerLatchMode,
-            "unitName": currentSessionData.getUnitName,
+            "unitName": predefinedSessionData.getUnitName,
             "resetPump": predefinedSessionData.resetPump, // not frequently required
             // "setUnitName": this.sessionData.setUnitName,
             "updateFirmware": predefinedSessionData.updateFirmware, // not frequently required
@@ -136,32 +139,45 @@ export default class BleAppmanager extends Component {
             this.writeData('getPumpTime\r');
           //this.writeData('getPumpTime\r');
           //TODO: read session Data
-        //   this.sessionData = {
-        //     "getBatteryLevel": "000",
-        //     "getESVState": "On",
-        //     "getFirmware": "1.20",
-        //     "getFlow": "00000000",
-        //     "getFlowRate": "00000000",
-        //     "getHWVersion": "Alpha0001",
-        //     "getModel": "V2020-SEP",
-        //     "getPumpState": "Off",
-        //     "getPumpTime": "00000000",
-        //     "getPumpedVolume": "00000360",
-        //     "getSerial": "2020-000001",
-        //     "getTriggerLatchMode": "Under Development",
-        //     "getUnitName": "2020-000001",
-        //     "resetPump": "OK",
-        //     "setUnitName": "OK",
-        //      "getTriggerLatchState":"TBD",
-        //     "updateFirmware": "Under Development"
-        // }
-          // 
-       console.log(">>sessionData ---=> ",sessionObjApi)
+          //   this.sessionData = {
+          //     "getBatteryLevel": "000",
+          //     "getESVState": "On",
+          //     "getFirmware": "1.20",
+          //     "getFlow": "00000000",
+          //     "getFlowRate": "00000000",
+          //     "getHWVersion": "Alpha0001",
+          //     "getModel": "V2020-SEP",
+          //     "getPumpState": "Off",
+          //     "getPumpTime": "00000000",
+          //     "getPumpedVolume": "00000360",
+          //     "getSerial": "2020-000001",
+          //     "getTriggerLatchMode": "Under Development",
+          //     "getUnitName": "2020-000001",
+          //     "resetPump": "OK",
+          //     "setUnitName": "OK",
+          //      "getTriggerLatchState":"TBD",
+          //     "updateFirmware": "Under Development"
+          // }
+            // 
+         console.log(">>sessionData ---=> ",sessionObjApi)
+
         // EventRegister.emit('BLECMD', { event: "homepageEvent" , cmd:'getSerial\r'})
+        
+        // Add session data into DB
+        var localSessionDtaObj = {};
+        localSessionDtaObj.sessionData= JSON.stringify(sessionObjApi);
+        localSessionDtaObj.isSync=0;
+        localSessionDtaObj.isFinished=1;
+        localSessionDtaObj.sessionId=getLocalSessionId();
+        localSessionDtaObj.serverId=null;
+        localSessionDtaObj.serverSessionId = null;
+        addSessionDataDB(localSessionDtaObj).then((respSessionData)=>{
+          console.log(">>respSessionData ",respSessionData);
+        })
         // TODO: upload session Data
-        addSessionDataAPI(sessionObjApi).then((respData)=>{
-          console.log("Request call ::"+JSON.stringify(respData),new Date(Date.now()));
-        })  
+        // addSessionDataAPI(sessionObjApi).then((respData)=>{
+        //   console.log("Request call ::"+JSON.stringify(respData),new Date(Date.now()));
+        // })  
        },10000) //every 10 seconds
       }
     });
@@ -274,6 +290,7 @@ export default class BleAppmanager extends Component {
       bleResults[getCurrentCmd()] = this.getStringFromAscii(data.value);
       this.sessionStartTime = Date.now();
       this.sessionData[getCurrentCmd().replace(/(\r\n|\n|\r)/gm, "")] = this.getStringFromAscii(data.value).replace(/(\r\n|\n|\r)/gm, "")
+      this.currentReadData.push(this.currentReadData);
     }
     
     console.log("currentCMD: "+ getCurrentCmd(),initCmdSeq.indexOf(getCurrentCmd()));
@@ -290,6 +307,7 @@ export default class BleAppmanager extends Component {
         // firstTimeRead =true;
         setCurrentSessionData(this.sessionData);
         setPredefinedessionData(this.sessionData);
+        setCurrentReadData(this.currentReadData);
         // clearInterval(this.readInterval);
         // EventRegister.emit('StartInterval');
         

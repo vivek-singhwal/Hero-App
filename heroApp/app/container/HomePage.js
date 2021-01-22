@@ -7,13 +7,13 @@ import Feather from 'react-native-vector-icons/Ionicons';
 import {getOperator,addSessionAPI, updateSessionAPI} from '../services/apiService';
 import {getReadingStatus, setSessionObjApiData,getSessionObjApiData,getDeviceData, 
         setReadingStatus,setSessionId, sessionDataList,getOperatorData , getDeviceHWData, 
-        setSessionDataList, currentSessionData, getSessionId, predefinedSessionData} from '../services/DataService';
+        setSessionDataList, currentSessionData, getSessionId, predefinedSessionData, setLocalSessionId, getLocalSessionId} from '../services/DataService';
 import SaveModal from './SaveModal';
 import { EventRegister } from 'react-native-event-listeners';
-import {initDB, addSession, getSessions} from '../services/DBService';
+import {initDB, addSession, getSessions, updateSessions, getSessionWithParam} from '../services/DBService';
 import {enableInterval,disableInterval} from '../services/BleService';
 
-let setStartTime ,setEndTime;
+let setStartTime ,setEndTime, setCurrentSessionId;
 export default  HomePage = ({navigation})=>{
 
     const [deviceData] = useState(getDeviceData());
@@ -46,10 +46,11 @@ export default  HomePage = ({navigation})=>{
       if(counter){
         initDB('sessions').then((res)=>{
           getSessions(getOperatorData().serverId).then((resSessions)=>{
-            //console.log(">>Res ",getOperatorData().serverId,resSessions,);
+            console.log(">>Res ",resSessions,);
             var listSession = resSessions;
             if(resSessions){
               for(let i=0;i<listSession.length;i++){
+                console.log(">>resSessions ",resSessions);
                 if(listSession[i].sessionData !=undefined && listSession[i].sessionData != null){
                   listSession[i]['sessionData'] = JSON.parse(listSession[i]['sessionData']);
                 }
@@ -85,6 +86,7 @@ export default  HomePage = ({navigation})=>{
     }
 
     var addSessionList = (comment,location)=>{
+     
       disableInterval();
       EventRegister.emit('StopInterval');
       // sessionDataList.push({location:'abc',comment:'',serverId:'0',startTime:this.sessionStartTime,endTime:Date.now()});
@@ -99,11 +101,26 @@ export default  HomePage = ({navigation})=>{
           endTime: setEndTime,
           sessionLocation: locationText,
           sessionComment: commentText,
-          sessionData: JSON.stringify(currentSessionData)
+          sessionData: JSON.stringify(currentSessionData),
+          id: getLocalSessionId(),
+          isSync:0,
+          // isFinished:1,
+          // isRinse:0,
+          // appVersion:"1.1",
+
       } 
-      addSession(sessionObj).then((res)=>{
-        console.log(">Added ",res);
+      // addSession(sessionObj).then((res)=>{
+      //   console.log(">Added ",res);
+      // })
+      // update location,comment and endtime in sessions data.
+      updateSessions(sessionObj).then((respUpdateSession)=>{
+        console.log(">>Update session ",respUpdateSession);
       })
+      sessionListAr.push({sessionLocation:locationText, startTime:setStartTime, endTime: setEndTime, ozSparayed:parseInt(currentSessionData.getPumpedVolume)/29.57})
+      setSessionList(sessionListAr);
+      setCommentText('');
+      setLocationText('');
+      return;
       var sessionObjApi =  getSessionObjApiData();
       sessionObjApi.sessionLocation = locationText;
       sessionObjApi.endTime = setEndTime;
@@ -115,18 +132,17 @@ export default  HomePage = ({navigation})=>{
       updateSessionAPI(sessionObjApi).then((resp)=>{
         console.log(">>Resp success",resp)
       })
-      sessionListAr.push({sessionLocation:locationText, startTime:setStartTime, endTime: setEndTime, ozSparayed:parseInt(currentSessionData.getPumpedVolume)/29.57})
-      setSessionList(sessionListAr);
-      setCommentText('');
-      setLocationText('');
+      
+     
       // console.log("ADd request",commentText,locationText,currentSessionData,setStartTime,setEndTime,Math.ceil(Math.abs(new Date(setStartTime).getTime()-new Date(setEndTime).getTime()) / 1000));
      
     }
     var startReading=()=>{
+      console.log(">>getLocalSessionId() ",getOperatorData(),getDeviceHWData());
       var sessionsObjAPI = {
         "startTime": setStartTime.toString(),
         // "endTime":"1609248424619",
-        "appVersion": "1.0.2",
+        "appVersion": "1.0.3",
         // "sessionLocation": "location1",
         operatorId: getOperatorData().serverId,
         sprayerId: getDeviceHWData().serverId,
@@ -137,20 +153,45 @@ export default  HomePage = ({navigation})=>{
         unitName: predefinedSessionData.getModel
         // "sessionComment": "first comment"
     }
-    setSessionObjApiData(sessionsObjAPI)
-    console.log(">>sessions ", sessionsObjAPI);
-     addSessionAPI(sessionsObjAPI).then((respData)=>{
-       console.log(">>respData ",JSON.stringify(respData));
-       if(respData.success){
-        setSessionId(respData.result.id);
+    var sessionObj = {
+      // serverId:0,
+      operatorId: getOperatorData().serverId,
+      sprayerId: getDeviceHWData().serverId,
+      chemistryType: getOperatorData().chemistryType,
+      startTime: setStartTime,
+      ozSparayed: parseInt(currentSessionData.getFlowRate)/29.57,
+      // endTime: setEndTime,
+      // sessionLocation: locationText,
+      // sessionComment: commentText,
+      sessionData: null,
+      isSync: 0,
+      isFinished: 1,
+      isRinse: 0,
+      "appVersion": "1.0.3",
+  } 
+  addSession(sessionObj).then((res)=>{
+    console.log(">Added ",res);
+    getSessionWithParam('startTime',setStartTime).then((resSession)=>{
+      console.log(">>resSession",resSession);
+      setLocalSessionId(resSession[0].id)
         enableInterval();
-        EventRegister.emit('StartInterval')
-       }else{
-         Alert.alert('HeroApp','Server Error.')
-         setReadStatus(false);
-       }
-      console.log("Request call ::"+JSON.stringify(respData),new Date(Date.now()));
-    }) 
+       EventRegister.emit('StartInterval')
+    })
+  })
+    // setSessionObjApiData(sessionsObjAPI)
+    // console.log(">>sessions ", sessionsObjAPI);
+    //  addSessionAPI(sessionsObjAPI).then((respData)=>{
+    //    console.log(">>respData ",JSON.stringify(respData));
+    //    if(respData.success){
+    //     setSessionId(respData.result.id);
+    //     enableInterval();
+    //     // EventRegister.emit('StartInterval')
+    //    }else{
+    //      Alert.alert('HeroApp','Server Error.')
+    //      setReadStatus(false);
+    //    }
+    //   console.log("Request call ::"+JSON.stringify(respData),new Date(Date.now()));
+    // }) 
      }
 
     function convertTime(sec) {

@@ -149,32 +149,39 @@ return(
               onPress={()=>{
                 var deviceObj = {
                     sdName:getDeviceHWData().sdName,
-                    hardwareId:getDeviceHWData().hardwareId
+                    hardwareId:getDeviceHWData().hardwareId,
+                    serverId:null,
+                    isSync:0
                 }
+              
+                getSprayersByHwId(getDeviceHWData().hardwareId).then((resDevice)=>{
+                  if(resDevice.length){
+                      console.log(">>resDevice",resDevice);
+                      deviceObj.serverId = resDevice[0].serverId;
+                  }else{
+                      addSprayer(deviceObj).then(()=>{
+                       
+                      })
+                  }
+                  setDeviceHWData(deviceObj);
+                  navigation.navigate('HomePage');
+              })
                 console.log(">>getDeviceHWData() ",getDeviceHWData())
-                if(getDeviceHWData().hardwareId != 0){
-                    addSprayerAPI(deviceObj).then((result)=>{
-                        console.log(">>result ",result.result);
-                        if(result.result){
-                          deviceObj.serverId = result.result.id;
-                          setDeviceHWData(deviceObj);
-                          if(result.success){
-                              getSprayersByHwId(getDeviceHWData().hardwareId).then((resDevice)=>{
-                                  if(resDevice.length){
-                                      console.log(">>resDevice",resDevice)
-                                  }else{
-                                      deviceObj.serverId = result.result.id;
-                                      addSprayer(deviceObj).then(()=>{
-                                              
-                                      })
-                                  }
-                              })
-                          }
-                        }
+                // if(getDeviceHWData().hardwareId != 0){
+                //     addSprayerAPI(deviceObj).then((result)=>{
+                //         console.log(">>result ",result.result);
+                //         if(result.result){
+                //           deviceObj.serverId = result.result.id;
+                          
+                //           setDeviceHWData(deviceObj);
+                //           if(result.success){
+                             
+                //           }
+                //         }
                         
-                     })
-                    navigation.navigate('HomePage');
-                }
+                //      })
+                //     // navigation.navigate('HomePage');
+                // }
                
               }}
               >
