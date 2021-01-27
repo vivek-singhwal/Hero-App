@@ -91,7 +91,7 @@ export default OperatorProfile= ({navigation}) =>{
       // getOperators().then((result)=>{
       //   console.log(">result ",result);
       // })
-      if(opName !== "" && opCompany !== ""){
+      if(opName.length > 2 && opCompany > 2){
         var operatorObj = {
           opName: opName,
           company: opCompany,

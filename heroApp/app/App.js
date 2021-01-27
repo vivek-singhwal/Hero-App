@@ -76,6 +76,7 @@ function App() {
         
       });
       initDB('sprayers').then((res)=>{});
+      initDB('sessionData').then((res)=>{});
   })
   
   return (

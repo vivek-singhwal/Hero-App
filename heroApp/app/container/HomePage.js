@@ -101,7 +101,7 @@ export default  HomePage = ({navigation})=>{
           endTime: setEndTime,
           sessionLocation: locationText,
           sessionComment: commentText,
-          sessionData: JSON.stringify(currentSessionData),
+          // sessionData: JSON.stringify(currentSessionData),
           id: getLocalSessionId(),
           isSync:0,
           // isFinished:1,
@@ -112,6 +112,7 @@ export default  HomePage = ({navigation})=>{
       // addSession(sessionObj).then((res)=>{
       //   console.log(">Added ",res);
       // })
+      console.log(">>addSessionList ",currentSessionData);
       // update location,comment and endtime in sessions data.
       updateSessions(sessionObj).then((respUpdateSession)=>{
         console.log(">>Update session ",respUpdateSession);
@@ -163,7 +164,7 @@ export default  HomePage = ({navigation})=>{
       // endTime: setEndTime,
       // sessionLocation: locationText,
       // sessionComment: commentText,
-      sessionData: null,
+      sessionData: JSON.stringify(currentSessionData),
       isSync: 0,
       isFinished: 1,
       isRinse: 0,
