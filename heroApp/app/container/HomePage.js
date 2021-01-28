@@ -6,12 +6,13 @@ import AwesomeIcon5 from 'react-native-vector-icons/FontAwesome5';
 import Feather from 'react-native-vector-icons/Ionicons';
 import {getOperator,addSessionAPI, updateSessionAPI} from '../services/apiService';
 import {getReadingStatus, setSessionObjApiData,getSessionObjApiData,getDeviceData, 
-        setReadingStatus,setSessionId, sessionDataList,getOperatorData , getDeviceHWData, 
+        setReadingStatus,setSessionId, sessionDataList,getOperatorData , getDeviceHWData, getIsRinseStart,
         setSessionDataList, currentSessionData, getSessionId, predefinedSessionData, setLocalSessionId, getLocalSessionId} from '../services/DataService';
 import SaveModal from './SaveModal';
 import { EventRegister } from 'react-native-event-listeners';
 import {initDB, addSession, getSessions, updateSessions, getSessionWithParam} from '../services/DBService';
 import {enableInterval,disableInterval} from '../services/BleService';
+import KeepAwake  from 'react-native-keep-awake';
 
 let setStartTime ,setEndTime, setCurrentSessionId;
 export default  HomePage = ({navigation})=>{
@@ -89,6 +90,7 @@ export default  HomePage = ({navigation})=>{
      
       disableInterval();
       EventRegister.emit('StopInterval');
+      KeepAwake.deactivate();
       // sessionDataList.push({location:'abc',comment:'',serverId:'0',startTime:this.sessionStartTime,endTime:Date.now()});
       var sessionListAr = [...sessionList];
       var sessionObj = {
@@ -139,6 +141,7 @@ export default  HomePage = ({navigation})=>{
      
     }
     var startReading=()=>{
+      KeepAwake.activate();
       console.log(">>getLocalSessionId() ",getOperatorData(),getDeviceHWData());
       var sessionsObjAPI = {
         "startTime": setStartTime.toString(),
@@ -312,6 +315,7 @@ export default  HomePage = ({navigation})=>{
   </View>
   
   <SaveModal addSessionList={addSessionList} setLocationText={setLocationText} locationText={locationText} commentText={commentText} setCommentText={setCommentText} visible={visible} hideModal={hideModal} SetReadingStatus={(isBack)=>{setReadStatus(isBack)}} />
+   {/* <RinseModal/> */}
     </>)
 }
 

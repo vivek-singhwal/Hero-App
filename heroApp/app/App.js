@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { View, StatusBar, SafeAreaView,StyleSheet, Alert, TouchableHighlight,Modal, } from 'react-native';
+import { View, StatusBar, SafeAreaView,StyleSheet, Alert, TouchableHighlight,Modal, Image} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-
+import Material from 'react-native-vector-icons/MaterialIcons';
 import { createStackNavigator } from '@react-navigation/stack';
 import TestPageAPI from './container/TestPageAPI';
 import HomePage from './container/HomePage';
@@ -13,8 +13,6 @@ import BleAppManager from './container/BleAppMananger';
 import AwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import { Text, } from 'react-native-paper';
 import { EventRegister } from 'react-native-event-listeners';
-import NetInfo,{useNetInfo} from "@react-native-community/netinfo";
-import {internetConnection,setInternetConnection} from './services/DataService'
 import { initDB } from './services/DBService';
 
 
@@ -64,12 +62,68 @@ const MessageModal = ({modalVisible,setModalVisible}) => {
     </Modal>
   );
 };
+const RinseModal = ({modalVisible,setModalVisible})=>{
+  const containerStyle = {backgroundColor: 'white',width:"70%",alignSelf:"center",borderRadius:10,paddingBottom:10};
+  return(  <Modal
+    animationType="slide"
+    transparent={true}
+    visible={modalVisible}
+    onRequestClose={() => {
+      Alert.alert("Modal has been closed.");
+    }}>
 
+  <View
+    style={{
+      position: 'absolute',
+      width: '100%',
+      height: '100%',
+      justifyContent: 'center',
+      backgroundColor: 'rgba(100,100,100, 0.5)',
+      padding: 40,
+    }}>
+
+      <View style={styles.modalView}>
+        <Text style={styles.modalText}>Finished spraying ?</Text>
+        <Text style={[styles.modalText]}>Time to do rinse cycle !</Text>
+        <Image style={{height:150,width:150,marginTop:20}} source={require('./asset/spray-icon.png')}/>
+    <View style={{flexDirection:"row",justifyContent:"space-between",marginTop:35,marginBottom:15,height:50}}>
+        <TouchableHighlight
+          style={{ ...styles.openButton,backgroundColor: "#fff",marginRight:10 ,borderColor:'#012554',borderWidth:1}}
+          onPress={() => {
+            // EventRegister.emit('BLECMD',{cmd:'disconnect'}) 
+            // setModalVisible(!modalVisible);
+          }}>
+          <Text style={[styles.textStyle,{color:'#012554'}]}>Cancel</Text>
+        </TouchableHighlight>
+        <TouchableHighlight
+          style={{ ...styles.openButton, backgroundColor: "#012554" }}
+          onPress={() => {
+            // setModalVisible(!modalVisible);
+            setModalVisible(false);
+          }}>
+            <View style={{flexDirection:"row",flex:1}}>
+              <Text style={styles.textStyle}>Start</Text>
+              <Material 
+                    style={{alignSelf:"center",marginLeft:10}}
+                    size={25}
+                    color={'#fff'}
+                    name="keyboard-arrow-right"/>
+          </View>
+        </TouchableHighlight>
+      </View>
+    </View>
+  </View>
+</Modal>)
+}
 
 
 function App() {
+  
   const [modalVisible, setModalVisible] = React.useState(false);
-  const [connectionModalVisible, setConnectionModalVisible] = React.useState(false);
+  const [rinseModal, setRingseModal] = React.useState(false);
+
+
+
   React.useEffect(()=>{
   
       initDB('sessions').then((res)=>{
@@ -86,10 +140,11 @@ function App() {
     <StatusBar barStyle="dark-content" />
     <SafeAreaView></SafeAreaView>
     {/* <MessageModal/> */}
+    <RinseModal modalVisible={rinseModal} setModalVisible={setRingseModal}l/>
     <BleAppManager/>
     <NavigationContainer>
     <OfflineSync/>  
-    <Stack.Navigator initialRouteName="Profile">
+    <Stack.Navigator initialRouteName="HomePage">
     <Stack.Screen name="TestPageAPI" component={TestPageAPI} options={{headerShown: false}}/>
     <Stack.Screen name="Profile" component={Profile} options={{
           headerShown: false,
@@ -122,7 +177,8 @@ function App() {
           headerTitleStyle: {fontSize:24,color:"#012554",fontWeight:"bold",fontStyle:"italic"},
           headerLeft: (()=><AwesomeIcon 
           onPress={()=>{
-            console.log(">>Click share")
+            console.log(">>Click share");
+            setRingseModal(true);
           }}
           size={32}
           // color={'#2C88D9'}
@@ -134,7 +190,9 @@ function App() {
             ]
           }} 
           name="share-square-o"/>),
+          
           headerLeftContainerStyle:{paddingLeft:20},
+
           headerRight:(()=><AwesomeIcon
           onPress={()=>{
             // console.log(">>Click bluetooth")

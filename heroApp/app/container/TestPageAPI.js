@@ -3,12 +3,22 @@ import React,{useEffect,useState} from 'react';
 import { View , StyleSheet, Text, TextInput as Input,Image, Alert, BackHandler} from 'react-native';
 import { Button, Switch, ProgressBar, Modal, Portal, Provider, TextInput } from 'react-native-paper';
 import { EventRegister } from 'react-native-event-listeners';
+import KeepAwake  from 'react-native-keep-awake';
 
 //import {getOperatorAPI, addOperatorAPI, addSessionAPI, addSessionDataAPI, addSprayerAPI} from '../services/apiService';
 
 export default TestPageAPI = () =>{
 
   return(<>
+ <Button style={{marginBottom:10}} icon="account" mode="contained" 
+    onPress={() => {KeepAwake.activate();}}>
+    Awake
+  </Button>
+  <Button style={{marginBottom:10}} icon="account" mode="contained" 
+    onPress={() => {KeepAwake.deactivate()}}>
+    Sleep
+  </Button>
+
   <Button style={{marginBottom:10}} icon="account" mode="contained" 
     onPress={() => console.log('Add Operator')}>
     Add Operator

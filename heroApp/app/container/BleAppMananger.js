@@ -198,6 +198,11 @@ export default class BleAppmanager extends Component {
         if(data.event == "test"){
         return 'test';
         }
+        if(data.event == "reqConnect"){
+          var peripherals = this.state.peripherals;
+          peripherals.set(data.device.id, data.device);
+          this.connect(data.device);
+          }
         else if (data.cmd == "disconnect"){
           this.connect(BleService.getPeripherial());
         } 
@@ -461,11 +466,13 @@ export default class BleAppmanager extends Component {
     
     //console.log("handleDiscoverPeripheral>>>"+peripheral.name)
     var peripherals = this.state.peripherals;
-  //  if(peripheral.name){
-  //   // console.log('Got ble peripheral', peripheral.name );
-  //   // console.log(JSON.stringify(peripheral))
-   
-  //  }
+   if(peripheral.name){
+    console.log('Got ble peripheral', peripheral.name );
+    this.setState({ peripherals });
+    EventRegister.emit('BLE_STATUS', { event: "bleDevices" ,devices: JSON.parse(JSON.stringify(peripheral))});
+    // console.log(JSON.stringify(peripheral))
+   }
+  
     if (!peripheral.name) {
       peripheral.name = 'NO NAME';
     }
@@ -475,9 +482,11 @@ export default class BleAppmanager extends Component {
       peripheral.name.startsWith("es") ||
       //peripheral.localName.startsWith("GhostBaste") || 
       peripheral.name.startsWith("Blue")){
-        peripherals.set(peripheral.id, peripheral);
-        this.setState({ peripherals });
-        this.connect(peripheral);
+        
+        // connect with device
+        // peripherals.set(peripheral.id, peripheral);
+        // 
+        // this.connect(peripheral);
     }
   }
   connect(peripheral) {

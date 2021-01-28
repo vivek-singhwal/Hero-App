@@ -13,6 +13,15 @@ var readingStatus = false;
 var operatorData = {opName:'',chemistryType:'',serverId:null,company:''};
 var deviceData = {};
 
+var isRinseStart = false;
+export var getIsRinseStart= ()=>{
+    return isRinseStart;
+}
+
+export var setIsRinseStart = (data)=>{
+    return isRinseStart = data;
+}
+
 var sessionId = "";
 export var getSessionId = ()=>{
     return sessionId;

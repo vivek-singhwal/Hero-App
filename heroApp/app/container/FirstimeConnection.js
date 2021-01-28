@@ -1,8 +1,8 @@
 import React,{useEffect,useState} from 'react';
-import { View , StyleSheet, Text, TextInput as Input,Image, Alert, BackHandler} from 'react-native';
+import { View , StyleSheet, Text, TextInput as Input,Image, Alert, BackHandler,TouchableHighlight ,FlatList} from 'react-native';
 import Material from 'react-native-vector-icons/MaterialIcons';
 import MaterialCom from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Avatar, Button, ActivityIndicator } from 'react-native-paper';
+import { Avatar, Button, ActivityIndicator,Modal } from 'react-native-paper';
 import { getOperatorData, setDeviceData, getDeviceHWData, setDeviceHWData , sessionDataList } from '../services/DataService';
 import { EventRegister } from 'react-native-event-listeners';
 import {setDefaultValue,getReadOk, } from '../services/BleService';
@@ -12,12 +12,19 @@ import { useBluetoothStatus ,BluetoothStatus} from 'react-native-bluetooth-statu
 
 
 export default FirstTimeConnection = ({navigation}) => {
+ let deviceListAr = [];
   const [btStatus, isPending, setBluetooth] = useBluetoothStatus();
     const [count,setCount] = useState(true);
     const [btStatusState,setBtStatusState] = useState(!btStatus);
     const [deviceStatus, setDeviceStatus] = useState('');
+    const [deviceList, setDeviceList] = useState([]);
     const [isDeviceConnected, setisDeviceConnected] = useState(false);
-   
+    const [visible, setVisible] = React.useState(false);
+
+    const showModal = () => setVisible(true);
+    const hideModal = () => setVisible(false);
+    const containerStyle = {backgroundColor: 'white',width:"70%",alignSelf:"center",borderRadius:10,paddingBottom:10};
+
     var  getBluetoothState=async()=> {
       return await BluetoothStatus.state();
     }
@@ -42,19 +49,19 @@ export default FirstTimeConnection = ({navigation}) => {
        
       };
     useEffect(()=>{
+     
       console.log(">>getOperatorData ",getOperatorData())
         if(count){
           initDB('sprayers').then((res)=>{
             console.log(">>Res ",res);
           });
-          
         setCount(false);
-        
       }
+
       scanAndConenct();
       BackHandler.addEventListener('hardwareBackPress', () => true)
         var listener = EventRegister.addEventListener('BLE_STATUS', (data) => {
-          console.log(">>BLE_STATUS ",data);
+          // console.log(">>BLE_STATUS ",data);
             if(data.event == "Data_Recieved"){
               console.log(data.value);
             }
@@ -67,19 +74,23 @@ export default FirstTimeConnection = ({navigation}) => {
             if(data.event == "connected"){
               setisDeviceConnected(true);
               setDeviceStatus("Connected");
+              hideModal()
             //   setSessionDataList([]); // set temp
 
+            }else if(data.event == "bleDevices"){
+                console.log(">>devices ",data.devices);
+                deviceListAr.push(data.devices);
+                var arrayUniqueByKey = [...new Map(deviceListAr.map(item =>
+                  [item['id'], item])).values()];
+                setDeviceList(arrayUniqueByKey);
+             
             }else if(data.event == "reading"){
               setDeviceStatus("Reading...");
             }else if(data.event == "readOK"){
               setDeviceStatus("Ready");
             }else if(data.event == "scanning"){
               setDeviceStatus("Scanning...");
-              setTimeout(()=>{
-                if(deviceStatus == "Scanning..."){
-                  setDeviceStatus("Scanning");
-                }
-              },10000)
+              showModal();  
             }else if(data.event == "disconnected"){
               setDefaultValue();
             //   setSessionDataList([]); // set temp
@@ -100,7 +111,12 @@ export default FirstTimeConnection = ({navigation}) => {
             BackHandler.removeEventListener('hardwareBackPress', () => true)
         }  
     },[])
-
+  
+  var emptyList=()=>{
+      return( <View style={{padding:15}}>
+      <Text style={{alignSelf:"center",fontSize:15}}>No device found</Text>
+    </View>);
+    }
 
 return(
 
@@ -211,11 +227,71 @@ return(
          } 
 
     </View>
+    <Modal dismissable={false} visible={visible} onDismiss={hideModal} contentContainerStyle={containerStyle}>
+        <View style={{alignSelf:"center",width:"100%"}}>
+          <View style={{height:30,backgroundColor:"#012554",}}>
+            <View style={{flexDirection:"row",justifyContent:"space-between"}}>
+          <Text style={{color:"#fff",marginLeft:10,paddingTop:2}}>Devices: </Text>
+          <MaterialCom onPress={hideModal} style={{alignSelf:"flex-end", marginRight:5}} color={'#fff'} size={25} name="close"/>
+          </View>
+          </View>
+          <View style={{padding:10}}>
+          <FlatList
+           data={deviceList}
+           ListEmptyComponent={emptyList}
+           keyExtractor={(item, index) => item.id}
+           renderItem={({item,index})=>
+            <TouchableHighlight onPress={()=>{
+              console.log(">>Click",item);
+              EventRegister.emit('BLECMD',{event:'reqConnect',device:item})
+              }} key={index} style={{height:40,borderBottomColor:'gray',borderBottomWidth:1}}>
+              <Text style={{fontSize:13,fontWeight:"bold",textTransform:'capitalize',marginStart:15,marginTop:5}}>{item.name}</Text>
+              
+                {/* <View style={{justifyContent:"space-around",flexDirection:'row'}}>
+                  <View>
+                  <Text style={{color:'#fff'}}>Start time</Text>
+                  <Text style={{color:'#fff'}}>{formatAMPM(item.startTime)}</Text>
+                  </View>
+                  <View>
+                  <Text style={{color:'#fff'}}>Time elapsed</Text>
+                  <Text style={{color:'#fff'}}>{convertTime(Math.ceil(Math.abs(new Date(item.startTime).getTime()-new Date(item.endTime).getTime()) / 1000))}</Text>
+                  </View>
+                  <View>
+                    <Text style={{color:'#fff'}}>Oz sprayed</Text>
+                    <Text style={{color:'#fff'}}>{parseFloat(item.ozSparayed).toFixed(2)} Oz</Text>
+                  </View>
+                </View> */}
+             </TouchableHighlight>
+            }
+         />
+          </View>
+         {/* <TouchableHighlight
+              style={{ ...styles.openButton, backgroundColor: "#012554",width:70,alignSelf:"center",marginTop:20 }}
+              onPress={() => {
+                setVisible(false)
+              }}>
+              <Text style={[styles.textStyle,{color:"#fff",alignSelf:"center"}]}>OK</Text>
+            </TouchableHighlight> */}
+            </View>
+        </Modal>
     </View>)
 }
 
 const styles = StyleSheet.create({
     textStyle:{
         fontSize:15
-    }
+    },openButton: {
+      backgroundColor: "#F194FF",
+      borderRadius: 4,
+      padding: 10,
+      elevation: 2
+    },
+    item: {
+      padding: 20,
+      marginVertical: 8,
+      marginHorizontal: 16,
+    },
+    title: {
+      fontSize: 32,
+    },
 })
