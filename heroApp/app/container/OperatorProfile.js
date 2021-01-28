@@ -96,7 +96,7 @@ export default OperatorProfile= ({navigation}) =>{
           opName: opName,
           company: opCompany,
           chemistryType: opChem,
-          isSync:false
+          isSync:0
         }
              addOperator(operatorObj).then((data)=>{
                   // console.log(">addOperator ",operatorObj,JSON.stringify(data));
