@@ -68,7 +68,7 @@ export default OperatorProfile= ({navigation}) =>{
                   var opObj = {"chemistryType": operatorDat.chemistryType, "company": operatorDat.company, "opName": operatorDat.opName, "serverId": operatorDat.serverId}
                   setOperatorData(opObj);
                   // console.log(getOperatorData())
-                  // navigation.navigate('FirstConnection')
+                  navigation.navigate('FirstConnection')
                 }
                
             })
