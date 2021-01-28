@@ -68,7 +68,7 @@ export default OperatorProfile= ({navigation}) =>{
                   var opObj = {"chemistryType": operatorDat.chemistryType, "company": operatorDat.company, "opName": operatorDat.opName, "serverId": operatorDat.serverId}
                   setOperatorData(opObj);
                   // console.log(getOperatorData())
-                  navigation.navigate('FirstConnection')
+                  // navigation.navigate('FirstConnection')
                 }
                
             })
@@ -83,7 +83,7 @@ export default OperatorProfile= ({navigation}) =>{
 
     var addRecord = ()=>{
       setLoading(true);
-      console.log(">result ", netInfo.isInternetReachable,netInfo.isConnected,netInfo.isWifiEnabled,netInfo.type);
+      // console.log(">result ", opName.length, opCompany.length);
       // return;
       // delOperator(0).then((data)=>{
       //   console.log(">Data ",data);
@@ -91,39 +91,25 @@ export default OperatorProfile= ({navigation}) =>{
       // getOperators().then((result)=>{
       //   console.log(">result ",result);
       // })
-      if(opName.length > 2 && opCompany > 2){
+      if(opName.length > 2 && opCompany.length > 2){
         var operatorObj = {
           opName: opName,
           company: opCompany,
           chemistryType: opChem,
           isSync:false
         }
-        // console.log(">>opName ",opChem,opName,opCompany)
-        if(netInfo.isConnected){
-          // addOperatorAPI(operatorObj).then((resOperator)=>{
-            // if(resOperator){
-              // console.log(">>resOperator ",resOperator);  
-              // operatorObj.serverId = resOperator.id;
-              addOperator(operatorObj).then((data)=>{
+             addOperator(operatorObj).then((data)=>{
                   // console.log(">addOperator ",operatorObj,JSON.stringify(data));
               })
               var opObj = {"chemistryType": operatorObj.chemistryType, "company": operatorObj.company, "opName": operatorObj.opName, "serverId":null,}
               setOperatorData(opObj);
+              navigation.navigate('FirstConnection')
               setLoading(false);
+          }else{
+            setLoading(false);
+            setVisible(true);
           }
-            navigation.navigate('FirstConnection')
-          // })
-        // }else{
-        //   Alert.alert('HeroApp','Internet connectivity issue found.');
-        //   setLoading(false);
-        // }
-        
-      }else{
-        setVisible(true);
-        setLoading(false);
-        // Alert.alert('HeroApp','Please provide valid info.');
-
-      }
+  
     }
 
     const keyboardVerticalOffset = Platform.OS === 'ios' ? 100 : 0
