@@ -244,7 +244,7 @@ export default OperatorProfile= ({navigation}) =>{
         <View style={{alignSelf:"center",height:130,width:"95%"}}>
         <Text>Please minimum 3 characters in below fields: </Text>
           {opName.length < 3 && <Text style={{fontWeight:"bold",paddingTop:4,paddingBottom:3}}>Name</Text>}
-          {opCompany.length < 3 && <Text style={{fontWeight:"bold"}}>Chemistry</Text>}
+          {opCompany.length < 3 && <Text style={{fontWeight:"bold"}}>Company</Text>}
           
           <TouchableHighlight
               style={{ ...styles.openButton, backgroundColor: "#012554",width:70,alignSelf:"center",marginTop:20 }}

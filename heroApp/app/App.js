@@ -92,6 +92,7 @@ const RinseModal = ({modalVisible,setModalVisible})=>{
           onPress={() => {
             // EventRegister.emit('BLECMD',{cmd:'disconnect'}) 
             // setModalVisible(!modalVisible);
+            setModalVisible(false);
           }}>
           <Text style={[styles.textStyle,{color:'#012554'}]}>Cancel</Text>
         </TouchableHighlight>
