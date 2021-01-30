@@ -4,7 +4,7 @@ import { Button, Switch, ProgressBar, Modal, Portal, Provider, TextInput } from 
 import {getOperatorData,getDeviceData,getDeviceHWData} from '../services/DataService';
 import Material from 'react-native-vector-icons/Ionicons';
 
-export default SettingPage = () => {
+export default SettingPage = ({navigation}) => {
     console.log(">>Data ",getOperatorData(),JSON.stringify(getDeviceHWData()))
     const [deviceData] = useState(getDeviceData());
     const [isSwitchEleOn, setIsSwitchEleOn] = useState(false);
@@ -63,11 +63,12 @@ export default SettingPage = () => {
                             color={'#012554'}
                             name="exit-outline"/>}
                         contentStyle={{ borderColor:'#012554',borderWidth:1,borderRadius:4,flexDirection:"row-reverse",paddingTop:1,height:47,width:"75%",alignSelf:"center"}}
-                        // onPress={()=>{
-                        //     navigation.navigate('HomePage');
-                        // }}
+                        onPress={()=>{
+                            console.log(">>finish")
+                            navigation.navigate('HomePage',{isRinseModal:true});
+                        }}
                         >
-               {'Finish Session'}
+               {'Finish Spraying'}
              </Button>
                 </View>
               

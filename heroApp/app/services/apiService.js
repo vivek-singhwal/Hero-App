@@ -27,6 +27,25 @@ export var setDeviceId = (deviceId) => {
 export var setSessionId = (sessionId) => {
     currentSessionId = sessionId;
 }
+
+export var checkConnection = () => {
+    return fetch(apiEndPoint+'/api/tests', {
+            method: "GET",
+            // body: JSON.stringify(data),
+            headers: { 'Content-Type': 'application/json' ,'Authorization':encryptToken()},
+        })
+        .then(res => res.json())
+        .then(
+            (result) => {
+                return result.result;
+            },
+            (error) => {
+                console.log(">>Eror ", error)
+                return error;
+            }
+        )
+}
+
 export var getOperatorAPI = () => {
     return fetch(apiEndPoint+'/api/operators', {
             method: "GET",

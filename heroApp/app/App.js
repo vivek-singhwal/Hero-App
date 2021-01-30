@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { View, StatusBar, SafeAreaView,StyleSheet, Alert, TouchableHighlight,Modal, Image} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import Material from 'react-native-vector-icons/MaterialIcons';
 import { createStackNavigator } from '@react-navigation/stack';
 import TestPageAPI from './container/TestPageAPI';
 import HomePage from './container/HomePage';
@@ -11,12 +10,16 @@ import FirstConnection from './container/FirstimeConnection';
 import Profile from './container/OperatorProfile';
 import BleAppManager from './container/BleAppMananger';
 import AwesomeIcon from 'react-native-vector-icons/FontAwesome';
-import { Text, } from 'react-native-paper';
+import { Text,Button } from 'react-native-paper';
+import RinseProcess from './container/RinseProcessScreens';
 import { EventRegister } from 'react-native-event-listeners';
 import { initDB } from './services/DBService';
-
+import { setIsRinseStart } from './services/DataService';
+import Material from 'react-native-vector-icons/MaterialIcons';
+// import GlbContext, { ContextProvider } from './container/GlobalContext';
 
 const Stack = createStackNavigator();
+
 const MessageModal = ({modalVisible,setModalVisible}) => {
   return (
       <Modal
@@ -62,78 +65,78 @@ const MessageModal = ({modalVisible,setModalVisible}) => {
     </Modal>
   );
 };
-const RinseModal = ({modalVisible,setModalVisible})=>{
-  const containerStyle = {backgroundColor: 'white',width:"70%",alignSelf:"center",borderRadius:10,paddingBottom:10};
-  return(  <Modal
-    animationType="slide"
-    transparent={true}
-    visible={modalVisible}
-    onRequestClose={() => {
-      Alert.alert("Modal has been closed.");
-    }}>
-
-  <View
-    style={{
-      position: 'absolute',
-      width: '100%',
-      height: '100%',
-      justifyContent: 'center',
-      backgroundColor: 'rgba(100,100,100, 0.5)',
-      padding: 40,
-    }}>
-
-      <View style={styles.modalView}>
-        <Text style={styles.modalText}>Finished spraying ?</Text>
-        <Text style={[styles.modalText]}>Time to do rinse cycle !</Text>
-        <Image style={{height:150,width:150,marginTop:20}} source={require('./asset/spray-icon.png')}/>
-    <View style={{flexDirection:"row",justifyContent:"space-between",marginTop:35,marginBottom:15,height:50}}>
-        <TouchableHighlight
-          style={{ ...styles.openButton,backgroundColor: "#fff",marginRight:10 ,borderColor:'#012554',borderWidth:1}}
-          onPress={() => {
-            // EventRegister.emit('BLECMD',{cmd:'disconnect'}) 
-            // setModalVisible(!modalVisible);
-            setModalVisible(false);
-          }}>
-          <Text style={[styles.textStyle,{color:'#012554'}]}>Cancel</Text>
-        </TouchableHighlight>
-        <TouchableHighlight
-          style={{ ...styles.openButton, backgroundColor: "#012554" }}
-          onPress={() => {
-            // setModalVisible(!modalVisible);
-            setModalVisible(false);
-          }}>
-            <View style={{flexDirection:"row",flex:1}}>
-              <Text style={styles.textStyle}>Start</Text>
-              <Material 
-                    style={{alignSelf:"center",marginLeft:10}}
-                    size={25}
-                    color={'#fff'}
-                    name="keyboard-arrow-right"/>
-          </View>
-        </TouchableHighlight>
-      </View>
-    </View>
-  </View>
-</Modal>)
-}
 
 
 function App() {
-  
+  // const rinseModalContext = { isRinseStart: false }
+  // const contextData = React.useContext(GlbContext);
+  // console.log(">>contextData ",contextData)
   const [modalVisible, setModalVisible] = React.useState(false);
   const [rinseModal, setRingseModal] = React.useState(false);
-
-
-
+  const [navigation, setNavigation] = React.useState({}); 
+  const RinseModal = ({ modalVisible,setModalVisible})=>{
+  
+    return(  <Modal
+      animationType="slide"
+      transparent={true}
+      visible={modalVisible}
+      onRequestClose={() => {
+        Alert.alert("Modal has been closed.");
+      }}>
+  
+    <View
+      style={{
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        justifyContent: 'center',
+        backgroundColor: 'rgba(100,100,100, 0.5)',
+        padding: 40,
+      }}>
+  
+        <View style={[styles.modalView,{justifyContent:"space-around"}]}>
+          <Text style={styles.modalText}>Finished spraying ?</Text>
+          <Text style={[styles.modalText]}>Time to do rinse cycle !</Text>
+          <Image style={{height:150,width:150,marginTop:20}} source={require('./asset/spray-icon.png')}/>
+      <View style={{flexDirection:"row",marginTop:35,marginBottom:15}}>
+          <TouchableHighlight
+            style={{ ...styles.openButton,backgroundColor: "#fff",marginRight:10 ,borderColor:'#012554',borderWidth:1}}
+            onPress={() => {
+              setModalVisible(false);
+            }}>
+            <Text style={[styles.textStyle,{color:'#012554',}]}>Cancel</Text>
+          </TouchableHighlight>
+          <Button
+          style={{justifyContent:"center",width:"40%",paddingStart:5}}
+          color={'#012554'}
+           contentStyle={{flexDirection:"row-reverse"}}
+           icon={()=><Material 
+                      // style={{backgroundColor:"pink"}}
+                     size={25}
+                      color={'#fff'}
+                      name="keyboard-arrow-right"/>} 
+          mode="contained"
+          onPress={() => {
+            setModalVisible(false);
+            navigation.navigate('RinseProcess')
+          }}>
+            Start
+          </Button>
+        </View>
+      </View>
+    </View>
+  </Modal>)
+  }
   React.useEffect(()=>{
-  
-      initDB('sessions').then((res)=>{
-        
-      });
-      initDB('sprayers').then((res)=>{});
-      initDB('sessionData').then((res)=>{});
+      initDB('sessions').then((res)=>{});
+    initDB('sprayers').then((res)=>{});
+    initDB('sessionData').then((res)=>{});
+   
   })
-  
+  if(navigation && navigation.dangerouslyGetState && navigation.dangerouslyGetState().routes &&  navigation.dangerouslyGetState().routes[0].params){
+    console.log(">>Inside if")
+    setRingseModal(true);
+  }
   return (
     <>
     <MessageModal modalVisible={modalVisible} setModalVisible={setModalVisible}/>
@@ -141,16 +144,23 @@ function App() {
     <StatusBar barStyle="dark-content" />
     <SafeAreaView></SafeAreaView>
     {/* <MessageModal/> */}
-    <RinseModal modalVisible={rinseModal} setModalVisible={setRingseModal}l/>
+    {/* <ContextProvider> */}
+        <RinseModal modalVisible={rinseModal} setModalVisible={setRingseModal}/>
+    {/* </ContextProvider> */}
+    
     <BleAppManager/>
     <NavigationContainer>
     <OfflineSync/>  
-    <Stack.Navigator initialRouteName="HomePage">
+    <Stack.Navigator initialRouteName="Profile">
     <Stack.Screen name="TestPageAPI" component={TestPageAPI} options={{headerShown: false}}/>
     <Stack.Screen name="Profile" component={Profile} options={{
           headerShown: false,
     }}/>
-       <Stack.Screen name="FirstConnection" component={FirstConnection} options={{
+    
+    <Stack.Screen name="RinseProcess" component={RinseProcess} options={{
+          headerShown: false,
+    }}/>
+    <Stack.Screen name="FirstConnection" component={FirstConnection} options={{
           headerShown: false,
     }}/>
     <Stack.Screen name="SettingPage" component={SettingPage}  options={{
@@ -171,21 +181,23 @@ function App() {
         }}/>
 
       <Stack.Screen name="HomePage" component={HomePage}
-        options={{
+        options={({navigation})=>({
           title: "RANGER",
           
           headerBackTitleVisible:true,
           headerTitleStyle: {fontSize:24,color:"#012554",fontWeight:"bold",fontStyle:"italic"},
           headerLeft: (()=><AwesomeIcon 
           onPress={()=>{
-            console.log(">>Click share");
-            setRingseModal(true);
+            
+            setNavigation(navigation);
+            setTimeout(()=>{
+              setRingseModal(true);
+            },600)
           }}
           size={32}
           // color={'#2C88D9'}
           color={'#012554'}
           style={{
-            // transform: [{ rotate: '270deg'}]
             transform: [
               { scaleX: -1 }
             ]
@@ -206,7 +218,7 @@ function App() {
           name="bluetooth-b"/>
           ),
           headerStyle:{height:80}
-       }}/>
+       })}/>
         </Stack.Navigator>  
     </NavigationContainer>
   </>);

@@ -1,12 +1,12 @@
 import React,{useEffect,useState} from 'react';
-import { View , StyleSheet, Text, TouchableOpacity, TextInput as Input,ScrollView,FlatList,TouchableHighlight, Alert} from 'react-native';
+import { View , StyleSheet, Text, TouchableOpacity, TextInput as Input,Image,FlatList,TouchableHighlight, Alert} from 'react-native';
 import { Button, Switch, ProgressBar, Modal, Portal, Provider, TextInput } from 'react-native-paper';
 import AwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import AwesomeIcon5 from 'react-native-vector-icons/FontAwesome5';
 import Feather from 'react-native-vector-icons/Ionicons';
 import {getOperator,addSessionAPI, updateSessionAPI} from '../services/apiService';
 import {getReadingStatus, setSessionObjApiData,getSessionObjApiData,getDeviceData, 
-        setReadingStatus,setSessionId, sessionDataList,getOperatorData , getDeviceHWData, getIsRinseStart,
+        setReadingStatus,setSessionId, sessionDataList,getOperatorData , getDeviceHWData,
         setSessionDataList, currentSessionData, getSessionId, predefinedSessionData, setLocalSessionId, getLocalSessionId} from '../services/DataService';
 import SaveModal from './SaveModal';
 import { EventRegister } from 'react-native-event-listeners';
@@ -14,9 +14,10 @@ import {initDB, addSession, getSessions, updateSessions, getSessionWithParam} fr
 import {enableInterval,disableInterval} from '../services/BleService';
 import KeepAwake  from 'react-native-keep-awake';
 
-let setStartTime ,setEndTime, setCurrentSessionId;
-export default  HomePage = ({navigation})=>{
+let setStartTime ,setEndTime;
 
+export default  HomePage = ({navigation})=>{
+  console.log(">>navigation ",navigation.dangerouslyGetState().routes[0].params)
     const [deviceData] = useState(getDeviceData());
     const [counter,setCounter] = useState(true);
     const [visible, setVisible] = useState(false);
@@ -43,7 +44,9 @@ export default  HomePage = ({navigation})=>{
       return strTime;
     }
     var interval ;
+   
     useEffect(()=>{
+      
       if(counter){
         initDB('sessions').then((res)=>{
           getSessions(getOperatorData().serverId).then((resSessions)=>{

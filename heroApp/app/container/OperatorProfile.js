@@ -245,7 +245,6 @@ export default OperatorProfile= ({navigation}) =>{
         <Text>Please minimum 3 characters in below fields: </Text>
           {opName.length < 3 && <Text style={{fontWeight:"bold",paddingTop:4,paddingBottom:3}}>Name</Text>}
           {opCompany.length < 3 && <Text style={{fontWeight:"bold"}}>Company</Text>}
-          
           <TouchableHighlight
               style={{ ...styles.openButton, backgroundColor: "#012554",width:70,alignSelf:"center",marginTop:20 }}
               onPress={() => {

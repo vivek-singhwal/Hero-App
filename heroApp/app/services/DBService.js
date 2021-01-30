@@ -43,7 +43,30 @@ export var initDB = (reqTable) => {
               db.executeSql('SELECT * FROM ' + reqTable + ' LIMIT 1').then((result) => {
                 console.log("Database is ready ... executing query ...",reqTable);
                 if(reqTable === 'sessions'){
-                    db.executeSql(
+                  db.executeSql(
+                    'SELECT rinseId FROM sessions').then(
+                  (results) => {
+                      if(results[0].rows.length == 0){
+                          // console.log(">>No data found")
+                      }
+                  }
+                ).catch(error => {
+                  db.executeSql(
+                    'ALTER TABLE sessions ADD COLUMN rinseId text').then(
+                  (results) => {
+                      if(results[0].rows.length == 0){
+                          // console.log(">>No data found")
+                      }
+                  }
+                ).catch(error => {
+            
+                console.log(error);
+                })
+
+                console.log(error);
+                })
+                  
+                  db.executeSql(
                       'SELECT isSync FROM sessions').then(
                     (results) => {
                         if(results[0].rows.length == 0){
@@ -205,7 +228,7 @@ export var initDB = (reqTable) => {
                 })
 
                 db.transaction((tx) => {
-                  tx.executeSql('CREATE TABLE IF NOT EXISTS sessions (id INTEGER PRIMARY KEY AUTOINCREMENT,serverId VARCHAR(25), operatorId VARCHAR(25), sprayerId VARCHAR(25), chemistryType VARCHAR(25) ,startTime INTEGER ,endTime INTEGER,sessionLocation VARCHAR(25),sessionComment VARCHAR(100),sessionData TEXT,ozSparayed REAL,isSync boolean not null default 0,isFinished boolean not null default 0,isRinse boolean not null default 0,appVersion boolean not null default 0)');
+                  tx.executeSql('CREATE TABLE IF NOT EXISTS sessions (id INTEGER PRIMARY KEY AUTOINCREMENT,serverId VARCHAR(25), operatorId VARCHAR(25), sprayerId VARCHAR(25), chemistryType VARCHAR(25) ,startTime INTEGER ,endTime INTEGER,sessionLocation VARCHAR(25),sessionComment VARCHAR(100),sessionData TEXT,ozSparayed REAL,isSync boolean not null default 0,isFinished boolean not null default 0,isRinse boolean not null default 0,appVersion boolean not null default 0,rinseId text)');
                 }).then((resp) => {
                   // console.log("resp user table "+resp);
                   resolve(db);
@@ -392,7 +415,7 @@ export var getOperators = function () {
   }
 
   export var getOperatorAPISync = function () {
-    console.log("getOperatorAPISync");
+    // console.log("getOperatorAPISync");
     let promise = new Promise((resolve, reject) => {
         db.executeSql(
             'SELECT * FROM operators where isSync=0 OR serverId=null').then(
@@ -415,7 +438,7 @@ export var getOperators = function () {
   }
 
   export var getSprayerAPISync = function () {
-    console.log("getSprayerAPISync");
+    // console.log("getSprayerAPISync");
     let promise = new Promise((resolve, reject) => {
         db.executeSql(
             'SELECT * FROM sprayers where isSync=0 OR serverId=null').then(
@@ -438,7 +461,7 @@ export var getOperators = function () {
   }
   
   export var getSessionAPISync = function () {
-    console.log("getOperators");
+    // console.log("getOperators");
     let promise = new Promise((resolve, reject) => {
         db.executeSql(
             'SELECT * FROM sessions where isSync=0 OR serverId=null').then(
@@ -461,7 +484,7 @@ export var getOperators = function () {
   }
   
   export var getSessionByIdSync = function (id) {
-    console.log("getOperators");
+    // console.log("getOperators");
     let promise = new Promise((resolve, reject) => {
         db.executeSql(
             'SELECT * FROM sessions where id=?',[id]).then(
@@ -484,7 +507,7 @@ export var getOperators = function () {
   }
 
   export var getSessionDataAPISync = function () {
-    console.log("getOperators");
+    // console.log("getOperators");
     let promise = new Promise((resolve, reject) => {
         db.executeSql(
             'SELECT * FROM sessionData where isSync=0 OR serverId=null').then(
@@ -507,7 +530,7 @@ export var getOperators = function () {
   }
 
   export var updateSessions = function (objSession) {
-    console.log("getOperators");
+    // console.log("getOperators");
     let promise = new Promise((resolve, reject) => {
         db.executeSql(
             'UPDATE sessions SET endTime=?,sessionLocation=?,sessionComment=?,isSync=? where id=?',[objSession.endTime,objSession.sessionLocation,objSession.sessionComment,objSession.isSync,objSession.id]).then(
@@ -576,7 +599,7 @@ export var getOperators = function () {
   }
 
   export var getSprayers = function () {
-    console.log("getOperators");
+    // console.log("getOperators");
     let promise = new Promise((resolve, reject) => {
         db.executeSql(
             'SELECT * FROM sprayers ').then(
@@ -599,7 +622,7 @@ export var getOperators = function () {
   }
 
   export var getSprayersByHwId = function (id) {
-    console.log("getOperators");
+    // console.log("getOperators");
     let promise = new Promise((resolve, reject) => {
         db.executeSql(
             'SELECT * FROM sprayers where hardwareId=?',[id]).then(
