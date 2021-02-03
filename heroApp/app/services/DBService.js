@@ -343,8 +343,34 @@ export var addOperator = function (data) {
         // console.log(">>addOperator ",db);
       db.transaction((tx) => {
         tx.executeSql(
-          'INSERT INTO sessions VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
-          [,data.serverId,data.operatorId,data.sprayerId,data.chemistryType,data.startTime,data.endTime,data.sessionLocation,data.sessionComment,data.sessionData,data.ozSparayed,data.isSync,data.isFinished,data.isRinse,data.appVersion],
+          'INSERT INTO sessions VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+          [,data.serverId,data.operatorId,data.sprayerId,data.chemistryType,data.startTime,data.endTime,data.sessionLocation,data.sessionComment,data.sessionData,data.ozSparayed,data.isSync,data.isFinished,data.isRinse,data.appVersion,data.rinseId],
+          (tx, results) => {
+            // console.log('Results', results.rowsAffected);
+            var success = "true";
+            resolve(results);
+              if (results.rowsAffected > 0) {
+                resolve(success);
+              } else {
+                alert('Registration Failed');
+              }
+          }
+        );
+        // alert("Complete")
+      });
+    }).catch(error => {
+      console.log(error);
+    });;;
+    return promise;
+  }
+
+  export var updateFininshedSession = function () {
+    // console.log(">>data ",data)
+    let promise = new Promise((resolve, reject) => {
+        // console.log(">>addOperator ",db);
+      db.transaction((tx) => {
+        tx.executeSql(
+          'UPDATE sessions SET isFinished=1',
           (tx, results) => {
             // console.log('Results', results.rowsAffected);
             var success = "true";
@@ -649,6 +675,23 @@ export var getOperators = function () {
       db.transaction((tx) => {
         tx.executeSql(
           'DELETE FROM operators where id=?',
+          [id],
+          (tx, results) => {
+            console.log('Results', results.rowsAffected);
+            resolve(results);
+          })
+      })
+    }).catch(error => {
+      console.log(error);
+    });;
+    return promise;
+  }
+
+  export var delsession = function (id) {
+    let promise = new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        tx.executeSql(
+          'DELETE FROM sessions where id=?',
           [id],
           (tx, results) => {
             console.log('Results', results.rowsAffected);

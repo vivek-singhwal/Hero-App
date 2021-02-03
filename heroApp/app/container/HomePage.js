@@ -17,7 +17,7 @@ import KeepAwake  from 'react-native-keep-awake';
 let setStartTime ,setEndTime;
 
 export default  HomePage = ({navigation})=>{
-  console.log(">>navigation ",navigation.dangerouslyGetState().routes[0].params)
+  // console.log(">>navigation ",navigation.dangerouslyGetState().routes[0].params)
     const [deviceData] = useState(getDeviceData());
     const [counter,setCounter] = useState(true);
     const [visible, setVisible] = useState(false);
@@ -174,7 +174,8 @@ export default  HomePage = ({navigation})=>{
       isSync: 0,
       isFinished: 1,
       isRinse: 0,
-      "appVersion": "1.0.3",
+      "appVersion": "1.0.4",
+      rinseId:0
   } 
   addSession(sessionObj).then((res)=>{
     console.log(">Added ",res);
@@ -243,20 +244,21 @@ export default  HomePage = ({navigation})=>{
            ListEmptyComponent={emptyList}
            keyExtractor={(item, index) => String(index)}
            renderItem={({item,index})=>
-            <View key={index} style={{height:100,backgroundColor:'#012554',width:"100%",borderBottomColor:'#fff',borderBottomWidth:1,padding:15}}>
-              <Text style={{color:'#fff',fontSize:23,fontWeight:"bold",textTransform:'capitalize',marginStart:15,paddingBottom:4}}>{item.sessionLocation}</Text>
+            <View key={index} style={{height:100,backgroundColor:item.isRinse? 'green':item.isFinished == 0?'#484848':'#012554',width:"100%",borderBottomColor:'#fff',borderBottomWidth:1,padding:15}}>
+              <Text style={{color:'#fff',fontSize:18,fontWeight:"bold",textTransform:'capitalize',marginStart:15,paddingBottom:4}}>{item.sessionLocation}</Text>
                 <View style={{justifyContent:"space-around",flexDirection:'row'}}>
                   <View>
-                  <Text style={{color:'#fff'}}>Start time</Text>
-                  <Text style={{color:'#fff'}}>{formatAMPM(item.startTime)}</Text>
+                  <Text style={{color:'#fff',fontSize:13}}>Start time</Text>
+                  <Text style={{color:'#fff',fontSize:13}}>{formatAMPM(item.startTime)}</Text>
                   </View>
+                  {item.isRinse ?<View/>:<View>
+                    <Text style={{color:'#fff',fontSize:13}}>Time elapsed</Text>
+                    <Text style={{color:'#fff',fontSize:13}}>{convertTime(Math.ceil(Math.abs(new Date(item.startTime).getTime()-new Date(item.endTime).getTime()) / 1000))}</Text>
+                  </View>}
+
                   <View>
-                  <Text style={{color:'#fff'}}>Time elapsed</Text>
-                  <Text style={{color:'#fff'}}>{convertTime(Math.ceil(Math.abs(new Date(item.startTime).getTime()-new Date(item.endTime).getTime()) / 1000))}</Text>
-                  </View>
-                  <View>
-                    <Text style={{color:'#fff'}}>Oz sprayed</Text>
-                    <Text style={{color:'#fff'}}>{parseFloat(item.ozSparayed).toFixed(2)} Oz</Text>
+                    <Text style={{color:'#fff',fontSize:13}}>{item.isRinse?'Date':'Oz sprayed'}</Text>
+                    <Text style={{color:'#fff',fontSize:13}}>{item.isRinse? new Date(item.startTime).toLocaleDateString():parseFloat(item.ozSparayed).toFixed(2)+' Oz'}</Text>
                   </View>
                 </View>
              </View>

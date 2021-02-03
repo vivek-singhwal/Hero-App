@@ -71,7 +71,7 @@ import { Button, Switch, ProgressBar, Modal, Portal, Provider, TextInput } from 
              <Button 
               color={'#012554'}
               mode={'contained'}
-              disabled={commentText && locationText && commentText !== "" && locationText !== ""?false:true}
+              disabled={locationText && locationText !== ""?false:true}
               labelStyle={{fontSize:16}} 
               icon={props=><Material 
                 size={35}

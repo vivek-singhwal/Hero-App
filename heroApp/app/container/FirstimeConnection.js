@@ -225,7 +225,6 @@ return(
                  <Text style={{color:'#fff',alignSelf:"center",fontSize:16}}>{deviceStatus}</Text>
             </View>
          } 
-
     </View>
     <Modal dismissable={false} visible={visible} onDismiss={hideModal} contentContainerStyle={containerStyle}>
         <View style={{alignSelf:"center",width:"100%"}}>
@@ -246,32 +245,11 @@ return(
               EventRegister.emit('BLECMD',{event:'reqConnect',device:item})
               }} key={index} style={{height:40,borderBottomColor:'gray',borderBottomWidth:1}}>
               <Text style={{fontSize:13,fontWeight:"bold",textTransform:'capitalize',marginStart:15,marginTop:5}}>{item.name}</Text>
-              
-                {/* <View style={{justifyContent:"space-around",flexDirection:'row'}}>
-                  <View>
-                  <Text style={{color:'#fff'}}>Start time</Text>
-                  <Text style={{color:'#fff'}}>{formatAMPM(item.startTime)}</Text>
-                  </View>
-                  <View>
-                  <Text style={{color:'#fff'}}>Time elapsed</Text>
-                  <Text style={{color:'#fff'}}>{convertTime(Math.ceil(Math.abs(new Date(item.startTime).getTime()-new Date(item.endTime).getTime()) / 1000))}</Text>
-                  </View>
-                  <View>
-                    <Text style={{color:'#fff'}}>Oz sprayed</Text>
-                    <Text style={{color:'#fff'}}>{parseFloat(item.ozSparayed).toFixed(2)} Oz</Text>
-                  </View>
-                </View> */}
              </TouchableHighlight>
             }
          />
           </View>
-         {/* <TouchableHighlight
-              style={{ ...styles.openButton, backgroundColor: "#012554",width:70,alignSelf:"center",marginTop:20 }}
-              onPress={() => {
-                setVisible(false)
-              }}>
-              <Text style={[styles.textStyle,{color:"#fff",alignSelf:"center"}]}>OK</Text>
-            </TouchableHighlight> */}
+        
             </View>
         </Modal>
     </View>)

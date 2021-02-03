@@ -2,8 +2,9 @@ import React,{useEffect,useState} from 'react';
 import { View , StyleSheet, Text, TextInput as Input,Image, Alert, TouchableHighlight} from 'react-native';
 import Material from 'react-native-vector-icons/MaterialIcons';
 import MaterialCom from 'react-native-vector-icons/MaterialCommunityIcons';
+import { addSession, delsession,updateFininshedSession } from '../services/DBService';
 import { Button, Switch, ProgressBar, Modal, Portal, Provider, TextInput } from 'react-native-paper';
-export default RinseProcess = () =>{
+export default RinseProcess = ({navigation}) =>{
     const [counter,setCounter] = useState(5);
     const [progressValue,setProgressValue] = useState(0);
     const [seconds,setSeconds] = useState(30);
@@ -29,12 +30,21 @@ export default RinseProcess = () =>{
         var sessionObj = {
             // serverId:0,
             startTime: Date.now(),
-            sessionLocation: 'Rinse Cycle Complete ✔️',
-            isRinse: 1
-        } 
+            sessionLocation: 'Rinse Cycle Complete  ✔',
+            isRinse: 1,
+            isSync:1,
+            isFinished:0,
+            appVersion:'1.0.4'
+        }
+        // delsession(13).then(()=>{})
         
-        console.log(">Add rinse session ",new Date(sessionObj.startTime).getTime());
-
+        addSession(sessionObj).then((res)=>{
+          // updateFininshedSession().then(()=>{
+            console.log(">Added ",res);
+            navigation.navigate('HomePage')
+          // })
+        })
+      console.log(">Add rinse session ",new Date(sessionObj.startTime).getTime());
     }
     return(<>
         <View style={[styles.modalView,{ justifyContent:"space-between",flexDirection:"column",height:"80%"}]}>
