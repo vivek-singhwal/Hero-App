@@ -96,9 +96,9 @@ export default OfflineSync = () =>{
                 })
              }
         },8000)
-        // initDB('sessions').then((res)=>{
+        initDB('sessions').then((res)=>{
         
-        // });
+        });
     var updateSessionData = () =>{
         getSessionDataAPISync().then((respSessionData)=>{
             // console.log(">>getSessionDataAPISync ",respSessionData)
@@ -168,7 +168,7 @@ export default OfflineSync = () =>{
                             serial: currentSessionData.getSerial,
                             model: currentSessionData.getModel,
                             unitName:currentSessionData.getUnitName,
-                            
+                            isRinse:respSession[i].isRinse
                             // "sessionComment": "first comment"
                         }
                         

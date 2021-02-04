@@ -5,7 +5,7 @@ import MaterialCom from 'react-native-vector-icons/MaterialCommunityIcons';
 import { addSession, delsession,updateFininshedSession } from '../services/DBService';
 import { Button, Switch, ProgressBar, Modal, Portal, Provider, TextInput } from 'react-native-paper';
 export default RinseProcess = ({navigation}) =>{
-    const [counter,setCounter] = useState(5);
+    const [counter,setCounter] = useState(1);
     const [progressValue,setProgressValue] = useState(0);
     const [seconds,setSeconds] = useState(30);
     useEffect(()=>{
@@ -31,18 +31,20 @@ export default RinseProcess = ({navigation}) =>{
             // serverId:0,
             startTime: Date.now(),
             sessionLocation: 'Rinse Cycle Complete  ✔',
-            isRinse: 1,
-            isSync:1,
+            isSync:0,
             isFinished:0,
-            appVersion:'1.0.4'
+            isRinse: 1,
+            appVersion:'1.0.4',
+            rinseId:0,
         }
-        // delsession(13).then(()=>{})
-        
+        // delsession(16).then(()=>{})
+        // delsession(17).then(()=>{})
         addSession(sessionObj).then((res)=>{
-          // updateFininshedSession().then(()=>{
+          updateFininshedSession().then(()=>{
             console.log(">Added ",res);
-            navigation.navigate('HomePage')
-          // })
+           
+          })
+          navigation.navigate('HomePageRinse');
         })
       console.log(">Add rinse session ",new Date(sessionObj.startTime).getTime());
     }
@@ -55,6 +57,7 @@ export default RinseProcess = ({navigation}) =>{
         {counter == 3 && "Step 3: Pressing 'Start"}
         {counter == 4 && "Rinse cycle is running "}
         {counter == 5 && "Rinse cycle is complete."}
+        {counter == 6 && "Rinse cycle could not be"}
         </Text>
      
          <Text style={[styles.modalText]}>
@@ -63,9 +66,16 @@ export default RinseProcess = ({navigation}) =>{
              {counter == 3 && "Rinse' will initiate the pump \n to run for 30 seconds."}
              {counter == 4 && "please wait until is \n finished."}
              {counter == 5 && "Now please store the sprayer \n safely and securely."}
+             {counter == 6 && "completed. Please try rising \n again for 30 seconds."}
         </Text>
         </View>
-        {counter == 5 && <MaterialCom size={150} color={'green'} style={{height:200,marginTop:20,marginBottom:40,}} name="check-bold"/>}
+        {counter == 5 && 
+        <MaterialCom size={150} color={'green'} style={{height:200,marginTop:20,marginBottom:40,}} name="check-bold"/>}
+        {counter == 6 && 
+        <View style={{height:90,width:85,backgroundColor:"#990000",justifyContent:"center",borderRadius:10}}>
+           <MaterialCom style={{alignSelf:"center"}} size={80} color={'#fff'}  name="exclamation-thick"/>
+        </View>}
+       
         {/* <Image style={{height:150,width:150,marginTop:20}} source={require('./asset/spray-icon.png')}/> */}
    {counter == 4 &&
         <View style={{flexDirection:"column"}}>
@@ -78,7 +88,53 @@ export default RinseProcess = ({navigation}) =>{
         </View>
        
     } 
-    <View style={{flexDirection:"row",marginBottom:15,width:"100%",paddingBottom:20,justifyContent:"space-around"}}>
+     {counter ==6 && 
+     <View style={{paddingBottom:50}}>
+       <Button
+        style={{marginBottom:20}}
+        color={'#012554'}
+        contentStyle={{flexDirection:"row-reverse",}}
+        mode="contained"
+        onPress={()=>{
+          setCounter(1)
+        }}
+       >
+          Rinse again
+        </Button>
+        <Button
+        style={{justifyContent:"center",width:"85%",}}
+        color={'#012554'}
+        contentStyle={{flexDirection:"row-reverse"}}
+        // mode="contained"
+        onPress={()=>{
+          // setCounter(1)
+          var sessionObj = {
+            // serverId:0,
+            startTime: Date.now(),
+            sessionLocation: 'Rinse Cycle Incomplete  X',
+            isSync:0,
+            isFinished:1,
+            isRinse: 1,
+            appVersion:'1.0.4',
+            rinseId:0,
+        }
+        // delsession(16).then(()=>{})
+        // delsession(17).then(()=>{})
+        addSession(sessionObj).then((res)=>{
+          updateFininshedSession().then(()=>{
+            console.log(">Added ",res);
+           
+          })
+          navigation.navigate('HomePageRinse');
+        })
+        }}
+       >
+         Finish without rising
+        </Button>
+     </View>
+     }
+
+    {counter !=6 && <View style={{flexDirection:"row",marginBottom:15,width:"100%",paddingBottom:20,justifyContent:"space-around"}}>
         {/* <TouchableHighlight
           style={{ ...styles.openButton,backgroundColor: "#fff",marginRight:10 ,borderColor:'#012554',borderWidth:1}}
           onPress={() => {
@@ -90,7 +146,7 @@ export default RinseProcess = ({navigation}) =>{
         </TouchableHighlight> */}
         {counter == 1 && <View style={{justifyContent:"center",width:"30%"}}/>}
        
-        {counter > 1 && 
+        {counter > 1 && counter != 6 && 
         <Button
             style={{justifyContent:"center",width:"30%"}}
             color={'#012554'}
@@ -102,11 +158,19 @@ export default RinseProcess = ({navigation}) =>{
                         name="keyboard-arrow-left"/>} 
             mode="outlined"
             
-            onPress={() =>setCounter(preCount=>preCount-1)}>
+            onPress={() =>{
+              if(counter == 4){
+                setCounter(6)
+              }else{
+                setCounter(preCount=>preCount-1)
+              }
+             }
+              }>
             Back
         </Button>}  
         
-       {counter < 4 ? <Button
+       {counter < 4 ? 
+       <Button
         style={{justifyContent:"center",width:"32%"}}
         color={'#012554'}
          contentStyle={{flexDirection:"row-reverse",}}
@@ -119,7 +183,8 @@ export default RinseProcess = ({navigation}) =>{
         
         onPress={() => setCounter(preCount=>preCount+1)}>
          {counter < 3 ?'Next':'Start'} 
-        </Button>: <Button
+        </Button> :
+        counter == 6 ?<View/>: <Button
         style={{justifyContent:"center",width:"35%"}}
         color={'#012554'}
         disabled={counter == 4}
@@ -136,7 +201,9 @@ export default RinseProcess = ({navigation}) =>{
         }}>
           Finish
         </Button> }
-      </View>
+       
+      </View>}
+     
     </View>
     </>)
 }

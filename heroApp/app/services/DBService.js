@@ -43,6 +43,17 @@ export var initDB = (reqTable) => {
               db.executeSql('SELECT * FROM ' + reqTable + ' LIMIT 1').then((result) => {
                 console.log("Database is ready ... executing query ...",reqTable);
                 if(reqTable === 'sessions'){
+                //   db.executeSql(
+                //     'PRAGMA table_info(sessions)').then(
+                //   (results) => {
+                //       // if(results[0].rows.length == 0){
+                //         for(let i=0;i<results[0].rows.length;i++){
+                //           console.log(">>Table structure ",results[0].rows.item(i).name)
+                //         }
+                         
+                //       // }
+                //   }
+                // )
                   db.executeSql(
                     'SELECT rinseId FROM sessions').then(
                   (results) => {
@@ -338,13 +349,16 @@ export var addOperator = function (data) {
   }
 
   export var addSession = function (data) {
-    // console.log(">>data ",data)
+    console.log(">>addSession ",JSON.stringify(data))
     let promise = new Promise((resolve, reject) => {
         // console.log(">>addOperator ",db);
       db.transaction((tx) => {
         tx.executeSql(
           'INSERT INTO sessions VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
-          [,data.serverId,data.operatorId,data.sprayerId,data.chemistryType,data.startTime,data.endTime,data.sessionLocation,data.sessionComment,data.sessionData,data.ozSparayed,data.isSync,data.isFinished,data.isRinse,data.appVersion,data.rinseId],
+          [,data.serverId, data.operatorId, data.sprayerId, data.chemistryType,
+            data.startTime, data.endTime, data.sessionLocation, data.sessionComment,
+            data.sessionData, data.ozSparayed, data.isSync, data.isFinished,
+            data.isRinse, data.appVersion, data.rinseId],
           (tx, results) => {
             // console.log('Results', results.rowsAffected);
             var success = "true";
@@ -370,7 +384,7 @@ export var addOperator = function (data) {
         // console.log(">>addOperator ",db);
       db.transaction((tx) => {
         tx.executeSql(
-          'UPDATE sessions SET isFinished=1',
+          'UPDATE sessions SET isFinished=0',
           (tx, results) => {
             // console.log('Results', results.rowsAffected);
             var success = "true";
@@ -582,7 +596,7 @@ export var getOperators = function () {
     // console.log("getSessions");
     let promise = new Promise((resolve, reject) => {
         db.executeSql(
-            'SELECT * FROM sessions').then(
+            'SELECT * FROM sessions ORDER BY startTime desc').then(
           (results) => {
               var records = [];
             // console.log(">>Inside getOperators",results)

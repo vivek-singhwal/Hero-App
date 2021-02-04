@@ -140,30 +140,22 @@ function App() {
   return (
     <>
     <MessageModal modalVisible={modalVisible} setModalVisible={setModalVisible}/>
-    {/* <ConnectionStatus/> */}
     <StatusBar barStyle="dark-content" />
     <SafeAreaView></SafeAreaView>
-    {/* <MessageModal/> */}
-    {/* <ContextProvider> */}
-        <RinseModal modalVisible={rinseModal} setModalVisible={setRingseModal}/>
-    {/* </ContextProvider> */}
-    
+    <RinseModal modalVisible={rinseModal} setModalVisible={setRingseModal}/>
     <BleAppManager/>
     <NavigationContainer>
     <OfflineSync/>  
-    <Stack.Navigator initialRouteName="Profile">
-    <Stack.Screen name="TestPageAPI" component={TestPageAPI} options={{headerShown: false}}/>
-    <Stack.Screen name="Profile" component={Profile} options={{
-          headerShown: false,
-    }}/>
+    <Stack.Navigator initialRouteName="RinseProcess">
     
-    <Stack.Screen name="RinseProcess" component={RinseProcess} options={{
-          headerShown: false,
-    }}/>
-    <Stack.Screen name="FirstConnection" component={FirstConnection} options={{
-          headerShown: false,
-    }}/>
-    <Stack.Screen name="SettingPage" component={SettingPage}  options={{
+    <Stack.Screen name="TestPageAPI" component={TestPageAPI} options={{headerShown: false}}/>
+    <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }}/>
+    <Stack.Screen name="RinseProcess" component={RinseProcess} options={{ headerShown: true }}/>
+    <Stack.Screen name="FirstConnection" component={FirstConnection} options={{ headerShown: false }}/>
+    
+    <Stack.Screen 
+          name="SettingPage" 
+          component={SettingPage}  options={{
           headerBackTitle:'Back',
           headerTitleStyle: {fontSize:24,color:"#012554",fontWeight:"bold",fontStyle:"italic"},
           headerRight:(()=><AwesomeIcon
@@ -181,6 +173,46 @@ function App() {
         }}/>
 
       <Stack.Screen name="HomePage" component={HomePage}
+        options={({navigation})=>({
+          title: "RANGER",
+          
+          headerBackTitleVisible:true,
+          headerTitleStyle: {fontSize:24,color:"#012554",fontWeight:"bold",fontStyle:"italic"},
+          headerLeft: (()=><AwesomeIcon 
+          onPress={()=>{
+            
+            setNavigation(navigation);
+            setTimeout(()=>{
+              setRingseModal(true);
+            },600)
+          }}
+          size={32}
+          // color={'#2C88D9'}
+          color={'#012554'}
+          style={{
+            transform: [
+              { scaleX: -1 }
+            ]
+          }} 
+          name="share-square-o"/>),
+          
+          headerLeftContainerStyle:{paddingLeft:20},
+
+          headerRight:(()=><AwesomeIcon
+          onPress={()=>{
+            // console.log(">>Click bluetooth")
+           setModalVisible(true);
+          }}
+          size={36}
+          // color={'#2C88D9'}
+          color='#012554'
+          style={{paddingRight:20}}
+          name="bluetooth-b"/>
+          ),
+          headerStyle:{height:80}
+       })}/>
+
+<Stack.Screen name="HomePageRinse" component={HomePage}
         options={({navigation})=>({
           title: "RANGER",
           

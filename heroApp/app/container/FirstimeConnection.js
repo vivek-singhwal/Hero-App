@@ -222,7 +222,7 @@ return(
             </Button>:
              <View style={{flexDirection:"row",backgroundColor:'#012554',borderRadius:4,opacity:0.5,height:47,width:200,justifyContent:"center"}}>
                 <ActivityIndicator animating={true} color={'#fff'} style={{marginRight:8}}/>
-                 <Text style={{color:'#fff',alignSelf:"center",fontSize:16}}>{deviceStatus}</Text>
+                 <Text style={{color:'#fff',alignSelf:"center",fontSize:16}}>{deviceStatus == 'Connected'?'Reding request':deviceStatus}</Text>
             </View>
          } 
     </View>

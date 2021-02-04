@@ -135,14 +135,17 @@ export var initCmdSeq = [
     'getFlowRate\r' ,
     'getFirmware\r' ,
     'updateFirmware\r' ,
-    //'sprayDisable\r',
-    //'sprayEnable\r',
+    
     'getPumpState\r',
     //'getHVState\r',
     //'getError\r',
     //'getFlow\r',
     'getFlow\r',
     'getBatteryLevel\r',
+    // 'sprayDisable\r',
+    // 'sprayEnable\r',
+    // 'setRinseCycles\r',
+    // 'setTriggerLatchMode\r',
     // "getTotalOnTime\r",
     /*
     'getSerial\r', //this must be first
@@ -157,7 +160,7 @@ export var initCmdSeq = [
     'getTriggerLatchState\r',
     'setTriggerLatchState\r',
     'getTriggerLatchMode\r',
-    'setTriggerLatchMode\r',
+   
     'resetPump\r',
     //'sprayDisable\r',
     //'sprayEnable\r',

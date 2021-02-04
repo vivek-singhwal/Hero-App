@@ -10,7 +10,7 @@ import {getReadingStatus, setSessionObjApiData,getSessionObjApiData,getDeviceDat
         setSessionDataList, currentSessionData, getSessionId, predefinedSessionData, setLocalSessionId, getLocalSessionId} from '../services/DataService';
 import SaveModal from './SaveModal';
 import { EventRegister } from 'react-native-event-listeners';
-import {initDB, addSession, getSessions, updateSessions, getSessionWithParam} from '../services/DBService';
+import {initDB, addSession, getSessions, updateSessions, getSessionWithParam ,delsession} from '../services/DBService';
 import {enableInterval,disableInterval} from '../services/BleService';
 import KeepAwake  from 'react-native-keep-awake';
 
@@ -90,7 +90,7 @@ export default  HomePage = ({navigation})=>{
     }
 
     var addSessionList = (comment,location)=>{
-     
+    
       disableInterval();
       EventRegister.emit('StopInterval');
       KeepAwake.deactivate();
@@ -123,6 +123,7 @@ export default  HomePage = ({navigation})=>{
         console.log(">>Update session ",respUpdateSession);
       })
       sessionListAr.push({sessionLocation:locationText, startTime:setStartTime, endTime: setEndTime, ozSparayed:parseInt(currentSessionData.getPumpedVolume)/29.57})
+      sessionListAr = sessionListAr.sort((a,b)=> b.startTime - a.startTime)
       setSessionList(sessionListAr);
       setCommentText('');
       setLocationText('');
@@ -145,37 +146,26 @@ export default  HomePage = ({navigation})=>{
     }
     var startReading=()=>{
       KeepAwake.activate();
+      // delsession(3).then(()=>{})
+      // return
       console.log(">>getLocalSessionId() ",getOperatorData(),getDeviceHWData());
-      var sessionsObjAPI = {
-        "startTime": setStartTime.toString(),
-        // "endTime":"1609248424619",
-        "appVersion": "1.0.3",
-        // "sessionLocation": "location1",
-        operatorId: getOperatorData().serverId,
-        sprayerId: getDeviceHWData().serverId,
-        chemistryType: getOperatorData().chemistryType,
-        HWVersion:predefinedSessionData.getHWVersion,
-        firmware:predefinedSessionData.getFirmware,
-        serial: predefinedSessionData.getSerial,
-        unitName: predefinedSessionData.getModel
-        // "sessionComment": "first comment"
-    }
+    
     var sessionObj = {
       // serverId:0,
       operatorId: getOperatorData().serverId,
       sprayerId: getDeviceHWData().serverId,
       chemistryType: getOperatorData().chemistryType,
       startTime: setStartTime,
-      ozSparayed: parseInt(currentSessionData.getFlowRate)/29.57,
       // endTime: setEndTime,
       // sessionLocation: locationText,
       // sessionComment: commentText,
       sessionData: JSON.stringify(currentSessionData),
+      ozSparayed: parseInt(currentSessionData.getFlowRate)/29.57,
       isSync: 0,
       isFinished: 1,
       isRinse: 0,
-      "appVersion": "1.0.4",
-      rinseId:0
+      // rinseId:0,
+      appVersion: "1.0.4",
   } 
   addSession(sessionObj).then((res)=>{
     console.log(">Added ",res);
@@ -244,7 +234,7 @@ export default  HomePage = ({navigation})=>{
            ListEmptyComponent={emptyList}
            keyExtractor={(item, index) => String(index)}
            renderItem={({item,index})=>
-            <View key={index} style={{height:100,backgroundColor:item.isRinse? 'green':item.isFinished == 0?'#484848':'#012554',width:"100%",borderBottomColor:'#fff',borderBottomWidth:1,padding:15}}>
+            <View key={index} style={{height:100,backgroundColor:item.isRinse? item.isFinished ==  1?'red':'green':item.isFinished == 0?'#484848':'#012554',width:"100%",borderBottomColor:'#fff',borderBottomWidth:1,padding:15}}>
               <Text style={{color:'#fff',fontSize:18,fontWeight:"bold",textTransform:'capitalize',marginStart:15,paddingBottom:4}}>{item.sessionLocation}</Text>
                 <View style={{justifyContent:"space-around",flexDirection:'row'}}>
                   <View>
