@@ -1,6 +1,8 @@
 import React,{useEffect,useState} from 'react';
 import { View , StyleSheet, Text, TouchableOpacity, TextInput as Input,Image,FlatList,TouchableHighlight, Alert} from 'react-native';
 import { Button, Switch, ProgressBar, Modal, Portal, Provider, TextInput } from 'react-native-paper';
+import {useRoute} from '@react-navigation/native';
+
 import AwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import AwesomeIcon5 from 'react-native-vector-icons/FontAwesome5';
 import Feather from 'react-native-vector-icons/Ionicons';
@@ -10,14 +12,14 @@ import {getReadingStatus, setSessionObjApiData,getSessionObjApiData,getDeviceDat
         setSessionDataList, currentSessionData, getSessionId, predefinedSessionData, setLocalSessionId, getLocalSessionId} from '../services/DataService';
 import SaveModal from './SaveModal';
 import { EventRegister } from 'react-native-event-listeners';
-import {initDB, addSession, getSessions, updateSessions, getSessionWithParam ,delsession} from '../services/DBService';
+import {initDB, addSession, getSessions, updateSessions, getSessionWithParam ,delsession,getDashboardSessions} from '../services/DBService';
 import {enableInterval,disableInterval} from '../services/BleService';
 import KeepAwake  from 'react-native-keep-awake';
 
 let setStartTime ,setEndTime;
 
 export default  HomePage = ({navigation})=>{
-  // console.log(">>navigation ",navigation.dangerouslyGetState().routes[0].params)
+  let currentRoute = useRoute().name;
     const [deviceData] = useState(getDeviceData());
     const [counter,setCounter] = useState(true);
     const [visible, setVisible] = useState(false);
@@ -49,20 +51,41 @@ export default  HomePage = ({navigation})=>{
       
       if(counter){
         initDB('sessions').then((res)=>{
-          getSessions(getOperatorData().serverId).then((resSessions)=>{
-            console.log(">>Res ",resSessions,);
-            var listSession = resSessions;
-            if(resSessions){
-              for(let i=0;i<listSession.length;i++){
-                console.log(">>resSessions ",resSessions);
-                if(listSession[i].sessionData !=undefined && listSession[i].sessionData != null){
-                  listSession[i]['sessionData'] = JSON.parse(listSession[i]['sessionData']);
+          // delsession(8).then(()=>{})
+          // delsession(9).then(()=>{})
+          // delsession(10).then(()=>{})
+          if(currentRoute == "Dashboard"){
+            getDashboardSessions().then((resSessions)=>{
+              // console.log(">>Res ",resSessions,);
+              var listSession = resSessions;
+              if(resSessions){
+                for(let i=0;i<listSession.length;i++){
+                  // console.log(">>resSessions ",resSessions);
+                  if(listSession[i].sessionData !=undefined && listSession[i].sessionData != null){
+                    listSession[i]['sessionData'] = JSON.parse(listSession[i]['sessionData']);
+                  }
                 }
+                setSessionList(listSession);
               }
-              setSessionList(listSession);
-            }
-            // setSessionList(listSession);
-          })
+              // setSessionList(listSession);
+            })
+          }else{
+            getSessions(getOperatorData().serverId).then((resSessions)=>{
+              // console.log(">>Res ",resSessions,);
+              var listSession = resSessions;
+              if(resSessions){
+                for(let i=0;i<listSession.length;i++){
+                  // console.log(">>resSessions ",resSessions);
+                  if(listSession[i].sessionData !=undefined && listSession[i].sessionData != null){
+                    listSession[i]['sessionData'] = JSON.parse(listSession[i]['sessionData']);
+                  }
+                }
+                setSessionList(listSession);
+              }
+              // setSessionList(listSession);
+            })
+          } 
+          
         });
         
         setCounter(false);
@@ -234,7 +257,7 @@ export default  HomePage = ({navigation})=>{
            ListEmptyComponent={emptyList}
            keyExtractor={(item, index) => String(index)}
            renderItem={({item,index})=>
-            <View key={index} style={{height:100,backgroundColor:item.isRinse? item.isFinished ==  1?'red':'green':item.isFinished == 0?'#484848':'#012554',width:"100%",borderBottomColor:'#fff',borderBottomWidth:1,padding:15}}>
+            <View key={index} style={{height:100,backgroundColor:item.isRinse == 1? item.isFinished ==  1?'red':'green':item.isFinished == 0?'#484848':'#012554',width:"100%",borderBottomColor:'#fff',borderBottomWidth:1,padding:15}}>
               <Text style={{color:'#fff',fontSize:18,fontWeight:"bold",textTransform:'capitalize',marginStart:15,paddingBottom:4}}>{item.sessionLocation}</Text>
                 <View style={{justifyContent:"space-around",flexDirection:'row'}}>
                   <View>
@@ -263,7 +286,20 @@ export default  HomePage = ({navigation})=>{
               />}/>
             </View>
           <View style={{bottom:70,}}>
-            {readingStatus ?
+            {currentRoute == "HomePageRinse"? 
+            <TouchableHighlight 
+            style={[styles.circle,{justifyContent:"center",marginTop:19}]}
+            onPress={() => {
+                 navigation.navigate('Dashboard')
+              }}
+            >
+              <Feather 
+              name={"ios-open-outline"} 
+              size={45}
+              color={'#D8D8D8'}
+              style={{alignSelf:"center",paddingLeft:"5%"}}/>
+             
+            </TouchableHighlight>:readingStatus ?
             <TouchableHighlight 
             style={[styles.circle,{justifyContent:"center",marginTop:19}]}
             onPress={() => {

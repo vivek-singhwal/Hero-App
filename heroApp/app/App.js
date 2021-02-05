@@ -16,6 +16,8 @@ import { EventRegister } from 'react-native-event-listeners';
 import { initDB } from './services/DBService';
 import { setIsRinseStart } from './services/DataService';
 import Material from 'react-native-vector-icons/MaterialIcons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
 // import GlbContext, { ContextProvider } from './container/GlobalContext';
 
 const Stack = createStackNavigator();
@@ -146,7 +148,7 @@ function App() {
     <BleAppManager/>
     <NavigationContainer>
     <OfflineSync/>  
-    <Stack.Navigator initialRouteName="RinseProcess">
+    <Stack.Navigator initialRouteName="Profile">
     
     <Stack.Screen name="TestPageAPI" component={TestPageAPI} options={{headerShown: false}}/>
     <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }}/>
@@ -175,7 +177,6 @@ function App() {
       <Stack.Screen name="HomePage" component={HomePage}
         options={({navigation})=>({
           title: "RANGER",
-          
           headerBackTitleVisible:true,
           headerTitleStyle: {fontSize:24,color:"#012554",fontWeight:"bold",fontStyle:"italic"},
           headerLeft: (()=><AwesomeIcon 
@@ -212,15 +213,13 @@ function App() {
           headerStyle:{height:80}
        })}/>
 
-<Stack.Screen name="HomePageRinse" component={HomePage}
+<Stack.Screen name="Dashboard" component={HomePage}
         options={({navigation})=>({
-          title: "RANGER",
-          
+          title: "Dashboard",
           headerBackTitleVisible:true,
           headerTitleStyle: {fontSize:24,color:"#012554",fontWeight:"bold",fontStyle:"italic"},
           headerLeft: (()=><AwesomeIcon 
           onPress={()=>{
-            
             setNavigation(navigation);
             setTimeout(()=>{
               setRingseModal(true);
@@ -235,6 +234,46 @@ function App() {
             ]
           }} 
           name="share-square-o"/>),
+          
+          headerLeftContainerStyle:{paddingLeft:20},
+
+          headerRight:(()=><AwesomeIcon
+          onPress={()=>{
+            // console.log(">>Click bluetooth")
+           setModalVisible(true);
+          }}
+          size={36}
+          // color={'#2C88D9'}
+          color='#012554'
+          style={{paddingRight:20}}
+          name="bluetooth-b"/>
+          ),
+          headerStyle:{height:80}
+       })}/>
+
+<Stack.Screen 
+          name="HomePageRinse" component={HomePage}
+          options={({navigation})=>({
+          title: "Finished Session",
+          headerBackTitleVisible:true,
+          headerTitleStyle: {fontSize:24,color:"#012554",fontWeight:"bold",fontStyle:"italic"},
+          headerLeft: (()=><Ionicons 
+          onPress={()=>{
+            navigation.navigate('Dashboard');
+            // setNavigation(navigation);
+            // setTimeout(()=>{
+            //   setRingseModal(true);
+            // },600)
+          }}
+          size={32}
+          // color={'#2C88D9'}
+          color={'#012554'}
+          // style={{
+          //   transform: [
+          //     { scaleX: -1 }
+          //   ]
+          // }} 
+          name="ios-open-outline"/>),
           
           headerLeftContainerStyle:{paddingLeft:20},
 

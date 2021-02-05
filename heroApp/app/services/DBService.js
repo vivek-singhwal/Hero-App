@@ -354,11 +354,11 @@ export var addOperator = function (data) {
         // console.log(">>addOperator ",db);
       db.transaction((tx) => {
         tx.executeSql(
-          'INSERT INTO sessions VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+          'INSERT INTO sessions (id,serverId,operatorId,sprayerId,chemistryType,startTime,endTime,sessionLocation,sessionComment,sessionData,ozSparayed,isSync,isFinished,isRinse,appVersion) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
           [,data.serverId, data.operatorId, data.sprayerId, data.chemistryType,
             data.startTime, data.endTime, data.sessionLocation, data.sessionComment,
             data.sessionData, data.ozSparayed, data.isSync, data.isFinished,
-            data.isRinse, data.appVersion, data.rinseId],
+            data.isRinse, data.appVersion],
           (tx, results) => {
             // console.log('Results', results.rowsAffected);
             var success = "true";
@@ -378,13 +378,39 @@ export var addOperator = function (data) {
     return promise;
   }
 
+  export var addRinseProcessSession = function (data) {
+    console.log(">>addSession ",JSON.stringify(data))
+    return new Promise((resolve, reject) => {
+        // console.log(">>addOperator ",db);
+      db.transaction((tx) => {
+        tx.executeSql(
+          'INSERT INTO sessions (id,startTime,sessionLocation,isSync,isFinished,isRinse,appVersion) VALUES (?,?,?,?,?,?,?)',
+          [,data.startTime,data.sessionLocation,data.isSync, data.isFinished, data.isRinse, data.appVersion],
+          (tx, results) => {
+            // console.log('Results', results.rowsAffected);
+            var success = "true";
+            resolve(results);
+              if (results.rowsAffected > 0) {
+                resolve(success);
+              } else {
+                alert('Registration Failed');
+              }
+          }
+        );
+        // alert("Complete")
+      });
+    }).catch(error => {
+      console.log(error);
+    });
+  }
+
   export var updateFininshedSession = function () {
     // console.log(">>data ",data)
     let promise = new Promise((resolve, reject) => {
         // console.log(">>addOperator ",db);
       db.transaction((tx) => {
         tx.executeSql(
-          'UPDATE sessions SET isFinished=0',
+          'UPDATE sessions SET isFinished=0 where isRinse=0',
           (tx, results) => {
             // console.log('Results', results.rowsAffected);
             var success = "true";
@@ -574,6 +600,29 @@ export var getOperators = function () {
     let promise = new Promise((resolve, reject) => {
         db.executeSql(
             'UPDATE sessions SET endTime=?,sessionLocation=?,sessionComment=?,isSync=? where id=?',[objSession.endTime,objSession.sessionLocation,objSession.sessionComment,objSession.isSync,objSession.id]).then(
+          (results) => {
+              var records = [];
+            // console.log(">>Inside getOperators",results)
+            if(results[0].rows.length){
+                for (let i = 0; i < results[0].rows.length; ++i){
+                    records.push(results[0].rows.item(i))
+                    // console.log(">>results ",i,)
+                }
+            }
+            resolve(records);
+          }
+        )
+    }).catch(error => {
+      console.log(error);
+    });;
+    return promise;
+  }
+
+  export var getDashboardSessions = function () {
+    // console.log("getSessions");
+    let promise = new Promise((resolve, reject) => {
+        db.executeSql(
+            'SELECT * FROM sessions where isRinse=0 AND isFinished=1 ORDER BY startTime desc').then(
           (results) => {
               var records = [];
             // console.log(">>Inside getOperators",results)

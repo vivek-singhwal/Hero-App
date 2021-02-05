@@ -168,7 +168,8 @@ export default OfflineSync = () =>{
                             serial: currentSessionData.getSerial,
                             model: currentSessionData.getModel,
                             unitName:currentSessionData.getUnitName,
-                            isRinse:respSession[i].isRinse
+                            isRinse:respSession[i].isRinse,
+                            isFinished:respSession[i].isFinished
                             // "sessionComment": "first comment"
                         }
                         

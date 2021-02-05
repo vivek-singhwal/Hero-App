@@ -2,7 +2,7 @@ import React,{useEffect,useState} from 'react';
 import { View , StyleSheet, Text, TextInput as Input,Image, Alert, TouchableHighlight} from 'react-native';
 import Material from 'react-native-vector-icons/MaterialIcons';
 import MaterialCom from 'react-native-vector-icons/MaterialCommunityIcons';
-import { addSession, delsession,updateFininshedSession } from '../services/DBService';
+import { addRinseProcessSession, updateIsFinished,delsession,updateFininshedSession,getSessionWithParam } from '../services/DBService';
 import { Button, Switch, ProgressBar, Modal, Portal, Provider, TextInput } from 'react-native-paper';
 export default RinseProcess = ({navigation}) =>{
     const [counter,setCounter] = useState(1);
@@ -25,21 +25,22 @@ export default RinseProcess = ({navigation}) =>{
             clearInterval(interval);
         }
     })
-
     var addRinseSession = () =>{
         var sessionObj = {
             // serverId:0,
             startTime: Date.now(),
             sessionLocation: 'Rinse Cycle Complete  ✔',
             isSync:0,
-            isFinished:0,
+            isFinished: 0,
             isRinse: 1,
             appVersion:'1.0.4',
-            rinseId:0,
+            // rinseId:0,
         }
         // delsession(16).then(()=>{})
         // delsession(17).then(()=>{})
-        addSession(sessionObj).then((res)=>{
+        addRinseProcessSession(sessionObj).then((res)=>{
+          
+          // updateIsFinished(s)
           updateFininshedSession().then(()=>{
             console.log(">Added ",res);
            
@@ -108,19 +109,20 @@ export default RinseProcess = ({navigation}) =>{
         // mode="contained"
         onPress={()=>{
           // setCounter(1)
-          var sessionObj = {
+          var sessionObjAr = {
             // serverId:0,
             startTime: Date.now(),
             sessionLocation: 'Rinse Cycle Incomplete  X',
             isSync:0,
-            isFinished:1,
+            isFinished: 1,
             isRinse: 1,
             appVersion:'1.0.4',
-            rinseId:0,
+            // rinseId:0,
         }
+        console.log(">>sessionObjAr ",JSON.stringify(sessionObjAr))
         // delsession(16).then(()=>{})
         // delsession(17).then(()=>{})
-        addSession(sessionObj).then((res)=>{
+        addRinseProcessSession(sessionObjAr).then((res)=>{
           updateFininshedSession().then(()=>{
             console.log(">Added ",res);
            
@@ -181,7 +183,11 @@ export default RinseProcess = ({navigation}) =>{
                     name="keyboard-arrow-right"/>} 
         mode="contained"
         
-        onPress={() => setCounter(preCount=>preCount+1)}>
+        onPress={() => {
+          if(counter == 3){
+            startTime = Date.now()
+          }
+          setCounter(preCount=>preCount+1)}}>
          {counter < 3 ?'Next':'Start'} 
         </Button> :
         counter == 6 ?<View/>: <Button
