@@ -28,11 +28,14 @@ export default  HomePage = ({navigation})=>{
     const [sessionList,setSessionList] = useState(sessionDataList);
     const showModal = () => setVisible(true);
     const hideModal = () => setVisible(false);
-    const [readingStatus,setReadStatus] = useState(getReadingStatus);
-    const [isSwitchEleOn, setIsSwitchEleOn] = useState(false);
-    const [isSwitchTrgOn, setIsSwitchTrgOn] = useState(false);
+    const [readingStatus,setReadStatus] = useState(getReadingStatus());
+    const [isSwitchEleOn, setIsSwitchEleOn] = useState(currentSessionData.getESVState == "On"?true:false);
+    const [isSwitchTrgOn, setIsSwitchTrgOn] = useState(currentSessionData.getTriggerLatchState == "On"?true:false);
     const onToggleEleSwitch = () => setIsSwitchEleOn(!isSwitchEleOn);
-    const onToggleTrgSwitch = () => setIsSwitchTrgOn(!isSwitchTrgOn);
+    const onToggleTrgSwitch = () => {
+      EventRegister.emit('BLECMD', { cmd: "setTriggerLatchState"});
+      setIsSwitchTrgOn(!isSwitchTrgOn);
+    }
     const toggleSetReading = () => setReadStatus(preState=>!preState);
 
     function formatAMPM(date) {
@@ -109,6 +112,7 @@ export default  HomePage = ({navigation})=>{
     var stopReading=()=>{
     
       setReadStatus(false);
+      setReadingStatus(false);
       showModal();
     }
 
@@ -191,9 +195,9 @@ export default  HomePage = ({navigation})=>{
       appVersion: "1.0.4",
   } 
   addSession(sessionObj).then((res)=>{
-    console.log(">Added ",res);
+    // console.log(">Added ",res);
     getSessionWithParam('startTime',setStartTime).then((resSession)=>{
-      console.log(">>resSession",resSession);
+      // console.log(">>resSession",resSession);
       setLocalSessionId(resSession[0].id)
         enableInterval();
        EventRegister.emit('StartInterval')
@@ -248,7 +252,7 @@ export default  HomePage = ({navigation})=>{
                </View>
                <View style={{flexDirection:"row",justifyContent:"space-between",paddingBottom:20}}>
                 <Text style={{fontSize:20,}}>Battery</Text>
-                <Text style={{fontSize:18,}}>{isNaN(parseInt(deviceData["getBatteryLevel\r"]))?'0':parseInt(deviceData["getBatteryLevel\r"])} %</Text>
+                <Text style={{fontSize:18,}}>{isNaN(parseInt(currentSessionData.getBatteryLevel))?'0':parseInt(currentSessionData.getBatteryLevel)} %</Text>
                </View>
                <ProgressBar style={{height:10}} progress={parseInt(deviceData["getBatteryLevel\r"])/100} color={'#012554'} />
             </View>:  
@@ -320,8 +324,10 @@ export default  HomePage = ({navigation})=>{
             onPress={() => {
               setStartTime = Date.now()
               console.log(">>start ",setStartTime);
+              
               startReading();
               setReadStatus(true);
+              setReadingStatus(true);
             if(readingStatus){
               showModal();
              }}}>
@@ -334,12 +340,7 @@ export default  HomePage = ({navigation})=>{
             
           </View>
           <View style={{marginTop:"10%",width:"30%"}}>
-            {/* {readingStatus? <View/>:
-            <Button
-              icon={props=><AwesomeIcon5 
-                              size={35}
-                              color={'#2C88D9'}
-                              name="recycle"/>}/>} */}
+     
             </View>
         </View>
       </View>

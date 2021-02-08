@@ -10,7 +10,6 @@ import {initDB, addSprayer, getSprayers, getSprayersByHwId, delSprayer} from '..
 import {addSprayerAPI} from '../services/apiService';
 import { useBluetoothStatus ,BluetoothStatus} from 'react-native-bluetooth-status';
 
-
 export default FirstTimeConnection = ({navigation}) => {
  let deviceListAr = [];
   const [btStatus, isPending, setBluetooth] = useBluetoothStatus();
@@ -202,7 +201,7 @@ return(
               }}
               >
                {'Begin Session'}
-             </Button>:
+             </Button> :
             deviceStatus === 'Disconnected' || (deviceStatus === 'stopScan')?
             // deviceStatus === 'Disconnected' || (deviceStatus === 'stopScan' && !isDeviceConnected)?
              <Button 
@@ -230,8 +229,8 @@ return(
         <View style={{alignSelf:"center",width:"100%"}}>
           <View style={{height:30,backgroundColor:"#012554",}}>
             <View style={{flexDirection:"row",justifyContent:"space-between"}}>
-          <Text style={{color:"#fff",marginLeft:10,paddingTop:2}}>Devices: </Text>
-          <MaterialCom onPress={hideModal} style={{alignSelf:"flex-end", marginRight:5}} color={'#fff'} size={25} name="close"/>
+          <Text style={{color:"#fff",marginLeft:10,alignSelf:"center"}}>Devices: </Text>
+          <MaterialCom onPress={hideModal} style={{alignSelf:"flex-end", marginRight:5,paddingTop:2.5}} color={'#fff'} size={25} name="close"/>
           </View>
           </View>
           <View style={{padding:10}}>

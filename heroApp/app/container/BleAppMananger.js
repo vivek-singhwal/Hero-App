@@ -7,7 +7,7 @@ import BleService, {getInterval, getReadOk, setReadOk , getCurrentCmd,setCurrent
 import { predefinedSessionData,setPredefinedessionData ,
         setDeviceHWData,currentSessionData,setCurrentSessionData,
         getLocalSessionId,
-         getSessionId, setSecondRead,secondRead, setInternetConnection,currentReadData,setCurrentReadData} from '../services/DataService';
+         getSessionId, setSecondRead,secondRead,setDeviceData, setInternetConnection,currentReadData,setCurrentReadData} from '../services/DataService';
 import { addSessionDataAPI,addSessionAPI } from '../services/apiService';
 import NetInfo from "@react-native-community/netinfo";
 import { addSessionDataDB } from '../services/DBService';
@@ -218,6 +218,8 @@ export default class BleAppmanager extends Component {
           this.writeSingleData(data.cmdValue);
         } else if(data.cmd == 'getUnitName'){
           this.writeSingleData(data.cmdValue);
+        }else if(data.cmd == 'setTriggerLatchState'){
+          this.writeSingleData('setTriggerLatchState\r');
         }
          else {
            console.log(">>elsepart ",data.cmd)

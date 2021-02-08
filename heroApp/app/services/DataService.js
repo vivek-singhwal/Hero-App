@@ -9,7 +9,7 @@ export var setToken=(tokenData)=>{
 }
 
 var connectionStatus = false;
-var readingStatus = false;
+export var readingStatus = false;
 var operatorData = {opName:'',chemistryType:'',serverId:null,company:''};
 var deviceData = {};
 

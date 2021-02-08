@@ -10,15 +10,13 @@ import FirstConnection from './container/FirstimeConnection';
 import Profile from './container/OperatorProfile';
 import BleAppManager from './container/BleAppMananger';
 import AwesomeIcon from 'react-native-vector-icons/FontAwesome';
-import { Text,Button } from 'react-native-paper';
+import { Text,Button ,IconButton} from 'react-native-paper';
 import RinseProcess from './container/RinseProcessScreens';
 import { EventRegister } from 'react-native-event-listeners';
 import { initDB } from './services/DBService';
-import { setIsRinseStart } from './services/DataService';
+import { getReadingStatus } from './services/DataService';
 import Material from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-
-// import GlbContext, { ContextProvider } from './container/GlobalContext';
 
 const Stack = createStackNavigator();
 
@@ -76,6 +74,8 @@ function App() {
   const [modalVisible, setModalVisible] = React.useState(false);
   const [rinseModal, setRingseModal] = React.useState(false);
   const [navigation, setNavigation] = React.useState({}); 
+  const [readStatus] = React.useState(getReadingStatus()); 
+  console.log(">>Reading status ",readStatus,getReadingStatus())
   const RinseModal = ({ modalVisible,setModalVisible})=>{
   
     return(  <Modal
@@ -179,23 +179,28 @@ function App() {
           title: "RANGER",
           headerBackTitleVisible:true,
           headerTitleStyle: {fontSize:24,color:"#012554",fontWeight:"bold",fontStyle:"italic"},
-          headerLeft: (()=><AwesomeIcon 
-          onPress={()=>{
+          headerLeft: (()=>
+          <IconButton
+          disabled={readStatus}
+            onPress={()=>{
+              setNavigation(navigation);
+              setTimeout(()=>{
+                setRingseModal(true);
+              },600)
+            }}
+           icon={props=><AwesomeIcon 
             
-            setNavigation(navigation);
-            setTimeout(()=>{
-              setRingseModal(true);
-            },600)
-          }}
-          size={32}
-          // color={'#2C88D9'}
-          color={'#012554'}
-          style={{
-            transform: [
-              { scaleX: -1 }
-            ]
-          }} 
-          name="share-square-o"/>),
+            size={32}
+            // color={'#2C88D9'}
+            color={'#012554'}
+            style={{
+              transform: [
+                { scaleX: -1 }
+              ]
+            }} 
+            name="share-square-o"/>}
+          />
+          ),
           
           headerLeftContainerStyle:{paddingLeft:20},
 
