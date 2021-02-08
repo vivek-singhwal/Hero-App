@@ -1,4 +1,4 @@
-import React,{useEffect,useState} from 'react';
+import React,{useEffect,useState,useContext} from 'react';
 import { View , StyleSheet, Text, TouchableOpacity, TextInput as Input,Image,FlatList,TouchableHighlight, Alert} from 'react-native';
 import { Button, Switch, ProgressBar, Modal, Portal, Provider, TextInput } from 'react-native-paper';
 import {useRoute} from '@react-navigation/native';
@@ -15,7 +15,7 @@ import { EventRegister } from 'react-native-event-listeners';
 import {initDB, addSession, getSessions, updateSessions, getSessionWithParam ,delsession,getDashboardSessions} from '../services/DBService';
 import {enableInterval,disableInterval} from '../services/BleService';
 import KeepAwake  from 'react-native-keep-awake';
-
+import AppContext from "../AppContext";
 let setStartTime ,setEndTime;
 
 export default  HomePage = ({navigation})=>{
@@ -32,12 +32,13 @@ export default  HomePage = ({navigation})=>{
     const [isSwitchEleOn, setIsSwitchEleOn] = useState(currentSessionData.getESVState == "On"?true:false);
     const [isSwitchTrgOn, setIsSwitchTrgOn] = useState(currentSessionData.getTriggerLatchState == "On"?true:false);
     const onToggleEleSwitch = () => setIsSwitchEleOn(!isSwitchEleOn);
+    const appContext = useContext(AppContext);
+    
     const onToggleTrgSwitch = () => {
       EventRegister.emit('BLECMD', { cmd: "setTriggerLatchState"});
       setIsSwitchTrgOn(!isSwitchTrgOn);
     }
     const toggleSetReading = () => setReadStatus(preState=>!preState);
-
     function formatAMPM(date) {
       var hours = new Date(date).getHours();
       var minutes = new Date(date).getMinutes();
@@ -108,14 +109,7 @@ export default  HomePage = ({navigation})=>{
         EventRegister.removeEventListener(listner);
     }  
     },[]);
-    
-    var stopReading=()=>{
-    
-      setReadStatus(false);
-      setReadingStatus(false);
-      showModal();
-    }
-
+  
     var addSessionList = (comment,location)=>{
     
       disableInterval();
@@ -239,8 +233,8 @@ export default  HomePage = ({navigation})=>{
     }
     return(<>
     <View style={{height:"100%"}}>
-      <View style={{flex:1,flexDirection:"column",height:"90%",backgroundColor:"#fff"}}>
-          <View style={{height:"80%"}}>
+      <View style={{flex:1,flexDirection:"column",height:"100%",backgroundColor:"#fff"}}>
+          <View style={{height:"85%"}}>
           {readingStatus ? <View style={{padding:18}}>
                <View style={{flexDirection:"row",justifyContent:"space-between",marginBottom:20,width:"100%"}}>
                 <Text style={{fontSize:20}}>Electrostatic</Text>
@@ -254,7 +248,7 @@ export default  HomePage = ({navigation})=>{
                 <Text style={{fontSize:20,}}>Battery</Text>
                 <Text style={{fontSize:18,}}>{isNaN(parseInt(currentSessionData.getBatteryLevel))?'0':parseInt(currentSessionData.getBatteryLevel)} %</Text>
                </View>
-               <ProgressBar style={{height:10}} progress={parseInt(deviceData["getBatteryLevel\r"])/100} color={'#012554'} />
+               <ProgressBar style={{height:10}} progress={parseInt(currentSessionData.getBatteryLevel)/100} color={'#012554'} />
             </View>:  
           <FlatList
            data={sessionList}
@@ -309,9 +303,11 @@ export default  HomePage = ({navigation})=>{
             onPress={() => {
                   setEndTime = Date.now()
                   console.log(">>end ",setEndTime);
-                  stopReading();
-              }}
-            >
+                  setReadStatus(false);
+                  setReadingStatus(false);
+                  appContext.doChangeRinseStatus(false);
+                  showModal();
+              }}>
               <AwesomeIcon name={"stop"} 
               size={45}
               color={'#D8D8D8'}
@@ -324,8 +320,8 @@ export default  HomePage = ({navigation})=>{
             onPress={() => {
               setStartTime = Date.now()
               console.log(">>start ",setStartTime);
-              
               startReading();
+              appContext.doChangeRinseStatus(true);
               setReadStatus(true);
               setReadingStatus(true);
             if(readingStatus){

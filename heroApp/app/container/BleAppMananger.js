@@ -123,7 +123,7 @@ export default class BleAppmanager extends Component {
             "pumpStatus": currentSessionData.getPumpState,
             "pumpStatusTime": currentSessionData.getPumpTime,
             // "triggerLatchStatusState": "this.sessionData.getTriggerLatchState",
-            triggerLatchStatusState: currentSessionData.getTriggerLatchState,
+            "triggerLatchStatusState": currentSessionData.getTriggerLatchState,
             "pumpedVolume": currentSessionData.getPumpedVolume ,
             "serial": predefinedSessionData.getSerial, // not frequently required
             "triggerLatchMode": currentSessionData.getTriggerLatchMode,

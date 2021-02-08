@@ -17,6 +17,7 @@ import { initDB } from './services/DBService';
 import { getReadingStatus } from './services/DataService';
 import Material from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import AppCtx from './AppContext'
 
 const Stack = createStackNavigator();
 
@@ -71,14 +72,14 @@ function App() {
   // const rinseModalContext = { isRinseStart: false }
   // const contextData = React.useContext(GlbContext);
   // console.log(">>contextData ",contextData)
+  const [isRinseStatus, setRinseStatus] = React.useState(false);
   const [modalVisible, setModalVisible] = React.useState(false);
   const [rinseModal, setRingseModal] = React.useState(false);
   const [navigation, setNavigation] = React.useState({}); 
-  const [readStatus] = React.useState(getReadingStatus()); 
-  console.log(">>Reading status ",readStatus,getReadingStatus())
-  const RinseModal = ({ modalVisible,setModalVisible})=>{
   
-    return(  <Modal
+  const RinseModal = ({ modalVisible,setModalVisible})=>{
+    return(  
+    <Modal
       animationType="slide"
       transparent={true}
       visible={modalVisible}
@@ -141,6 +142,14 @@ function App() {
   }
   return (
     <>
+    <AppCtx.Provider
+        value={{
+          doChangeRinseStatus: (status) => {
+            console.log("status:"+status);
+            setRinseStatus(status);
+          }
+        }}
+      >
     <MessageModal modalVisible={modalVisible} setModalVisible={setModalVisible}/>
     <StatusBar barStyle="dark-content" />
     <SafeAreaView></SafeAreaView>
@@ -152,7 +161,7 @@ function App() {
     
     <Stack.Screen name="TestPageAPI" component={TestPageAPI} options={{headerShown: false}}/>
     <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }}/>
-    <Stack.Screen name="RinseProcess" component={RinseProcess} options={{ headerShown: true }}/>
+    <Stack.Screen name="RinseProcess" component={RinseProcess} options={{ headerShown: false }}/>
     <Stack.Screen name="FirstConnection" component={FirstConnection} options={{ headerShown: false }}/>
     
     <Stack.Screen 
@@ -181,7 +190,7 @@ function App() {
           headerTitleStyle: {fontSize:24,color:"#012554",fontWeight:"bold",fontStyle:"italic"},
           headerLeft: (()=>
           <IconButton
-          disabled={readStatus}
+          disabled={isRinseStatus}
             onPress={()=>{
               setNavigation(navigation);
               setTimeout(()=>{
@@ -297,6 +306,7 @@ function App() {
        })}/>
         </Stack.Navigator>  
     </NavigationContainer>
+    </AppCtx.Provider>
   </>);
 }
 export default App;
