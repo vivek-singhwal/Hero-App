@@ -45,6 +45,7 @@ export default RinseProcess = ({navigation}) =>{
             console.log(">Added ",res);
            
           })
+          setCounter(1)
           navigation.navigate('HomePageRinse');
         })
       console.log(">Add rinse session ",new Date(sessionObj.startTime).getTime());
@@ -127,6 +128,7 @@ export default RinseProcess = ({navigation}) =>{
             console.log(">Added ",res);
            
           })
+          setCounter(1);
           navigation.navigate('HomePageRinse');
         })
         }}
