@@ -48,7 +48,7 @@ export var setSessionObjApiData=(data)=>{
     return sessionsObjAPI = data;
 }
 
-export let DeviceHWData = {hardwareId:0,sdName:'',serverId:null};
+export let DeviceHWData = {hardwareId:0,sdName:'',serverId:null,sprayerName:''};
 export var getDeviceHWData = ()=>{
     return DeviceHWData;
 }

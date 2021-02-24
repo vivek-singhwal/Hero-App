@@ -214,6 +214,29 @@ export var initDB = (reqTable) => {
 
               console.log(error);
               })
+
+               db.executeSql(
+                  'SELECT sprayerName FROM sprayers').then(
+                (results) => {
+                    if(results[0].rows.length == 0){
+                        // console.log(">>No data found")
+                    }
+                }
+              ).catch(error => {
+                db.executeSql(
+                  'ALTER TABLE sprayers ADD COLUMN sprayerName text').then(
+                (results) => {
+                    if(results[0].rows.length == 0){
+                        // console.log(">>No data found")
+                    }
+                }
+              ).catch(error => {
+          
+              console.log(error);
+              })
+
+              console.log(error);
+              })
             }
                 // db.transaction((tx) => {
                 //   tx.executeSql('DROP TABLE '+reqTable);
@@ -232,7 +255,7 @@ export var initDB = (reqTable) => {
                 })
                 
                 db.transaction((tx) => {
-                  tx.executeSql('CREATE TABLE IF NOT EXISTS sprayers (id INTEGER PRIMARY KEY AUTOINCREMENT,serverId VARCHAR(25), sdName VARCHAR(25),hardwareId VARCHAR(50),isSync boolean not null default 0)');
+                  tx.executeSql('CREATE TABLE IF NOT EXISTS sprayers (id INTEGER PRIMARY KEY AUTOINCREMENT,serverId VARCHAR(25), sdName VARCHAR(25),hardwareId VARCHAR(50),isSync boolean not null default 0,sprayerName text)');
                 }).then((resp) => {
                   console.log("resp sprayers "+resp);
                   resolve(db);
@@ -327,8 +350,8 @@ export var addOperator = function (data) {
         // console.log(">>addOperator ",db);
       db.transaction((tx) => {
         tx.executeSql(
-          'INSERT INTO sprayers VALUES (?,?,?,?,?)',
-          [,data.serverId,data.sdName,data.hardwareId,data.isSync],
+          'INSERT INTO sprayers VALUES (?,?,?,?,?,?)',
+          [,data.serverId,data.sdName,data.hardwareId,data.isSync,data.sprayerName],
           (tx, results) => {
             // console.log('Results', results.rowsAffected);
             var success = "true";
@@ -807,6 +830,23 @@ export var getOperators = function () {
         tx.executeSql(
           'UPDATE sessionData SET serverId=?,serverSessionId=?,isSync=1 where id=?',
           [serverId,severSessionId,id],
+          (tx, results) => {
+            console.log('Results', results.rowsAffected);
+            resolve(results);
+          })
+      })
+    }).catch(error => {
+      console.log(error);
+    });;
+    return promise;
+  }
+
+  export var updateSprayerName = function (id,sprayerName) {
+    let promise = new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        tx.executeSql(
+          'UPDATE sprayers SET sprayerName=?,isSync=0 where hardwareId=?',
+          [sprayerName,id],
           (tx, results) => {
             console.log('Results', results.rowsAffected);
             resolve(results);

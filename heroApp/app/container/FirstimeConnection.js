@@ -28,8 +28,10 @@ export default FirstTimeConnection = ({navigation}) => {
       return await BluetoothStatus.state();
     }
     var scanAndConenct = () => {
+      showModal();  
         getBluetoothState().then((state)=>{
           console.log(">getBluetoothState ",state);
+          
           if(state != false){
              if(!isDeviceConnected){
               EventRegister.emit('BLECMD', { cmd: 'startScan' });
@@ -45,11 +47,9 @@ export default FirstTimeConnection = ({navigation}) => {
           // console.log(">>scanAndConenct ",state)
         })
         // console.log("scanAndConenct "+isDeviceConnected,isEnabled);
-       
       };
     useEffect(()=>{
-     
-      console.log(">>getOperatorData ",getOperatorData())
+       console.log(">>getOperatorData ",getOperatorData())
         if(count){
           initDB('sprayers').then((res)=>{
             console.log(">>Res ",res);
@@ -166,13 +166,15 @@ return(
                     sdName:getDeviceHWData().sdName,
                     hardwareId:getDeviceHWData().hardwareId,
                     serverId:null,
-                    isSync:0
+                    isSync:0,
+                    sprayerName:getDeviceHWData().sprayerName
                 }
               
                 getSprayersByHwId(getDeviceHWData().hardwareId).then((resDevice)=>{
                   if(resDevice.length){
                       console.log(">>resDevice",resDevice);
                       deviceObj.serverId = resDevice[0].serverId;
+                      deviceObj.sprayerName = resDevice[0].sprayerName;
                   }else{
                       addSprayer(deviceObj).then(()=>{
                        
@@ -241,6 +243,7 @@ return(
            renderItem={({item,index})=>
             <TouchableHighlight onPress={()=>{
               console.log(">>Click",item);
+              hideModal();
               EventRegister.emit('BLECMD',{event:'reqConnect',device:item})
               }} key={index} style={{height:40,borderBottomColor:'gray',borderBottomWidth:1}}>
               <Text style={{fontSize:13,fontWeight:"bold",textTransform:'capitalize',marginStart:15,marginTop:5}}>{item.name}</Text>

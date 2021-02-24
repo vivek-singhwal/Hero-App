@@ -228,7 +228,7 @@ export default  HomePage = ({navigation})=>{
     var emptyList=()=>{
       return( <View style={{backgroundColor:"#012554",padding:35}}>
       <Text style={{color:"#fff",alignSelf:"center",fontSize:18,paddingBottom:5}}>Your spray history will show up here.</Text>
-      <Text style={{color:"#fff",alignSelf:"center",fontSize:18}}>Begin a new route to ge started.</Text>
+      <Text style={{color:"#fff",alignSelf:"center",fontSize:18}}>Begin a new route to get started.</Text>
     </View>);
     }
     return(<>
@@ -264,7 +264,7 @@ export default  HomePage = ({navigation})=>{
                   </View>
                   {item.isRinse ?<View/>:<View>
                     <Text style={{color:'#fff',fontSize:13}}>Time elapsed</Text>
-                    <Text style={{color:'#fff',fontSize:13}}>{convertTime(Math.ceil(Math.abs(new Date(item.startTime).getTime()-new Date(item.endTime).getTime()) / 1000))}</Text>
+                    <Text style={{color:'#fff',fontSize:13}}>{item.endTime && convertTime(Math.ceil(Math.abs(new Date(item.startTime).getTime()-new Date(item.endTime).getTime()) / 1000))}</Text>
                   </View>}
 
                   <View>

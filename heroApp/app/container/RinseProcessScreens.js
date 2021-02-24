@@ -46,6 +46,7 @@ export default RinseProcess = ({navigation}) =>{
            
           })
           setCounter(1)
+          setProgressValue(0);
           navigation.navigate('HomePageRinse');
         })
       console.log(">Add rinse session ",new Date(sessionObj.startTime).getTime());
@@ -98,7 +99,8 @@ export default RinseProcess = ({navigation}) =>{
         contentStyle={{flexDirection:"row-reverse",}}
         mode="contained"
         onPress={()=>{
-          setCounter(1)
+          setCounter(1);
+          setProgressValue(0);
         }}
        >
           Rinse again
@@ -129,6 +131,7 @@ export default RinseProcess = ({navigation}) =>{
            
           })
           setCounter(1);
+          setProgressValue(0);
           navigation.navigate('HomePageRinse');
         })
         }}

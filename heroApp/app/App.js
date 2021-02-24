@@ -166,7 +166,8 @@ function App() {
     
     <Stack.Screen 
           name="SettingPage" 
-          component={SettingPage}  options={{
+          component={SettingPage} 
+          options={{
           headerBackTitle:'Back',
           headerTitleStyle: {fontSize:24,color:"#012554",fontWeight:"bold",fontStyle:"italic"},
           headerRight:(()=><AwesomeIcon
@@ -232,22 +233,44 @@ function App() {
           title: "Dashboard",
           headerBackTitleVisible:true,
           headerTitleStyle: {fontSize:24,color:"#012554",fontWeight:"bold",fontStyle:"italic"},
-          headerLeft: (()=><AwesomeIcon 
-          onPress={()=>{
-            setNavigation(navigation);
-            setTimeout(()=>{
-              setRingseModal(true);
-            },600)
-          }}
-          size={32}
-          // color={'#2C88D9'}
-          color={'#012554'}
-          style={{
-            transform: [
-              { scaleX: -1 }
-            ]
-          }} 
-          name="share-square-o"/>),
+          headerLeft: (()=>
+          <IconButton
+          disabled={isRinseStatus}
+            onPress={()=>{
+              setNavigation(navigation);
+              setTimeout(()=>{
+                setRingseModal(true);
+              },600)
+            }}
+           icon={props=><AwesomeIcon 
+            
+            size={32}
+            // color={'#2C88D9'}
+            color={'#012554'}
+            style={{
+              transform: [
+                { scaleX: -1 }
+              ]
+            }} 
+            name="share-square-o"/>}
+          />
+          // <AwesomeIcon 
+          // onPress={()=>{
+          //   setNavigation(navigation);
+          //   setTimeout(()=>{
+          //     setRingseModal(true);
+          //   },600)
+          // }}
+          // size={32}
+          // // color={'#2C88D9'}
+          // color={'#012554'}
+          // style={{
+          //   transform: [
+          //     { scaleX: -1 }
+          //   ]
+          // }} 
+          // name="share-square-o"/>
+          ),
           
           headerLeftContainerStyle:{paddingLeft:20},
 
@@ -265,13 +288,14 @@ function App() {
           headerStyle:{height:80}
        })}/>
 
-<Stack.Screen 
+    <Stack.Screen 
           name="HomePageRinse" component={HomePage}
           options={({navigation})=>({
           title: "Finished Session",
           headerBackTitleVisible:true,
           headerTitleStyle: {fontSize:24,color:"#012554",fontWeight:"bold",fontStyle:"italic"},
           headerLeft: (()=><Ionicons 
+          
           onPress={()=>{
             navigation.navigate('Dashboard');
             // setNavigation(navigation);

@@ -519,6 +519,7 @@ export default class BleAppmanager extends Component {
 
           localHw.sdName = peripheral.name;
           localHw.hardwareId = peripheral.id;
+          localHw.sprayerName = peripheral.name;
           setDeviceHWData(localHw);
           console.log('Connected to ' + peripheral.id +"\n"+peripheral.name);
           // Command initiate level

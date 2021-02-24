@@ -40,7 +40,7 @@ export var checkConnection = () => {
                 return result.result;
             },
             (error) => {
-                console.log(">>Eror ", error)
+                console.log(">>Eror checkConnection ", error)
                 return error;
             }
         )
@@ -58,7 +58,7 @@ export var getOperatorAPI = () => {
                 return result.result;
             },
             (error) => {
-                console.log(">>Eror ", error)
+                console.log(">>Eror getOperatorAPI ", error)
                 return error;
             }
         )
@@ -75,7 +75,7 @@ export var getSessionAPI = () => {
                 return result.result;
             },
             (error) => {
-                console.log(">>Eror ", error)
+                console.log(">>Eror getSessionAPI", error)
                 return error;
             }
         )
@@ -92,7 +92,7 @@ export var getSessionDataAPI = () => {
                 return result.result;
             },
             (error) => {
-                console.log(">>Eror ", error)
+                console.log(">>Eror getSessionDataAPI", error)
                 return error;
             }
         )
@@ -106,7 +106,7 @@ export var addOperatorAPI = (data) => {
         "company": "Kesem"
         }
     */
-   console.log(">>addOperatorAPI1 ", data)
+//    console.log(">>addOperatorAPI1 ", data)
     return fetch(apiEndPoint+'/api/operators', {
             method: "POST",
             body: JSON.stringify(data),
@@ -119,7 +119,7 @@ export var addOperatorAPI = (data) => {
                 return result.result;
             },
             (error) => {
-                console.log(">>Eror ", error)
+                console.log(">>Eror addOperatorAPI", error)
                 return error;
             }
         )
@@ -146,7 +146,7 @@ export var addSessionAPI = (data) => {
                 return result;
             },
             (error) => {
-                console.log(">>Eror ", error)
+                console.log(">>Eror addSessionAPI", error)
                 return error;
             }
         )
@@ -164,7 +164,7 @@ export var updateSessionAPI = (data) => {
                 return result;
             },
             (error) => {
-                console.log(">>Eror ", error)
+                console.log(">>Eror updateSessionAPI", error)
                 return error;
             }
         )
@@ -183,7 +183,7 @@ export var addSessionDataAPI = (data) => {
                 return result;
             },
             (error) => {
-                console.log(">>Eror ", error)
+                console.log(">>Eror addSessionDataAPI", error)
                 return error;
             }
         )
@@ -201,7 +201,7 @@ export var addSprayerAPI = (data) => {
                 return result;
             },
             (error) => {
-                console.log(">>Eror ", error)
+                console.log(">>Eror addSprayerAPI", error)
                 return error;
             }
         )

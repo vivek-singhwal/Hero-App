@@ -1,12 +1,16 @@
 import React,{useEffect,useState} from 'react';
 import { View , Text , TextInput as Input,ScrollView} from 'react-native';
 import { Button, Switch, ProgressBar, Modal, Portal, Provider, TextInput } from 'react-native-paper';
-import {getOperatorData,getDeviceData,getDeviceHWData} from '../services/DataService';
+import {getOperatorData,getDeviceData,getDeviceHWData, setDeviceHWData} from '../services/DataService';
+import { updateSprayerName } from '../services/DBService';
 import Material from 'react-native-vector-icons/Ionicons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 export default SettingPage = ({navigation}) => {
     console.log(">>Data ",getOperatorData(),JSON.stringify(getDeviceHWData()))
     const [deviceData] = useState(getDeviceData());
+    const [sprayerInput,setSprayerInput] = useState(getDeviceHWData().sprayerName);
+    const [isEditable,setEditable] = useState(false);
     const [isSwitchEleOn, setIsSwitchEleOn] = useState(false);
     const [isSwitchTrgOn, setIsSwitchTrgOn] = useState(false);
     const onToggleEleSwitch = () => setIsSwitchEleOn(!isSwitchEleOn);
@@ -37,8 +41,44 @@ export default SettingPage = ({navigation}) => {
                     <Text style={{fontSize:18,}}>{getOperatorData().opName}</Text>
                    </View>
                    <View style={{flexDirection:"row",justifyContent:"space-between",paddingTop:10}}>
-                    <Text style={{fontSize:20}}>Sprayer:</Text>
+                    <Text style={{fontSize:20}}>Device:</Text>
                     <Text style={{fontSize:18,}}>{getDeviceHWData().sdName}</Text>
+                   </View>
+                   <View style={{flexDirection:"row",justifyContent:"space-between",paddingTop:10}}>
+                    <Text style={{fontSize:20}}>Sprayer:</Text>
+                    {!isEditable ? <View style={{flexDirection:"row"}}>
+                    <Text style={{fontSize:18,}}>{getDeviceHWData().sprayerName}</Text> 
+                    <MaterialIcons 
+                       onPress={()=>{setEditable(true)}}
+                            size={25}
+                            color={'#012554'}
+                            name="edit"/>
+                    </View>:<View style={{flexDirection:"row"}}>
+                    <Input style={{width:100,borderColor:"black",borderBottomWidth:1,padding:0}}
+                    defaultValue={sprayerInput}
+                     onChangeText={text => setSprayerInput(text)}
+                    />
+                    
+                    <Material 
+                            onPress={()=>{
+                                if(sprayerInput != ""){
+                                    let sprayerObj = getDeviceHWData();
+                                    sprayerObj.sprayerName = sprayerInput;
+                                    setDeviceHWData(sprayerObj);
+                                    updateSprayerName(sprayerObj.hardwareId,sprayerInput).then(()=>{
+                                        console.log(">Success")
+                                    })
+                                    console.log(">>sprayerInput ",sprayerInput,getDeviceHWData())
+                                }
+                               
+                                setEditable(false);
+                            }}
+                            size={25}
+                            color={'#012554'}
+                            name="ios-checkmark"/>
+                    </View>}
+                    
+                    {/* <Text style={{fontSize:18,}}>{getDeviceHWData().sprayerName}</Text> */}
                    </View>
                    <View style={{flexDirection:"row",justifyContent:"space-between",paddingTop:10}}>
                     <Text style={{fontSize:20}}>Area Sprayed:</Text>
