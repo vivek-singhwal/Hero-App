@@ -70,7 +70,6 @@ export default SettingPage = ({navigation}) => {
                                     })
                                     console.log(">>sprayerInput ",sprayerInput,getDeviceHWData())
                                 }
-                               
                                 setEditable(false);
                             }}
                             size={25}

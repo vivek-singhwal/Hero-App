@@ -255,8 +255,8 @@ export default  HomePage = ({navigation})=>{
            ListEmptyComponent={emptyList}
            keyExtractor={(item, index) => String(index)}
            renderItem={({item,index})=>
-            <View key={index} style={{height:100,backgroundColor:item.isRinse == 1? item.isFinished ==  1?'red':'green':item.isFinished == 0?'#484848':'#012554',width:"100%",borderBottomColor:'#fff',borderBottomWidth:1,padding:15}}>
-              <Text style={{color:'#fff',fontSize:18,fontWeight:"bold",textTransform:'capitalize',marginStart:15,paddingBottom:4}}>{item.sessionLocation}</Text>
+            <View key={index} style={{height:100,backgroundColor:item.isRinse == 1? item.isFinished ==  1?'red':'green':item.isFinished == 0?'#484848':item.sessionLocation?'#012554':'#a3780b',width:"100%",borderBottomColor:'#fff',borderBottomWidth:1,padding:15}}>
+              <Text style={{color:'#fff',fontSize:18,fontWeight:"bold",textTransform:'capitalize',marginStart:15,paddingBottom:4}}>{item.sessionLocation?item.sessionLocation:'Incomplete session'}</Text>
                 <View style={{justifyContent:"space-around",flexDirection:'row'}}>
                   <View>
                   <Text style={{color:'#fff',fontSize:13}}>Start time</Text>
@@ -264,7 +264,7 @@ export default  HomePage = ({navigation})=>{
                   </View>
                   {item.isRinse ?<View/>:<View>
                     <Text style={{color:'#fff',fontSize:13}}>Time elapsed</Text>
-                    <Text style={{color:'#fff',fontSize:13}}>{item.endTime && convertTime(Math.ceil(Math.abs(new Date(item.startTime).getTime()-new Date(item.endTime).getTime()) / 1000))}</Text>
+                    <Text style={{color:'#fff',fontSize:13}}>{item.endTime ? convertTime(Math.ceil(Math.abs(new Date(item.startTime).getTime()-new Date(item.endTime).getTime()) / 1000)):'00:00:00 '}</Text>
                   </View>}
 
                   <View>

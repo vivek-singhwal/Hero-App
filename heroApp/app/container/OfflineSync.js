@@ -59,7 +59,7 @@ export default OfflineSync = () =>{
         
     }
 
-    checkSprayerSync=()=>{
+    var checkSprayerSync=()=>{
         // console.log(">>sprayer sync");
         getSprayerAPISync().then((opResult)=>{
             // console.log(">>checkSprayerSync ",opResult);
@@ -147,7 +147,7 @@ export default OfflineSync = () =>{
         // Add and get session 
         // if(getLocalSessionId() && getLocalSessionId() != ""){
             getSessionAPISync().then((respSession)=>{
-                // console.log(">>getSessionAPISync ",respSession)
+                console.log(">>getSessionAPISync ",respSession)
                 if(respSession && respSession.length){
                     // update session list into API
                     var currentSessionData ={};
