@@ -60,7 +60,7 @@ export default  HomePage = ({navigation})=>{
           // delsession(10).then(()=>{})
           if(currentRoute == "Dashboard"){
             getDashboardSessions().then((resSessions)=>{
-              // console.log(">>Res ",resSessions,);
+              // console.log(">>Res ",resSessions);
               var listSession = resSessions;
               if(resSessions){
                 for(let i=0;i<listSession.length;i++){
@@ -75,7 +75,7 @@ export default  HomePage = ({navigation})=>{
             })
           }else{
             getSessions(getOperatorData().serverId).then((resSessions)=>{
-              // console.log(">>Res ",resSessions,);
+              // console.log(">>Res ",resSessions);
               var listSession = resSessions;
               if(resSessions){
                 for(let i=0;i<listSession.length;i++){
@@ -269,7 +269,7 @@ export default  HomePage = ({navigation})=>{
 
                   <View>
                     <Text style={{color:'#fff',fontSize:13}}>{item.isRinse?'Date':'Oz sprayed'}</Text>
-                    <Text style={{color:'#fff',fontSize:13}}>{item.isRinse? new Date(item.startTime).toLocaleDateString():parseFloat(item.ozSparayed).toFixed(2)+' Oz'}</Text>
+                    <Text style={{color:'#fff',fontSize:13}}>{item.isRinse? new Date(item.startTime).toLocaleDateString():item.ozSparayed != null ? parseFloat(item.ozSparayed).toFixed(2)+' Oz':'0.00 Oz'}</Text>
                   </View>
                 </View>
              </View>
