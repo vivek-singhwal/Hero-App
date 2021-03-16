@@ -20,7 +20,6 @@ let setStartTime ,setEndTime;
 
 export default  HomePage = ({navigation})=>{
   let currentRoute = useRoute().name;
-    const [deviceData] = useState(getDeviceData());
     const [counter,setCounter] = useState(true);
     const [visible, setVisible] = useState(false);
     const [locationText, setLocationText] = useState('');
@@ -29,6 +28,7 @@ export default  HomePage = ({navigation})=>{
     const showModal = () => setVisible(true);
     const hideModal = () => setVisible(false);
     const [readingStatus,setReadStatus] = useState(getReadingStatus());
+    const [btryPerct] = useState(isNaN(parseInt(currentSessionData.getBatteryLevel))?'0':parseInt(currentSessionData.getBatteryLevel))
     const [isSwitchEleOn, setIsSwitchEleOn] = useState(currentSessionData.getESVState == "On"?true:false);
     const [isSwitchTrgOn, setIsSwitchTrgOn] = useState(currentSessionData.getTriggerLatchState == "On"?true:false);
     const onToggleEleSwitch = () => setIsSwitchEleOn(!isSwitchEleOn);
@@ -246,9 +246,9 @@ export default  HomePage = ({navigation})=>{
                </View>
                <View style={{flexDirection:"row",justifyContent:"space-between",paddingBottom:20}}>
                 <Text style={{fontSize:20,}}>Battery</Text>
-                <Text style={{fontSize:18,}}>{isNaN(parseInt(currentSessionData.getBatteryLevel))?'0':parseInt(currentSessionData.getBatteryLevel)} %</Text>
+                <Text style={{fontSize:18,}}>{btryPerct} %</Text>
                </View>
-               <ProgressBar style={{height:10}} progress={parseInt(currentSessionData.getBatteryLevel)/100} color={'#012554'} />
+               <ProgressBar style={{height:10}} progress={btryPerct/100} color={'#012554'} />
             </View>:  
           <FlatList
            data={sessionList}

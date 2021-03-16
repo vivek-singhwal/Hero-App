@@ -1,7 +1,7 @@
 import React,{useEffect,useState} from 'react';
 import { View , Text , TextInput as Input,ScrollView} from 'react-native';
 import { Button, Switch, ProgressBar, Modal, Portal, Provider, TextInput } from 'react-native-paper';
-import {getOperatorData,getDeviceData,getDeviceHWData, setDeviceHWData} from '../services/DataService';
+import {getOperatorData,getDeviceData,getDeviceHWData, setDeviceHWData, currentSessionData} from '../services/DataService';
 import { updateSprayerName } from '../services/DBService';
 import Material from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -11,8 +11,10 @@ export default SettingPage = ({navigation}) => {
     const [deviceData] = useState(getDeviceData());
     const [sprayerInput,setSprayerInput] = useState(getDeviceHWData().sprayerName);
     const [isEditable,setEditable] = useState(false);
-    const [isSwitchEleOn, setIsSwitchEleOn] = useState(false);
-    const [isSwitchTrgOn, setIsSwitchTrgOn] = useState(false);
+    // const [isSwitchEleOn, setIsSwitchEleOn] = useState(false);
+    // const [isSwitchTrgOn, setIsSwitchTrgOn] = useState(false);
+    const [isSwitchEleOn, setIsSwitchEleOn] = useState(currentSessionData.getESVState == "On"?true:false);
+    const [isSwitchTrgOn, setIsSwitchTrgOn] = useState(currentSessionData.getTriggerLatchState == "On"?true:false);
     const onToggleEleSwitch = () => setIsSwitchEleOn(!isSwitchEleOn);
     const onToggleTrgSwitch = () => setIsSwitchTrgOn(!isSwitchTrgOn);
     return(<>
@@ -28,9 +30,9 @@ export default SettingPage = ({navigation}) => {
                    </View>
                    <View style={{flexDirection:"row",justifyContent:"space-between",paddingBottom:20}}>
                     <Text style={{fontSize:20,}}>Battery</Text>
-                    <Text style={{fontSize:18,}}>{isNaN(parseInt(deviceData["getBatteryLevel\r"]))?'0':parseInt(deviceData["getBatteryLevel\r"])} %</Text>
+                    <Text style={{fontSize:18,}}>{isNaN(parseInt(currentSessionData.getBatteryLevel))?'0':parseInt(currentSessionData.getBatteryLevel)} %</Text>
                    </View>
-                   <ProgressBar style={{height:10}} progress={parseInt(deviceData["getBatteryLevel\r"])/100} color={'#012554'} />
+                   <ProgressBar style={{height:10}} progress={isNaN(parseInt(currentSessionData.getBatteryLevel))?'0':parseInt(currentSessionData.getBatteryLevel)/100} color={'#012554'} />
 
                    <View style={{flexDirection:"row",justifyContent:"space-between",paddingTop:30}}>
                     <Text style={{fontSize:20,fontWeight:"bold"}}>System Info.</Text>
