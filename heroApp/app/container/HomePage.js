@@ -23,6 +23,7 @@ export default  HomePage = ({navigation})=>{
     const [counter,setCounter] = useState(true);
     const [visible, setVisible] = useState(false);
     const [locationText, setLocationText] = useState('');
+    const [locationImg, setLocationImg] = useState('');
     const [commentText, setCommentText] = useState('');
     const [sessionList,setSessionList] = useState(sessionDataList);
     const showModal = () => setVisible(true);
@@ -125,8 +126,9 @@ export default  HomePage = ({navigation})=>{
           startTime: setStartTime,
           ozSparayed:parseInt(currentSessionData.getFlowRate)/29.57,
           endTime: setEndTime,
-          sessionLocation: locationText,
+          sessionLocation: 'Session-'+sessionList.length,
           sessionComment: commentText,
+          locationImages:locationImg,
           // sessionData: JSON.stringify(currentSessionData),
           id: getLocalSessionId(),
           isSync:0,
@@ -143,11 +145,12 @@ export default  HomePage = ({navigation})=>{
       updateSessions(sessionObj).then((respUpdateSession)=>{
         console.log(">>Update session ",respUpdateSession);
       })
-      sessionListAr.push({sessionLocation:locationText, startTime:setStartTime, endTime: setEndTime, ozSparayed:parseInt(currentSessionData.getPumpedVolume)/29.57})
+      sessionListAr.push({sessionLocation:'Session-'+sessionList.length, startTime:setStartTime, endTime: setEndTime, ozSparayed:parseInt(currentSessionData.getPumpedVolume)/29.57})
       sessionListAr = sessionListAr.sort((a,b)=> b.startTime - a.startTime)
       setSessionList(sessionListAr);
       setCommentText('');
       setLocationText('');
+      setLocationImg('');
       return;
       var sessionObjApi =  getSessionObjApiData();
       sessionObjApi.sessionLocation = locationText;
@@ -342,7 +345,7 @@ export default  HomePage = ({navigation})=>{
       </View>
   </View>
   
-  <SaveModal addSessionList={addSessionList} setLocationText={setLocationText} locationText={locationText} commentText={commentText} setCommentText={setCommentText} visible={visible} hideModal={hideModal} SetReadingStatus={(isBack)=>{setReadStatus(isBack)}} />
+  <SaveModal locationImg={locationImg} setLocationImg={setLocationImg} addSessionList={addSessionList} setLocationText={setLocationText} locationText={locationText} commentText={commentText} setCommentText={setCommentText} visible={visible} hideModal={hideModal} SetReadingStatus={(isBack)=>{setReadStatus(isBack)}} />
    {/* <RinseModal/> */}
     </>)
 }

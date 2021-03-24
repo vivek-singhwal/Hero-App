@@ -147,7 +147,7 @@ export default OfflineSync = () =>{
         // Add and get session 
         // if(getLocalSessionId() && getLocalSessionId() != ""){
             getSessionAPISync().then((respSession)=>{
-                console.log(">>getSessionAPISync ",respSession)
+                // console.log(">>getSessionAPISync ",respSession)
                 if(respSession && respSession.length){
                     // update session list into API
                     var currentSessionData ={};
@@ -169,17 +169,19 @@ export default OfflineSync = () =>{
                             model: currentSessionData.getModel,
                             unitName:currentSessionData.getUnitName,
                             isRinse:respSession[i].isRinse,
-                            isFinished:respSession[i].isFinished
+                            isFinished:respSession[i].isFinished,
                             // "sessionComment": "first comment"
                         }
                         
                         sessionsObjAPI.sessionLocation = respSession[i].sessionLocation;
+                        sessionsObjAPI.locationImages = respSession[i].locationImages
                         sessionsObjAPI.endTime = respSession[i].endTime;
                         sessionsObjAPI.sessionComment = respSession[i].sessionComment;
                         // respSession = [{"appVersion": 1.1, "chemistryType": "NaDCC", "endTime": null, "id": 1, "isFinished": 1, "isRinse": 0, "isSync": 0, "operatorId": "abc04f5c-1b1f-4214-87f7-a899ef368693", "ozSparayed": 1.0821778829895163, "serverId": null, "sessionComment": null, "sessionData": null, "sessionLocation": null, "sprayerId": "41226a0b-5fcf-4eac-9867-49535a809810", "startTime": 1611306974085}];
-                        // console.log(">>sessionApiObj ",JSON.stringify(respSession));
+                       
                         if(respSession[i].serverId){
                             sessionsObjAPI.id = respSession[i].serverId;
+                            console.log(">>sessionApiObj ",JSON.stringify(sessionsObjAPI));
                            updateSessionAPI(sessionsObjAPI).then((respData)=>{
                             // console.log(">>updateSessionAPI ",respData)
                             if(respData.success){

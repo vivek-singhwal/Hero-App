@@ -1,28 +1,75 @@
-import React,{useEffect,useState} from 'react';
-import { View , StyleSheet, Text, TouchableOpacity, TextInput as Input,ScrollView, Keyboard} from 'react-native';
+import React,{ useEffect, useState } from 'react';
+import { View , StyleSheet, Text, TouchableOpacity, TextInput as Input,ScrollView, Image} from 'react-native';
 import Material from 'react-native-vector-icons/MaterialIcons';
-import { Button, Switch, ProgressBar, Modal, Portal, Provider, TextInput } from 'react-native-paper';
+import MaterialCom from 'react-native-vector-icons/MaterialCommunityIcons';
+import { Button, Modal, Portal, Provider } from 'react-native-paper';
+import { launchCamera } from 'react-native-image-picker';
+import { uploadImage } from '../services/apiService';
+import { apiEndPoint } from '../services/constants';
+import ImageResizer from 'react-native-image-resizer';
 
- export default SaveModal = ({addSessionList,setLocationText,locationText,commentText,setCommentText,visible,hideModal,SetReadingStatus}) => {
+ export default SaveModal = ({locationImg,setLocationImg,addSessionList,setLocationText,locationText,commentText,setCommentText,visible,hideModal,SetReadingStatus}) => {
   var inputBox;
     const [textFocused,setTextFocused] = useState(false);
+    const [isClickable,setIsClickable] = useState(false);
+  //  const [imageUri,setImageUri] = useState('');
     const containerStyle = {backgroundColor: 'white', padding: 20};
+   var openlaunchCamera = () => {
+     console.log("Here")
+      let options = {
+        storageOptions: {
+          skipBackup: true,
+          path: 'images'
+        },
+      };
+      launchCamera(options, (response) => {
+        console.log('Response = ', response);
+        setIsClickable(false);
+        if (response.didCancel) {
+          console.log('User cancelled image picker');
+        } else if (response.error) {
+          console.log('ImagePicker Error: ', response.error);
+        } else if (response.customButton) {
+          console.log('User tapped custom button: ', response.customButton);
+          alert(response.customButton);
+        } else {
+          console.log(">Resp",JSON.stringify(response));
+          ImageResizer.createResizedImage(response.uri, 1000, 1000, 'JPEG', 50)
+          .then(respImg => {
+            // console.log(">response compressed  img ",respImg);
+            uploadImage(respImg).then((resp)=>{
+                console.log(">Re  sp",JSON.stringify(resp));
+                if(resp.image){
+                  let imageuri = resp.image.replace('/opt/data/','');
+                // setImageUri(imageuri);
+                setLocationImg(imageuri);
+                setIsClickable(true);
+            }
+            
+            // setLocationText()
+          })
+            // response.uri is the URI of the new image that can now be displayed, uploaded...
+            // response.path is the path of the new image
+            // response.name is the name of the new image with the extension
+            // response.size is the size of the new image
+          })
+          .catch(err => {
+            // Oops, something went wrong. Check that the filename is correct and
+            // inspect err to get more details.
+          });
+          
+        }
+      });
+      return
+    }
     return (
       <Provider>
         <Portal>
           <Modal visible={visible} dismissable={false} contentContainerStyle={containerStyle}>
           <ScrollView keyboardShouldPersistTaps='never'>
             <View style={{flexDirection:"column"}}>
-            <Text style={{fontSize:17,color:"#4A4A4A",paddingBottom:10}}>Location</Text>
-            {/* <TextInput
-              theme={{ colors: { primary: '#012554',underlineColor:'transparent',}}}
-              style={{paddingBottom:20}}
-              mode={'outlined'}
-              defaultValue={locationText}
-              placeholder={'Where did you spray?'}
-              onChangeText={text => setLocationText(text)}
-            /> */}
-            <Input
+            <Text style={{fontSize:17,color:"#4A4A4A",paddingBottom:5}}>Upload spread area picture</Text>
+{/*       <Input
                         onFocus={()=> setTextFocused(true)}
                         onBlur={()=> setTextFocused(false)}
                         placeholder={'Where did you spray?'}
@@ -31,8 +78,16 @@ import { Button, Switch, ProgressBar, Modal, Portal, Provider, TextInput } from 
                         defaultValue={locationText}
                         onChangeText={text => setLocationText(text)}
                         // ref = {(input) => this.input = input}
-                    />
-            <Text style={{fontSize:17,color:"#4A4A4A",paddingBottom:16}}>Comments</Text>
+                    /> */}
+            <TouchableOpacity onPress={()=>openlaunchCamera()} style={{flexDirection:"row",justifyContent:"space-between",padding:10,marginTop:5,fontSize:16,borderWidth:1,paddingRight:10,borderColor:'#012554',borderRadius:4}}>
+                <Text style={{alignSelf:"center",fontSize:18}}>Capture image</Text>
+                <MaterialCom 
+                size={30}
+                color={'#012554'}
+                name="camera-plus"/>
+              </TouchableOpacity>
+             { locationImg != "" && <Image style={{height:200,borderColor:'gray',borderWidth:1,marginTop:10}} source={{uri:apiEndPoint+'/'+locationImg}}></Image> } 
+            <Text style={{fontSize:17,color:"#4A4A4A",paddingBottom:16,marginTop:10}}>Comments</Text>
             <TouchableOpacity
               activeOpacity={1}
               onPress={()=>inputBox.focus()}>
@@ -71,7 +126,7 @@ import { Button, Switch, ProgressBar, Modal, Portal, Provider, TextInput } from 
              <Button 
               color={'#012554'}
               mode={'contained'}
-              disabled={locationText && locationText !== ""?false:true}
+              disabled={locationImg && locationImg !== ""?!isClickable?true:false:true}
               labelStyle={{fontSize:16}} 
               icon={props=><Material 
                 size={35}

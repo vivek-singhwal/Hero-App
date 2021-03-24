@@ -102,7 +102,7 @@ export default class BleAppmanager extends Component {
       clearInterval(this.readInterval);
       setSecondRead(true);
       
-      console.log(">>firstTimeRead ",getReadOk(),currentSessionData)
+      // console.log(">>firstTimeRead ",getReadOk(),currentSessionData)
      // if(getReadOk()){
       if(this.state.readSessionData == 0){
         
@@ -111,7 +111,7 @@ export default class BleAppmanager extends Component {
           if(getInterval == false){
             return;
           }
-          console.log(">>> interval method..."+this.state.readSessionData);
+          // console.log(">>> interval method..."+this.state.readSessionData);
           var sessionObjApi = {
             "batteryLevel": currentSessionData.getBatteryLevel,
             "esvStatusState":  currentSessionData.getESVState,
@@ -222,7 +222,7 @@ export default class BleAppmanager extends Component {
           this.writeSingleData('setTriggerLatchState\r');
         }
          else {
-           console.log(">>elsepart ",data.cmd)
+          //  console.log(">>elsepart ",data.cmd)
           if(bleCommands.indexOf(data.cmd) >= 0 && data.event == 'initCmdSeq'){
             this.writeData(data.cmd);
           }if(data.event == 'homepageEvent'){
@@ -300,7 +300,7 @@ export default class BleAppmanager extends Component {
       this.currentReadData.push(this.currentReadData);
     }
     
-    console.log("currentCMD: "+ getCurrentCmd(),initCmdSeq.indexOf(getCurrentCmd()));
+    // console.log("currentCMD: "+ getCurrentCmd(),initCmdSeq.indexOf(getCurrentCmd()));
     if( !getReadOk() && initCmdSeq.indexOf(getCurrentCmd()) >= 0 && !secondRead) {
       let cmdIndex = initCmdSeq.indexOf(getCurrentCmd());
       let nextCmd = initCmdSeq[cmdIndex +1];
@@ -309,7 +309,7 @@ export default class BleAppmanager extends Component {
         EventRegister.emit('BLE_STATUS', { event: "reading" });
         EventRegister.emit('BLECMD', { event: "initCmdSeq" , cmd:nextCmd});
       }else{
-        console.log('final result...');
+        // console.log('final result...');
         setReadOk(true);
         // firstTimeRead =true;
         setCurrentSessionData(this.sessionData);
@@ -392,11 +392,13 @@ export default class BleAppmanager extends Component {
            }).catch((error) => {
              console.log('Notification error', error);
             //  EventRegister.emit('BLE_STATUS', { event: "error"});
+            EventRegister.emit('BLE_STATUS', { event: "disconnected" });
            })
        }).catch((error) => {
         //  EventRegister.emit('BLE_DATA',{event:'error'});
          console.log('service error writeSingleData ', error);
-         EventRegister.emit('BLE_STATUS', { event: "error"});
+         EventRegister.emit('BLE_STATUS', { event: "disconnected" });
+        //  EventRegister.emit('BLE_STATUS', { event: "error"});
        });
     }else{
       console.log("Command null");
@@ -420,6 +422,7 @@ export default class BleAppmanager extends Component {
             }, 20);
           }).catch((error) => {
             console.log('Notification error', error);
+            EventRegister.emit('BLE_STATUS', { event: "disconnected" });
           })
       }).catch((error) => {
         console.log('service error writeData', error);
@@ -469,7 +472,7 @@ export default class BleAppmanager extends Component {
     //console.log("handleDiscoverPeripheral>>>"+peripheral.name)
     var peripherals = this.state.peripherals;
    if(peripheral.name){
-    console.log('Got ble peripheral', peripheral.name );
+    // console.log('Got ble peripheral', peripheral.name );
     this.setState({ peripherals });
     EventRegister.emit('BLE_STATUS', { event: "bleDevices" ,devices: JSON.parse(JSON.stringify(peripheral))});
     // console.log(JSON.stringify(peripheral))

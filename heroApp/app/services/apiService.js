@@ -46,6 +46,41 @@ export var checkConnection = () => {
         )
 }
 
+export var uploadImage = (image) => {
+    /*
+        {
+        fieldname: 'demo_image',
+        originalname: 'spray-icon_low.png',
+        encoding: '7bit',
+        mimetype: 'image/png',
+        destination: './public/images',
+        filename: '2398782347.png',
+        path: 'public/images/2398782347.png',
+        size: 8548
+        }
+    */
+        const data = new FormData();
+
+        data.append("demo_image", { uri: image.uri, name: image.name, type: 'image/jpeg' });
+    // console.log(">Form data ",data,image)
+    return fetch(apiEndPoint+'/api/sessions/upload-image?90', {
+            body: data,
+            method: "POST",
+            headers: {'Accept': 'application/json','Content-Type': 'multipart/form-data','Authorization':encryptToken()},
+         })
+        .then(res =>  res.json())
+        .then(
+            (result) => {
+                // console.log("result ",result)
+                return result;
+            },
+            (error) => {
+                console.log(">>Eror checkConnection ", error)
+                return error;
+            }
+        )
+}
+
 export var getOperatorAPI = () => {
     return fetch(apiEndPoint+'/api/operators', {
             method: "GET",

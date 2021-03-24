@@ -77,7 +77,7 @@ export default FirstTimeConnection = ({navigation}) => {
             //   setSessionDataList([]); // set temp
 
             }else if(data.event == "bleDevices"){
-                console.log(">>devices ",data.devices);
+                // console.log(">>devices ",data.devices);
                 deviceListAr.push(data.devices);
                 var arrayUniqueByKey = [...new Map(deviceListAr.map(item =>
                   [item['id'], item])).values()];

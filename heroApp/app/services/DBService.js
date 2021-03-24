@@ -54,7 +54,31 @@ export var initDB = (reqTable) => {
                 //       // }
                 //   }
                 // )
-                  db.executeSql(
+            
+                db.executeSql(
+                  'SELECT locationImages FROM sessions').then(
+                (results) => {
+                    if(results[0].rows.length == 0){
+                        // console.log(">>No data found")
+                    }
+                }
+              ).catch(error => {
+                db.executeSql(
+                  'ALTER TABLE sessions ADD COLUMN locationImages text').then(
+                (results) => {
+                    if(results[0].rows.length == 0){
+                        // console.log(">>No data found")
+                    }
+                }
+              ).catch(error => {
+          
+              console.log(error);
+              })
+
+              console.log(error);
+              })
+                
+                db.executeSql(
                     'SELECT rinseId FROM sessions').then(
                   (results) => {
                       if(results[0].rows.length == 0){
@@ -262,7 +286,7 @@ export var initDB = (reqTable) => {
                 })
 
                 db.transaction((tx) => {
-                  tx.executeSql('CREATE TABLE IF NOT EXISTS sessions (id INTEGER PRIMARY KEY AUTOINCREMENT,serverId VARCHAR(25), operatorId VARCHAR(25), sprayerId VARCHAR(25), chemistryType VARCHAR(25) ,startTime INTEGER ,endTime INTEGER,sessionLocation VARCHAR(25),sessionComment VARCHAR(100),sessionData TEXT,ozSparayed REAL,isSync boolean not null default 0,isFinished boolean not null default 0,isRinse boolean not null default 0,appVersion boolean not null default 0,rinseId text)');
+                  tx.executeSql('CREATE TABLE IF NOT EXISTS sessions (id INTEGER PRIMARY KEY AUTOINCREMENT,serverId VARCHAR(25), operatorId VARCHAR(25), sprayerId VARCHAR(25), chemistryType VARCHAR(25) ,startTime INTEGER ,endTime INTEGER,sessionLocation VARCHAR(25),sessionComment VARCHAR(100),sessionData TEXT,ozSparayed REAL,isSync boolean not null default 0,isFinished boolean not null default 0,isRinse boolean not null default 0,appVersion boolean not null default 0,rinseId text, locationImages text)');
                 }).then((resp) => {
                   // console.log("resp user table "+resp);
                   resolve(db);
@@ -622,7 +646,30 @@ export var getOperators = function () {
     // console.log("getOperators");
     let promise = new Promise((resolve, reject) => {
         db.executeSql(
-            'UPDATE sessions SET endTime=?,sessionLocation=?,sessionComment=?,isSync=? where id=?',[objSession.endTime,objSession.sessionLocation,objSession.sessionComment,objSession.isSync,objSession.id]).then(
+            'UPDATE sessions SET endTime=?,sessionLocation=?,sessionComment=?,isSync=?, locationImages=? where id=?',[objSession.endTime,objSession.sessionLocation,objSession.sessionComment,objSession.isSync,objSession.locationImages,objSession.id]).then(
+          (results) => {
+              var records = [];
+            // console.log(">>Inside getOperators",results)
+            if(results[0].rows.length){
+                for (let i = 0; i < results[0].rows.length; ++i){
+                    records.push(results[0].rows.item(i))
+                    // console.log(">>results ",i,)
+                }
+            }
+            resolve(records);
+          }
+        )
+    }).catch(error => {
+      console.log(error);
+    });;
+    return promise;
+  }
+
+  export var updateSessionsImage = function (objSession) {
+    // console.log("getOperators");
+    let promise = new Promise((resolve, reject) => {
+        db.executeSql(
+            'UPDATE sessions SET locationImages=?, isSync=? where id=?',[objSession.imageUrl,objSession.isSync,objSession.id]).then(
           (results) => {
               var records = [];
             // console.log(">>Inside getOperators",results)
