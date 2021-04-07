@@ -41,10 +41,12 @@
 	<string>App needs to connect bluetooth device</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>App needs to connect bluetooth device</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Allow user to capture location picture.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
- <string></string>
- <key>NSCameraUsageDescription</key>
- <string>This app requires access to the camera.</string>
+	<string></string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Allow user to upload location picture.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>
