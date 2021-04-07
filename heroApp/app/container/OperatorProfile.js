@@ -176,6 +176,7 @@ export default OperatorProfile= ({navigation}) =>{
                 <RNPickerSelect
                     // icon={<Entypo size={20} name="select-arrows" style={{alignSelf:"center"}}/>}
                     value={opChem}
+                    placeholder={{}}
                     style={{
                       inputIOS:{
                         bottom:20,
@@ -205,8 +206,8 @@ export default OperatorProfile= ({navigation}) =>{
                       return <Entypo size={20} name="select-arrows" style={{alignSelf:"center"}}/>;
                     }}
                     items={[
-                        { label: 'NaDCC', value: 'NaDCC' },
-                        { label: 'AHP', value: 'AHP' }
+                        {key:'1', label: 'NaDCC', value: 'NaDCC'},
+                        {key:'2', label: 'AHP', value: 'AHP'}
                       ]}
                 />
             {/* </View> */}

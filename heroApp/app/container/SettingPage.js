@@ -32,7 +32,7 @@ export default SettingPage = ({navigation}) => {
                     <Text style={{fontSize:20,}}>Battery</Text>
                     <Text style={{fontSize:18,}}>{isNaN(parseInt(currentSessionData.getBatteryLevel))?'0':parseInt(currentSessionData.getBatteryLevel)} %</Text>
                    </View>
-                   <ProgressBar style={{height:10}} progress={isNaN(parseInt(currentSessionData.getBatteryLevel))?'0':parseInt(currentSessionData.getBatteryLevel)/100} color={'#012554'} />
+                   <ProgressBar style={{height:10}} progress={currentSessionData.getBatteryLevel && isNaN(parseInt(currentSessionData.getBatteryLevel))?'0':parseInt(currentSessionData.getBatteryLevel)/100} color={'#012554'} />
 
                    <View style={{flexDirection:"row",justifyContent:"space-between",paddingTop:30}}>
                     <Text style={{fontSize:20,fontWeight:"bold"}}>System Info.</Text>
@@ -89,9 +89,13 @@ export default SettingPage = ({navigation}) => {
                     <Text style={{fontSize:20}}>Time Sprayed:</Text>
                     {/* <Text style={{fontSize:18,}}>90%</Text> */}
                    </View>
-                   <View style={{flexDirection:"row",justifyContent:"space-between",paddingTop:10,marginBottom:35}}>
+                   <View style={{flexDirection:"row",justifyContent:"space-between",paddingTop:10}}>
                     <Text style={{fontSize:20}}>Session Start:</Text>
                     {/* <Text style={{fontSize:18,}}>90%</Text> */}
+                   </View>
+                   <View style={{flexDirection:"row",justifyContent:"space-between",paddingTop:10,marginBottom:35}}>
+                    <Text style={{fontSize:20}}>Version:</Text>
+                    <Text style={{fontSize:18,}}>{currentSessionData.getFirmware}</Text>
                    </View>
                    <Button 
                         color={'#012554'}
