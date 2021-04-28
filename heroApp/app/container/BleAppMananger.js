@@ -6,7 +6,7 @@ import { EventRegister } from 'react-native-event-listeners';
 import BleService, {getInterval, getReadOk, setReadOk , getCurrentCmd,setCurrentCmd, bleCommands,initCmdSeq,bleResults, dataCmdSeq} from '../services/BleService';
 import { predefinedSessionData,setPredefinedessionData ,
         setDeviceHWData,currentSessionData,setCurrentSessionData,
-        getLocalSessionId,
+        getLocalSessionId,setBtStatus,
          getSessionId, setSecondRead,secondRead,setDeviceData, setInternetConnection,currentReadData,setCurrentReadData} from '../services/DataService';
 import { addSessionDataAPI,addSessionAPI } from '../services/apiService';
 import NetInfo from "@react-native-community/netinfo";
@@ -52,7 +52,15 @@ export default class BleAppmanager extends Component {
   // })
   
   componentDidMount() {
-
+    bleManagerEmitter.addListener("BleManagerDidUpdateState", (args) => {
+      console.log(">>Args "+args.state);
+      if(args.state == "off"){
+        setBtStatus(true);
+      }else{
+        setBtStatus(false);
+      }
+      // The new state: args.state
+    });
     NetInfo.configure({
       reachabilityUrl: 'https://hero-api.kesemsolutions.com',
       reachabilityTest: async (response) => response.status === 204,
@@ -444,6 +452,7 @@ export default class BleAppmanager extends Component {
     }).catch((error) => {
       // Failure code
       console.log("The user refuse to enable bluetooth");
+      // EventRegister.emit('BLE_STATUS', { event: "error"});
       //Alert.alert("Hero", "Please turn your bluetooth on.")
     });
   }

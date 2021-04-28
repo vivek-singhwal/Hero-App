@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, StatusBar, SafeAreaView,StyleSheet, Alert, TouchableHighlight,Modal, Image} from 'react-native';
+import { View, StatusBar, NativeModules, NativeEventEmitter ,SafeAreaView,StyleSheet, Alert, TouchableHighlight,Modal, Image} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import TestPageAPI from './container/TestPageAPI';
@@ -8,6 +8,7 @@ import OfflineSync from './container/OfflineSync';
 import SettingPage from './container/SettingPage';
 import FirstConnection from './container/FirstimeConnection';
 import Profile from './container/OperatorProfile';
+import DeviceConnection from './container/DeviceConnection';
 import BleAppManager from './container/BleAppMananger';
 import AwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import { Text,Button ,IconButton} from 'react-native-paper';
@@ -18,6 +19,8 @@ import { getReadingStatus } from './services/DataService';
 import Material from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AppCtx from './AppContext'
+const BleManagerModule = NativeModules.BleManager;
+const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
 
 const Stack = createStackNavigator();
 
@@ -157,13 +160,14 @@ function App() {
     <BleAppManager/>
     <NavigationContainer>
     <OfflineSync/>  
-    <Stack.Navigator initialRouteName="Profile">
+    <Stack.Navigator initialRouteName="HomePage">
     
     <Stack.Screen name="TestPageAPI" component={TestPageAPI} options={{headerShown: false}}/>
     <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }}/>
     <Stack.Screen name="RinseProcess" component={RinseProcess} options={{ headerShown: false }}/>
     <Stack.Screen name="FirstConnection" component={FirstConnection} options={{ headerShown: false }}/>
-    
+    <Stack.Screen name="DeviceConnection" component={DeviceConnection} options={{ title: 'SCOUT', headerTitleStyle:{fontWeight:"bold",fontSize:25},headerBackTitleVisible:false,headerLeft: ()=> null }}/>
+    {/* DeviceConnection */}
     <Stack.Screen 
           name="SettingPage" 
           component={SettingPage} 

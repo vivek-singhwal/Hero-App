@@ -59,7 +59,7 @@ export default FirstTimeConnection = ({navigation}) => {
 
       scanAndConenct();
       BackHandler.addEventListener('hardwareBackPress', () => true)
-        var listener = EventRegister.addEventListener('BLE_STATUS', (data) => {
+        var listener = EventRegister.addEventListener('BLE_STATUS1', (data) => {
           // console.log(">>BLE_STATUS ",data);
             if(data.event == "Data_Recieved"){
               console.log(data.value);
@@ -155,7 +155,7 @@ return(
               mode={'contained'}
               uppercase={false}
             //   disabled={deviceStatus === "Ready"?false:true}
-              labelStyle={{fontSize:16}} 
+              labelStyle={{fontSize:16,}} 
               icon={props=><Material 
                 size={35}
                 color={'#fff'}

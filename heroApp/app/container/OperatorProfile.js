@@ -1,36 +1,31 @@
 import React,{useEffect,useState} from 'react';
-import { View, TextInput as Input,ScrollView, Alert, KeyboardAvoidingView,  StyleSheet,TouchableHighlight, Keyboard} from 'react-native';
+import { View, TextInput as Input,ScrollView, Linking, KeyboardAvoidingView, NativeModules, NativeEventEmitter, StyleSheet,TouchableHighlight, Keyboard} from 'react-native';
 import { Avatar, Button,Text ,Modal} from 'react-native-paper';
 import AwesomeIcon5 from 'react-native-vector-icons/FontAwesome5';
 import Material from 'react-native-vector-icons/MaterialIcons';
 import Entypo from 'react-native-vector-icons/Entypo';
-import {Picker} from '@react-native-picker/picker';
-import { getOperators, initDB , addOperator,delOperator, updateServerId, deleteAllOperator } from '../services/DBService';
-import { setOperatorData,getOperatorData } from '../services/DataService';
-import { getOperatorAPI,addOperatorAPI } from '../services/apiService';
-import NetInfo,{useNetInfo} from "@react-native-community/netinfo";
+import Foundation from 'react-native-vector-icons/Foundation';
+import { getOperators, initDB , addOperator } from '../services/DBService';
+import { setOperatorData } from '../services/DataService';
 import RNPickerSelect from 'react-native-picker-select';
+import BleStatusModal from './BleStatusModal';
+const BleManagerModule = NativeModules.BleManager;
+const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
 
 export default OperatorProfile= ({navigation}) =>{
-  
-    const netInfo = useNetInfo();
-
     const [count,setCount] = useState(true);
-    const [deviceStatus, setDeviceStatus] = useState('');
-    const [isDeviceConnected, setisDeviceConnected] = useState(false);
     const [textFocusedName,setTextFocusedName] = useState(false);
     const [textFocusedChem,setTextFocusedChem] = useState(false);
-    const [visible, setVisible] = React.useState(false);
-
-    const showModal = () => setVisible(true);
+    const [visible, setVisible] = useState(false);
     const hideModal = () => setVisible(false);
     const containerStyle = {backgroundColor: 'white', padding: 10,width:"70%",alignSelf:"center",borderRadius:4};
-
     const [opName,setOpName] = useState('');
     const [opCompany,setOpCompany] = useState('');
     const [opChem,setOpChem] = useState('NaDCC');
     const [loading,setLoading] = useState(false);
-
+    const [btStatus, setBtStatus]=useState(false);
+    const [bleModal, setBleModal] = useState(false);
+    const hideBleModal = () => setBleModal(false);
     useEffect(()=>{
      
         if(count){
@@ -68,7 +63,8 @@ export default OperatorProfile= ({navigation}) =>{
                   var opObj = {"chemistryType": operatorDat.chemistryType, "company": operatorDat.company, "opName": operatorDat.opName, "serverId": operatorDat.serverId}
                   setOperatorData(opObj);
                   // console.log(getOperatorData())
-                  navigation.navigate('FirstConnection')
+                 
+                  navigation.navigate('DeviceConnection')
                 }
                
             })
@@ -77,6 +73,7 @@ export default OperatorProfile= ({navigation}) =>{
         setCount(false);
         }
         return()=>{
+          bleManagerEmitter.removeAllListeners('BleManagerDidUpdateState');
           // unsubscribe();
         }
     },[])
@@ -238,6 +235,18 @@ export default OperatorProfile= ({navigation}) =>{
              </Button>} 
 
         </View>
+       
+       {btStatus &&  <TouchableHighlight style={{alignSelf:"center",marginTop:10}} onPress={()=>{setBleModal(true);}}>
+          <View style={{flexDirection:"row"}}>
+          <Foundation color={'red'} size={22} name="alert" style={{paddingRight:10}}/>
+          <Text style={{fontSize:18, color:"red",textDecorationStyle:"dotted",textDecorationColor:"red",textDecorationLine:"underline"}}>
+           Bluetooth is OFF 
+          </Text>
+          <Foundation color={'red'} size={22} name="bluetooth" style={{paddingLeft:10}}/>
+          </View>
+        </TouchableHighlight>}
+       
+
       </KeyboardAvoidingView>
     </ScrollView>
     </View>
@@ -255,6 +264,28 @@ export default OperatorProfile= ({navigation}) =>{
             </TouchableHighlight>
             </View>
         </Modal>
+        
+        {/* <Modal visible={true} onDismiss={hideModal} contentContainerStyle={containerStyle}>
+          <View style={{alignSelf:"center",width:"95%",paddingTop:10,paddingBottom:10}}>
+          <Text style={styles.modalStyle}>Your mobile device's Bluetooth is</Text>
+          <Text style={styles.modalStyle}>turned OFF.</Text>
+          <Text></Text>
+          <Text></Text>
+          <Text style={styles.modalStyle}>Please open your device settings</Text>
+          <Text style={styles.modalStyle}>and turn bluetooth ON, then return</Text>
+          <Text style={styles.modalStyle}>to the Scout ES app.</Text>
+          <View style={{height:200,backgroundColor:"gray", marginTop:10}}/>
+            <TouchableHighlight
+                style={{ ...styles.openButton, backgroundColor: "#012554",width:170,alignSelf:"center",marginTop:20, }}
+                onPress={() => {
+                  Linking.openURL('App-Prefs:Bluetooth');
+                  // setVisible(false);
+                }}>
+                <Text style={[styles.modalStyle,{color: "white",fontWeight: "bold",textAlign: "center"}]}>Open Settings</Text>
+              </TouchableHighlight>
+            </View>
+        </Modal> */}
+      <BleStatusModal status={bleModal} hideModal={hideBleModal} containerStyle={containerStyle}/>
     </>)
 }
 
@@ -271,4 +302,9 @@ const styles = StyleSheet.create({
     padding: 10,
     elevation: 2
   },
+  modalStyle:{
+    alignSelf:"center",
+    fontSize:15,
+    paddingBottom:5
+  }
 });

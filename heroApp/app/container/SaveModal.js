@@ -3,7 +3,7 @@ import { View , StyleSheet, Text, TouchableOpacity, TextInput as Input,ScrollVie
 import Material from 'react-native-vector-icons/MaterialIcons';
 import MaterialCom from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Button, Modal, Portal, Provider } from 'react-native-paper';
-import { launchCamera } from 'react-native-image-picker';
+import { launchCamera ,launchImageLibrary} from 'react-native-image-picker';
 import { uploadImage } from '../services/apiService';
 import { apiEndPoint } from '../services/constants';
 import ImageResizer from 'react-native-image-resizer';
@@ -12,16 +12,23 @@ import ImageResizer from 'react-native-image-resizer';
   var inputBox;
     const [textFocused,setTextFocused] = useState(false);
     const [isClickable,setIsClickable] = useState(false);
+    
   //  const [imageUri,setImageUri] = useState('');
     const containerStyle = {backgroundColor: 'white', padding: 20};
    var openlaunchCamera = () => {
      console.log("Here")
       let options = {
+        
         storageOptions: {
           skipBackup: true,
           path: 'images'
         },
       };
+      launchImageLibrary(options,(response)=>{
+        console.log('Response = ', response);
+
+      })
+      // return
       launchCamera(options, (response) => {
         console.log('Response = ', response);
         setIsClickable(false);

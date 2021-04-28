@@ -126,3 +126,9 @@ export var internetConnection = false;
 export var setInternetConnection=(data)=>{
     return internetConnection = data;
 }
+
+export var btStatus = false;
+
+export var setBtStatus=(status)=>{
+    return btStatus = status;
+}

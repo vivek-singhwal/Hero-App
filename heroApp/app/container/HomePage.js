@@ -1,5 +1,5 @@
 import React,{useEffect,useState,useContext} from 'react';
-import { View , StyleSheet, Text, TouchableOpacity, TextInput as Input,Image,FlatList,TouchableHighlight, Alert} from 'react-native';
+import { View , StyleSheet, Text, TouchableOpacity, TextInput as Input,Image,FlatList,TouchableHighlight, ScrollView} from 'react-native';
 import { Button, Switch, ProgressBar, Modal, Portal, Provider, TextInput } from 'react-native-paper';
 import {useRoute} from '@react-navigation/native';
 
@@ -16,6 +16,7 @@ import {initDB, addSession, getSessions, updateSessions, getSessionWithParam ,de
 import {enableInterval,disableInterval} from '../services/BleService';
 import KeepAwake  from 'react-native-keep-awake';
 import AppContext from "../AppContext";
+import SubSession from './SubSession';
 let setStartTime ,setEndTime;
 
 export default  HomePage = ({navigation})=>{
@@ -200,20 +201,6 @@ export default  HomePage = ({navigation})=>{
        EventRegister.emit('StartInterval')
     })
   })
-    // setSessionObjApiData(sessionsObjAPI)
-    // console.log(">>sessions ", sessionsObjAPI);
-    //  addSessionAPI(sessionsObjAPI).then((respData)=>{
-    //    console.log(">>respData ",JSON.stringify(respData));
-    //    if(respData.success){
-    //     setSessionId(respData.result.id);
-    //     enableInterval();
-    //     // EventRegister.emit('StartInterval')
-    //    }else{
-    //      Alert.alert('HeroApp','Server Error.')
-    //      setReadStatus(false);
-    //    }
-    //   console.log("Request call ::"+JSON.stringify(respData),new Date(Date.now()));
-    // }) 
      }
 
     function convertTime(sec) {
@@ -238,21 +225,26 @@ export default  HomePage = ({navigation})=>{
     <View style={{height:"100%"}}>
       <View style={{flex:1,flexDirection:"column",height:"100%",backgroundColor:"#fff"}}>
           <View style={{height:"85%"}}>
-          {readingStatus ? <View style={{padding:18}}>
-               <View style={{flexDirection:"row",justifyContent:"space-between",marginBottom:20,width:"100%"}}>
-                <Text style={{fontSize:20}}>Electrostatic</Text>
-                <Switch value={isSwitchEleOn} onValueChange={onToggleEleSwitch} color={'#012554'}/>
-               </View>
-               <View style={{flexDirection:"row",justifyContent:"space-between",marginBottom:20}}>
-                <Text style={{fontSize:20}}>Trigger Lock</Text>
-                <Switch value={isSwitchTrgOn} onValueChange={onToggleTrgSwitch} color={'#012554'}/>
-               </View>
-               <View style={{flexDirection:"row",justifyContent:"space-between",paddingBottom:20}}>
-                <Text style={{fontSize:20,}}>Battery</Text>
-                <Text style={{fontSize:18,}}>{btryPerct} %</Text>
-               </View>
-               <ProgressBar style={{height:10}} progress={btryPerct/100} color={'#012554'} />
-            </View>:  
+          {!readingStatus ? 
+          // <View style={{padding:18}}>
+          //      <View style={{flexDirection:"row",justifyContent:"space-between",marginBottom:20,width:"100%"}}>
+          //       <Text style={{fontSize:20}}>Electrostatic</Text>
+          //       <Switch value={isSwitchEleOn} onValueChange={onToggleEleSwitch} color={'#012554'}/>
+          //      </View>
+          //      <View style={{flexDirection:"row",justifyContent:"space-between",marginBottom:20}}>
+          //       <Text style={{fontSize:20}}>Trigger Lock</Text>
+          //       <Switch value={isSwitchTrgOn} onValueChange={onToggleTrgSwitch} color={'#012554'}/>
+          //      </View>
+          //      <View style={{flexDirection:"row",justifyContent:"space-between",paddingBottom:20}}>
+          //       <Text style={{fontSize:20,}}>Battery</Text>
+          //       <Text style={{fontSize:18,}}>{btryPerct} %</Text>
+          //      </View>
+          //      <ProgressBar style={{height:10}} progress={btryPerct/100} color={'#012554'} />
+          //   </View>
+          <ScrollView>
+            <SubSession/>
+            </ScrollView>
+            :  
           <FlatList
            data={sessionList}
            ListEmptyComponent={emptyList}
