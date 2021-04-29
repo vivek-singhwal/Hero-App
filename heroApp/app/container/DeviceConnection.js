@@ -3,6 +3,7 @@ import { View, TextInput as Input,FlatList,Text,TouchableOpacity,StyleSheet ,Ima
 import { Avatar, Button, ActivityIndicator,Modal } from 'react-native-paper';
 import Material from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Foundation from 'react-native-vector-icons/Foundation';
 import { EventRegister } from 'react-native-event-listeners';
 import { getOperatorData, setDeviceData, getDeviceHWData, setDeviceHWData , sessionDataList } from '../services/DataService';
 import {initDB, addSprayer, getSprayers, getSprayersByHwId, delSprayer} from '../services/DBService';
@@ -18,16 +19,25 @@ export default DeviceConnection = ({navigation})=>{
     const [isDeviceConnected, setisDeviceConnected] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
 
-    let rotateValue = new Animated.Value(0);
+    // let rotateValue = new Animated.Value(0);
     
-    let rotation = rotateValue.interpolate({
-        inputRange: [0, 1],
-        outputRange: ["0deg", "360deg"],// degree of rotation
-      }); 
+    // let rotation = rotateValue.interpolate({
+    //     inputRange: [0, 1],
+    //     outputRange: ["0deg", "360deg"],// degree of rotation
+    //   });
+
     listEmptyComponent = () => {
         return (
             <View>
-                <Text style={{fontSize: 18,}}>{deviceStatus === 'Disconnected' || deviceStatus === 'stopScan' || deviceStatus === 'error'?'No device found.':deviceStatus}</Text>
+               <View style={{flexDirection:"row",paddingBottom:5}}>
+                 <Foundation color={'red'} size={22} name="alert" style={{paddingRight:5}}/>
+                 <Text style={{fontSize: 18, color:"red", textDecorationStyle:"solid", textDecorationLine:"underline"}}>No Sprayer found.</Text>
+                </View>
+                <Text style={{fontSize: 18,}}>Make sure your sprayer is charged,</Text>
+                <Text  style={{fontSize: 18,}}>Powered ON, and in range.</Text>
+                <TouchableOpacity onPress={()=>setModalVisible(true)}>
+                    <Text style={{color:"#012554",fontSize: 18,paddingTop:5,textDecorationLine:"underline"}}>How to connect your sprayer.</Text>
+                </TouchableOpacity>
             </View>
         )
     }
@@ -52,7 +62,7 @@ export default DeviceConnection = ({navigation})=>{
               if(data.event == "error"){
                   setisDeviceConnected(false);
                   setDeviceStatus("Disconnected");
-                  navigation.navigate('FirstConnection');
+                  navigation.navigate('DeviceConnection');
                 }
               if(data.event == "connected"){
                 setisDeviceConnected(true);
@@ -80,7 +90,7 @@ export default DeviceConnection = ({navigation})=>{
                 setisDeviceConnected(false);
                 // navigation.navigate('Home');
                 setDeviceStatus("Disconnected");
-                navigation.navigate('FirstConnection');
+                navigation.navigate('DeviceConnection');
               //   setTimeout(()=>{
               //     setDeviceStatus("Disconnected");
               //   },500)
@@ -94,35 +104,23 @@ export default DeviceConnection = ({navigation})=>{
             //   BackHandler.removeEventListener('hardwareBackPress', () => true)
           }  
     })
-    let refreshDeviceList = ()=>{
-        // Animated.timing(rotateValue, {
-        //     toValue: 1,
-        //     duration: 700,
-        //     // easing: Easing.linear,
-        //     useNativeDriver: true
-        //   }).start((val)=>{
-        //     console.log(">>Val ",val);
-        //     if(val.finished){
-        //         rotateIcon();
-        //     }
-           
-        //   });
-        Animated.loop(
-            Animated.timing(
-              rotateValue,
-              {
-               toValue: 1,
-               duration: 1000,
-               easing: Easing.linear,
-               useNativeDriver: true
-              }
-            )
-           ).start();
-           EventRegister.emit('BLECMD', { cmd: 'startScan' });
-           setDeviceStatus('');
-           setSelectedId(null);
-        //    setDeviceList([]);
-    }
+    // let refreshDeviceList = ()=>{
+    //      Animated.loop(
+    //         Animated.timing(
+    //           rotateValue,
+    //           {
+    //            toValue: 1,
+    //            duration: 1000,
+    //            easing: Easing.linear,
+    //            useNativeDriver: true
+    //           }
+    //         )
+    //        ).start();
+    //        EventRegister.emit('BLECMD', { cmd: 'startScan' });
+    //        setDeviceStatus('');
+    //        setSelectedId(null);
+    //     //    setDeviceList([]);
+    // }
     return(<>
     <View style={{flex:1,width:"85%",height:"100%",alignSelf:"center",marginTop:30}}>
         <View style={{justifyContent:"space-between",flexDirection:"row"}}>  
@@ -130,17 +128,15 @@ export default DeviceConnection = ({navigation})=>{
             <TouchableOpacity onPress={()=>{setModalVisible(true)}} style={{paddingBottom:10}}>
             <Text style={{fontSize:18,color:"#012554", textDecorationLine:"underline",fontWeight:"700"}}>Learn how</Text>
             </TouchableOpacity>
-            
         </View>
         
         <Image source={require('../asset/sprayDevice.png')} style={{alignSelf:"center",width:"100%",borderWidth:0.7,borderColor:"gray"}}/>
         <View style={{flexDirection:"row",justifyContent:"space-between",paddingBottom:10,marginTop:20}}>
             <Text style={{fontSize:18}}>Select sprayer</Text>
-            {
-            // (deviceStatus === 'Disconnected' || deviceStatus === 'stopScan' || deviceStatus === 'error' || deviceStatus === 'scanning')  && 
+            {/* {
             <Animated.View style={{transform:[{ rotate: rotation }]}}>
                <FontAwesome onPress={()=>refreshDeviceList()} name="refresh" size={22}/>
-            </Animated.View>} 
+            </Animated.View>}  */}
         </View>
         <View style={{height:200,backgroundColor:"white",padding:15,paddingLeft:20,borderWidth:0.7,borderColor:"gray"}}> 
             <FlatList
@@ -163,7 +159,7 @@ export default DeviceConnection = ({navigation})=>{
         />
        
         </View>
-        <Button 
+        {deviceList.length > 0 ?<Button 
                 style={{flexDirection:"row",borderRadius:4,height:47,justifyContent:"center",marginTop:30}}
                 color={'#012554'}
                 mode={'contained'}
@@ -203,11 +199,27 @@ export default DeviceConnection = ({navigation})=>{
                           navigation.navigate('HomePage');
                         })
                     }
-                }}
-             >
-                 {/* {console.log(">deviceStatus ",deviceStatus)} */}
+                }}>
               {deviceStatus == "Reading..." || deviceStatus == 'Connected' || deviceStatus=='Ready'?deviceStatus:'Connect'}
-            </Button>
+            </Button>:<Button 
+                style={{flexDirection:"row",borderRadius:4,height:47,justifyContent:"center",marginTop:30}}
+                color={'#012554'}
+                mode={'contained'}
+                disabled={deviceStatus == 'Scanning...'}
+                uppercase={false}
+                labelStyle={{fontSize:18, textTransform: 'capitalize'}} 
+                icon={props=><Material 
+                    size={25}
+                    color={'#fff'}
+                    name="keyboard-arrow-right"/>}
+                contentStyle={{flexDirection:"row-reverse",paddingTop:1,height:47,width:"90%",alignSelf:"center"}}
+                onPress={()=>{
+                    // if(deviceStatus != 'Connected' && deviceStatus != 'Ready'){
+                      EventRegister.emit('BLECMD', { cmd: 'startScan' });
+                    // }
+                }}>
+              {deviceStatus == 'Scanning...'?deviceStatus:'Scan'}
+            </Button>}
     </View>
     <LearnHow modalVisible={modalVisible} setModalVisible={setModalVisible}/>
     </>)

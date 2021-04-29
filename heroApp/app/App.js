@@ -165,7 +165,7 @@ function App() {
     <Stack.Screen name="TestPageAPI" component={TestPageAPI} options={{headerShown: false}}/>
     <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }}/>
     <Stack.Screen name="RinseProcess" component={RinseProcess} options={{ headerShown: false }}/>
-    <Stack.Screen name="FirstConnection" component={FirstConnection} options={{ headerShown: false }}/>
+    {/* <Stack.Screen name="FirstConnection" component={FirstConnection} options={{ headerShown: false }}/> */}
     <Stack.Screen name="DeviceConnection" component={DeviceConnection} options={{ title: 'SCOUT', headerTitleStyle:{fontWeight:"bold",fontSize:25},headerBackTitleVisible:false,headerLeft: ()=> null }}/>
     {/* DeviceConnection */}
     <Stack.Screen 
