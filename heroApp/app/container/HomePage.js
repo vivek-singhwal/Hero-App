@@ -17,6 +17,7 @@ import {enableInterval,disableInterval} from '../services/BleService';
 import KeepAwake  from 'react-native-keep-awake';
 import AppContext from "../AppContext";
 import SubSession from './SubSession';
+
 let setStartTime ,setEndTime;
 
 export default  HomePage = ({navigation})=>{
@@ -225,7 +226,7 @@ export default  HomePage = ({navigation})=>{
     <View style={{height:"100%"}}>
       <View style={{flex:1,flexDirection:"column",height:"100%",backgroundColor:"#fff"}}>
           <View style={{height:"85%"}}>
-          {!readingStatus ? 
+          {readingStatus ? 
           // <View style={{padding:18}}>
           //      <View style={{flexDirection:"row",justifyContent:"space-between",marginBottom:20,width:"100%"}}>
           //       <Text style={{fontSize:20}}>Electrostatic</Text>
@@ -319,6 +320,7 @@ export default  HomePage = ({navigation})=>{
               appContext.doChangeRinseStatus(true);
               setReadStatus(true);
               setReadingStatus(true);
+              navigation.navigate('SesstionStart');
             if(readingStatus){
               showModal();
              }}}>

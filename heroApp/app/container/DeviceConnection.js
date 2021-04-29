@@ -1,5 +1,5 @@
 import React,{useEffect,useState} from 'react';
-import { View, TextInput as Input,FlatList,Text,TouchableOpacity,StyleSheet ,Image, Animated , Easing} from 'react-native';
+import { View, TextInput as Input,FlatList,Text,TouchableOpacity,StyleSheet ,Image, Animated , ScrollView} from 'react-native';
 import { Avatar, Button, ActivityIndicator,Modal } from 'react-native-paper';
 import Material from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -122,7 +122,8 @@ export default DeviceConnection = ({navigation})=>{
     //     //    setDeviceList([]);
     // }
     return(<>
-    <View style={{flex:1,width:"85%",height:"100%",alignSelf:"center",marginTop:30}}>
+    <ScrollView>
+    <View style={{flex:1,width:"85%",height:"100%",alignSelf:"center",marginTop:30,marginBottom:10}}>
         <View style={{justifyContent:"space-between",flexDirection:"row"}}>  
             <Text style={{fontSize:18,paddingBottom:10,}}>Power ON sprayer</Text>
             <TouchableOpacity onPress={()=>{setModalVisible(true)}} style={{paddingBottom:10}}>
@@ -222,6 +223,7 @@ export default DeviceConnection = ({navigation})=>{
             </Button>}
     </View>
     <LearnHow modalVisible={modalVisible} setModalVisible={setModalVisible}/>
+    </ScrollView>
     </>)
 }
 

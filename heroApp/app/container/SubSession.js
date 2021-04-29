@@ -1,5 +1,5 @@
-import React,{ useEffect, useState } from 'react';
-import { View , StyleSheet, Text, TouchableOpacity, TextInput as Input,ScrollView, Image,FlatList} from 'react-native';
+import React,{ useState } from 'react';
+import { View,  Text, TouchableOpacity, TextInput as Input, Image,FlatList} from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import { launchCamera } from 'react-native-image-picker';
@@ -10,13 +10,13 @@ export default SubSession =()=>{
     const [textFocused,setTextFocused] = useState(false);
     const [imageList, setImageList] = useState([]);
     var getIndexVal=(index)=>{
-      // console.log(">Index",index);
       if(imageList.length == 3 || imageList.length == 6 || imageList.length == 9){
         return imageList.length - 3 == index
       }else{
         return imageList.length - 1 == index
       } 
     }
+  
     var emptyList = ()=>{
       return(
        <TouchableOpacity onPress={()=>{
@@ -26,9 +26,9 @@ export default SubSession =()=>{
               </TouchableOpacity>
       )
     }
+  
     var addImages = () =>{
       let options = {
-        
         storageOptions: {
           skipBackup: true,
           path: 'images'
@@ -54,26 +54,20 @@ export default SubSession =()=>{
               let tempList = [...imageList];
               tempList.push(respImg)
               setImageList(tempList);
-            /*
-            {"height": 1000, "name": "7a98c4e2-4373-4a14-b72b-bfe022f570df.JPEG", "path": "/data/user/0/com.heroapp/cache/7a98c4e2-4373-4a14-b72b-bfe022f570df.JPEG", "size": 18451, "uri": "file:///data/user/0/com.heroapp/cache/7a98c4e2-4373-4a14-b72b-bfe022f570df.JPEG", "width": 750}
-            */
-            // response.uri is the URI of the new image that can now be displayed, uploaded...
+             // response.uri is the URI of the new image that can now be displayed, uploaded...
             // response.path is the path of the new image
             // response.name is the name of the new image with the extension
             // response.size is the size of the new image
           })
           .catch(err => {
-            // Oops, something went wrong. Check that the filename is correct and
-            // inspect err to get more details.
+           console.log(err);
           });
           
         }
       });
-      // let tempList = [...imageList];
-      // tempList.push(imageList.length)
-      // setImageList(tempList);
     }
-    return <>
+  
+  return <>
     <View style={{padding:25}}>
        <Text style={{fontSize:17,color:"#4A4A4A",paddingBottom:5}}>Location*</Text>
        <Input

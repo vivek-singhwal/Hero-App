@@ -100,7 +100,7 @@ export default OperatorProfile= ({navigation}) =>{
               })
               var opObj = {"chemistryType": operatorObj.chemistryType, "company": operatorObj.company, "opName": operatorObj.opName, "serverId":null,}
               setOperatorData(opObj);
-              navigation.navigate('FirstConnection')
+              navigation.navigate('DeviceConnection')
               setLoading(false);
           }else{
             setLoading(false);
