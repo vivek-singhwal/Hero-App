@@ -6,10 +6,10 @@ import Onboarding from 'react-native-onboarding-swiper';
 import Swiper from 'react-native-swiper'
 
 export default LearnHow = ({modalVisible,setModalVisible}) =>{
-  let indxScroll = 0;
+  // let indxScroll = 0; 
     const [counter,setCounter] = useState(1);
     const [progressValue,setProgressValue] = useState(0);
-    
+    const [ indxScroll,setIndexScroll ] = useState(0);
     return(
         <Modal
         animationType="slide"
@@ -48,10 +48,15 @@ export default LearnHow = ({modalVisible,setModalVisible}) =>{
         ]}
       /> */}
       <Swiper 
-      onIndexChanged={(index)=>{console.log(">scroll ",indxScroll); return indxScroll = index}}
+      showsPagination={false}
       showsButtons={true}
-      // loop={false}
-      buttonWrapperStyle={{backgroundColor: 'transparent', flexDirection: 'row', position: 'absolute', top:260, left: 0,  paddingHorizontal: 10, paddingVertical: 10, justifyContent: 'space-between',}}
+      loop={false}
+      onIndexChanged={(index)=>{
+        // console.log(">>indx "+index);
+        setIndexScroll(index)
+      }}
+      
+      buttonWrapperStyle={{backgroundColor: 'transparent', flexDirection: 'row', position: 'absolute', top:"30%", left: 0,  paddingHorizontal: 10, paddingVertical: 10, justifyContent: 'space-between',}}
       prevButton={<Button
         // style={{width:"60%"}}
         color={'#012554'}
@@ -73,45 +78,56 @@ export default LearnHow = ({modalVisible,setModalVisible}) =>{
   >
  {'Back'} 
 </Button>}
-      nextButton={<Button
+      nextButton={
+indxScroll == 2 ? <Button
         style={{alignSelf:"flex-end"}}
        color={'#012554'}
        contentStyle={{flexDirection:"row-reverse"}}
        icon={()=><Material 
                    // style={{backgroundColor:"pink"}}
-               size={25}
+                   size={25}
                    color={'#fff'}
                    name="keyboard-arrow-right"/>} 
        mode="contained"
-       
-   //     onPress={() => {
-   //         setCounter(preCount=>preCount+1)
-   //     if(counter == 3){
-   //         setModalVisible(false);
-   //         setCounter(1);
-   //     }
-   //  }}
+       onPress={() => {
+           setModalVisible(false);
+          setIndexScroll(0)
+    }}
  >
-{indxScroll == 2 ?'Done':'Next'} 
-</Button>}
-      renderPagination={(index, total, context)=><View style={{alignSelf:"center",flexDirection:"row",backgroundColor:"#fff"}}> 
-          {/* <View style={{width:"50%"}}>
-          
-          </View>
-          <View style={{width:"50%"}}>
-          
-          </View> */}
-          
-      </View>}
-      style={styles.wrapper}>
-        <View style={styles.slide1}>
-          <Text style={styles.text}>Hello Swiper</Text>
+{ 'Done' } 
+</Button> : <Button
+        style={{alignSelf:"flex-end"}}
+       color={'#012554'}
+       contentStyle={{flexDirection:"row-reverse"}}
+       icon={()=><Material 
+                   // style={{backgroundColor:"pink"}}
+                   size={25}
+                   color={'#fff'}
+                   name="keyboard-arrow-right"/>} 
+       mode="contained"
+    //    onPress={() => {
+    //    if(indxScroll == 2){
+    //        setModalVisible(false);
+    //        setCounter(1);
+    //    }
+    // }}
+ >
+{ 'Next' } 
+</Button> } 
+      // renderPagination={(index, total, context)=><View style={{alignSelf:"center",flexDirection:"row",backgroundColor:"#fff"}}> 
+      // </View>}
+      >
+        <View style={{backgroundColor:"#fff",height:"85%",justifyContent:"center",paddingBottom:25}}>
+          <Text style={styles.text}>{'First, make sure your sprayer \n battery is charged and\n inserted correctly into the \n battery housing.'}</Text>
+          <Image style={{height:300,borderColor:"gray",borderWidth:0.7,alignSelf:"center"}} source={require('../asset/learn-more-device1.png')} />
         </View>
-        <View style={styles.slide2}>
-          <Text style={styles.text}>Beautiful</Text>
+        <View style={{backgroundColor:"#fff",height:"85%",justifyContent:"center",paddingBottom:25}}>
+          <Text style={styles.text}> {'Next, make sure your sprayer\n is powered ON, Wait 5 seconds\n for your sprayer to enter\n paring mode.'}</Text>
+          <Image style={{height:300,borderColor:"gray",borderWidth:0.7,alignSelf:"center"}} source={require('../asset/learn-more-device2.png')} />
         </View>
-        <View style={styles.slide3}>
-          <Text style={styles.text}>And simple</Text>
+        <View style={{backgroundColor:"#fff",height:"85%",justifyContent:"center",paddingBottom:25}}>
+          <Text style={styles.text}>{"Finally, turn your mobile device's bluetooth ON\n "} {'Return to the Scout ES mobile \n app and select the sprayer\n you want to connect with.'}</Text>
+          <Image style={{height:230,width:"80%",borderColor:"gray",borderWidth:0.7,alignSelf:"center"}} source={require('../asset/bleStatus.png')} />
         </View>
       </Swiper>
       </View>
@@ -286,8 +302,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#92BBD9'
     },
     text: {
-        color: '#fff',
-        fontSize: 30,
-        fontWeight: 'bold'
+        // color: '#fff',
+        fontSize: 20,
+        textAlign:"center"
+        // fontWeight: 'bold'
     }
   });
