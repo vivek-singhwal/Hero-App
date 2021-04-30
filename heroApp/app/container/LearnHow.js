@@ -56,7 +56,7 @@ export default LearnHow = ({modalVisible,setModalVisible}) =>{
         setIndexScroll(index)
       }}
       
-      buttonWrapperStyle={{backgroundColor: 'transparent', flexDirection: 'row', position: 'absolute', top:"30%", left: 0,  paddingHorizontal: 10, paddingVertical: 10, justifyContent: 'space-between',}}
+      buttonWrapperStyle={{backgroundColor: 'transparent', flexDirection: 'row', position: 'absolute', top:"35%", left: 0,  paddingHorizontal: 10, paddingVertical: 10, justifyContent: 'space-between',}}
       prevButton={<Button
         // style={{width:"60%"}}
         color={'#012554'}
@@ -117,17 +117,33 @@ indxScroll == 2 ? <Button
       // renderPagination={(index, total, context)=><View style={{alignSelf:"center",flexDirection:"row",backgroundColor:"#fff"}}> 
       // </View>}
       >
-        <View style={{backgroundColor:"#fff",height:"85%",justifyContent:"center",paddingBottom:25}}>
+        
+        <View style={{backgroundColor:"#fff",height:"90%",justifyContent:"center",paddingBottom:25}}>
+          <View style={{flexDirection:"row",justifyContent:"space-around",paddingBottom:10}}>
+        <View style={{backgroundColor:"#012554",width:30,height:5,alignSelf:"center",}}/>
+        <View style={{backgroundColor:indxScroll == 1?"#012554":"gray",width:30,height:5,alignSelf:"center"}}/>
+        <View style={{backgroundColor:indxScroll == 2?"#012554":"gray",width:30,height:5,alignSelf:"center"}}/>
+        </View>
           <Text style={styles.text}>{'First, make sure your sprayer \n battery is charged and\n inserted correctly into the \n battery housing.'}</Text>
-          <Image style={{height:300,borderColor:"gray",borderWidth:0.7,alignSelf:"center"}} source={require('../asset/learn-more-device1.png')} />
+          <Image style={{height:300,width:"80%",borderColor:"gray",borderWidth:0.7,alignSelf:"center"}} source={require('../asset/learn-more-device1.png')} />
         </View>
-        <View style={{backgroundColor:"#fff",height:"85%",justifyContent:"center",paddingBottom:25}}>
+        <View style={{backgroundColor:"#fff",height:"90%",justifyContent:"center",paddingBottom:25}}>
+        <View style={{flexDirection:"row",justifyContent:"space-around",paddingBottom:10}}>
+        <View style={{backgroundColor:"gray",width:30,height:5,alignSelf:"center",}}/>
+        <View style={{backgroundColor:"#012554",width:30,height:5,alignSelf:"center"}}/>
+        <View style={{backgroundColor:"gray",width:30,height:5,alignSelf:"center"}}/>
+        </View>
           <Text style={styles.text}> {'Next, make sure your sprayer\n is powered ON, Wait 5 seconds\n for your sprayer to enter\n paring mode.'}</Text>
-          <Image style={{height:300,borderColor:"gray",borderWidth:0.7,alignSelf:"center"}} source={require('../asset/learn-more-device2.png')} />
+          <Image style={{height:300,width:"80%",borderColor:"gray",borderWidth:0.7,alignSelf:"center"}} source={require('../asset/learn-more-device2.png')} />
         </View>
-        <View style={{backgroundColor:"#fff",height:"85%",justifyContent:"center",paddingBottom:25}}>
-          <Text style={styles.text}>{"Finally, turn your mobile device's bluetooth ON\n "} {'Return to the Scout ES mobile \n app and select the sprayer\n you want to connect with.'}</Text>
-          <Image style={{height:230,width:"80%",borderColor:"gray",borderWidth:0.7,alignSelf:"center"}} source={require('../asset/bleStatus.png')} />
+        <View style={{backgroundColor:"#fff",height:"90%",justifyContent:"center",paddingBottom:25}}>
+        <View style={{flexDirection:"row",justifyContent:"space-around",paddingBottom:10}}>
+        <View style={{backgroundColor:"gray",width:30,height:5,alignSelf:"center",}}/>
+        <View style={{backgroundColor:"gray",width:30,height:5,alignSelf:"center"}}/>
+        <View style={{backgroundColor:"#012554",width:30,height:5,alignSelf:"center"}}/>
+        </View>
+          <Text style={[styles.text]}>{"Finally, turn your mobile device's bluetooth ON\n "} {'Return to the Scout ES mobile \n app and select the sprayer\n you want to connect with.'}</Text>
+          <Image style={{height:300,width:"80%",borderColor:"gray",borderWidth:0.7,alignSelf:"center"}} source={require('../asset/learn-more-device3.png')} />
         </View>
       </Swiper>
       </View>
@@ -303,8 +319,9 @@ const styles = StyleSheet.create({
     },
     text: {
         // color: '#fff',
-        fontSize: 20,
-        textAlign:"center"
+        fontSize: 17,
+        textAlign:"center",
+        paddingBottom:10
         // fontWeight: 'bold'
     }
   });

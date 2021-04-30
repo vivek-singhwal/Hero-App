@@ -207,7 +207,7 @@ function App() {
     <BleAppManager/>
     <NavigationContainer>
     <OfflineSync/>  
-    <Stack.Navigator initialRouteName="HomePage">
+    <Stack.Navigator initialRouteName="Profile">
     
     <Stack.Screen name="TestPageAPI" component={TestPageAPI} options={{headerShown: false}}/>
     <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }}/>
