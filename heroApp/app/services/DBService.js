@@ -711,7 +711,7 @@ export var getOperators = function () {
     return promise;
   }
 
-  export var getSessions = function (id) {
+  export var getSessions = function () {
     // console.log("getSessions");
     let promise = new Promise((resolve, reject) => {
         db.executeSql(

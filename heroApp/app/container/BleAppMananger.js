@@ -52,15 +52,7 @@ export default class BleAppmanager extends Component {
   // })
   
   componentDidMount() {
-    bleManagerEmitter.addListener("BleManagerDidUpdateState", (args) => {
-      console.log(">>Args "+args.state);
-      if(args.state == "off"){
-        setBtStatus(true);
-      }else{
-        setBtStatus(false);
-      }
-      // The new state: args.state
-    });
+    
     NetInfo.configure({
       reachabilityUrl: 'https://hero-api.kesemsolutions.com',
       reachabilityTest: async (response) => response.status === 204,
@@ -260,20 +252,20 @@ export default class BleAppmanager extends Component {
   }
   handleAppStateChange(nextAppState) {
     if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
-      console.log('App has come to the foreground!')
-      BleManager.getConnectedPeripherals([]).then((peripheralsArray) => {
-        console.log('Connected peripherals: ' + peripheralsArray.length);
-        var peripherals = this.state.peripherals;
-        if(peripheralsArray.length){
-          peripherals.connected = true;
-          peripherals.set(peripheralsArray[0].id, peripheralsArray[0]);
-          this.setState({peripherals});
-          EventRegister.emit('BLE_STATUS', { event: "connected" });
-          setTimeout(() => { 
-            this.writeData('getSerial\r');
-          }, 90);
-        }
-      });
+      console.log('App has come to the foreground!',nextAppState)
+      // BleManager.getConnectedPeripherals([]).then((peripheralsArray) => {
+      //   console.log('Connected peripherals: ' + peripheralsArray.length);
+      //   var peripherals = this.state.peripherals;
+      //   if(peripheralsArray.length){
+      //     peripherals.connected = true;
+      //     peripherals.set(peripheralsArray[0].id, peripheralsArray[0]);
+      //     this.setState({peripherals});
+      //     EventRegister.emit('BLE_STATUS', { event: "connected" });
+      //     setTimeout(() => { 
+      //       this.writeData('getSerial\r');
+      //     }, 90);
+      //   }
+      // });
     }
     this.setState({appState: nextAppState});
   }

@@ -1,9 +1,8 @@
 import React,{useEffect,useState} from 'react';
-import {getOperatorAPISync,initDB,updateServerId,getSprayerAPISync,getSessionAPISync,getSessionDataAPISync, getSessionByIdSync, updateServerForSessionDataId} from '../services/DBService';
-import {addOperatorAPI, addSprayerAPI,addSessionAPI, updateSessionAPI,addSessionDataAPI,checkConnection} from '../services/apiService';
+import {getOperatorAPISync,initDB,updateServerId,getSprayerAPISync,getSessionAPISync,getSessionDataAPISync, getSessionByIdSync, updateServerForSessionDataId, updateSessionsImage} from '../services/DBService';
+import {addOperatorAPI, addSprayerAPI,addSessionAPI, updateSessionAPI,addSessionDataAPI,checkConnection, uploadImage} from '../services/apiService';
 import {setOperatorData,setDeviceHWData,getLocalSessionId,getOperatorData, getDeviceHWData,predefinedSessionData} from '../services/DataService';
-// import {BluetoothStatus} from 'react-native-bluetooth-status';
-import {getInterval} from '../services/BleService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default OfflineSync = () =>{
 
@@ -73,6 +72,36 @@ export default OfflineSync = () =>{
             }
         })
     }
+    
+    var uploadImagesToS3 = async()=>{
+     const keys = await AsyncStorage.getAllKeys();
+     const result = await AsyncStorage.multiGet(keys);
+     uploadS3Images(result[result.length-1]); 
+   }
+   
+   let uploadS3Images = (imageList)=>{
+       if(imageList && imageList.length == 2){
+           let key = imageList[0];
+           let value = JSON.parse(imageList[1]);
+           uploadImage(value).then((resp)=>{
+            console.log(">uploadImage",JSON.stringify(resp));
+            if(resp.status){
+             // update imagelist in localDB.  
+             let updateImageSessions ={
+                 id:key,
+                 imageUrl: JSON.stringify(resp.image),
+                 isSync:0
+             } 
+             updateSessionsImage(updateImageSessions).then(()=>{
+                AsyncStorage.removeItem(key);
+             })
+             
+          }
+        })
+         console.log(">>imageList "+imageList);
+       }
+    
+  }
     useEffect(()=>{
         if(count){
             initDB('operators').then((res)=>{ });
@@ -92,6 +121,7 @@ export default OfflineSync = () =>{
                         updateSessionData();
                         checkOperatorSync();
                         checkSprayerSync();
+                        uploadImagesToS3();
                     }
                 })
              }
@@ -174,7 +204,7 @@ export default OfflineSync = () =>{
                         }
                         
                         sessionsObjAPI.sessionLocation = respSession[i].sessionLocation;
-                        sessionsObjAPI.locationImages = respSession[i].locationImages
+                        sessionsObjAPI.locationImages = respSession[i].locationImages;
                         sessionsObjAPI.endTime = respSession[i].endTime;
                         sessionsObjAPI.sessionComment = respSession[i].sessionComment;
                         // respSession = [{"appVersion": 1.1, "chemistryType": "NaDCC", "endTime": null, "id": 1, "isFinished": 1, "isRinse": 0, "isSync": 0, "operatorId": "abc04f5c-1b1f-4214-87f7-a899ef368693", "ozSparayed": 1.0821778829895163, "serverId": null, "sessionComment": null, "sessionData": null, "sessionLocation": null, "sprayerId": "41226a0b-5fcf-4eac-9867-49535a809810", "startTime": 1611306974085}];
@@ -206,31 +236,8 @@ export default OfflineSync = () =>{
                    }
                 }
             })
-
-
-
-            // addSessionAPI(sessionApiObj).then((respData)=>{
-            //        console.log(">>respData ",JSON.stringify(respData));
-            //        if(respData.success){
-            //         setSessionId(respData.result.id);
-            //         enableInterval();
-            //         // EventRegister.emit('StartInterval')
-            //        }else{
-            //          Alert.alert('HeroApp','Server Error.')
-            //          setReadStatus(false);
-            //        }
-            //       console.log("Request call ::"+JSON.stringify(respData),new Date(Date.now()));
-            //     }) 
-        // }
-        // after session add, add session data.
-        // console.log(">>Here ");
     }
-       
-    //    let btListner = BluetoothStatus.addListener(({ eventType, status }) => {
-    //        console.log(">>status ",status,eventType)
-        
-    // })
-        return ()=>{
+      return ()=>{
             clearInterval(interval);
         }   
         // return ()=>{

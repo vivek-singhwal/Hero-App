@@ -213,7 +213,7 @@ function App() {
     <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }}/>
     <Stack.Screen name="RinseProcess" component={RinseProcess} options={{ headerShown: false }}/>
     {/* <Stack.Screen name="FirstConnection" component={FirstConnection} options={{ headerShown: false }}/> */}
-    <Stack.Screen name="DeviceConnection" component={DeviceConnection} options={{ title: 'SCOUT', headerTitleStyle:{fontWeight:"bold",fontSize:25},headerBackTitleVisible:false,headerLeft: ()=> null }}/>
+    <Stack.Screen name="DeviceConnection" component={DeviceConnection} options={{ title: 'SCOUT', headerTitleStyle:{fontWeight:"bold",fontSize:25,},headerBackTitleVisible:false,headerLeft: ()=> null }}/>
     <Stack.Screen 
           name="SettingPage" 
           component={SettingPage} 
@@ -313,7 +313,7 @@ function App() {
           headerRight:(()=><AwesomeIcon
           onPress={()=>{
             // console.log(">>Click bluetooth")
-           setModalVisible(true);
+            setModalVisible(true);
           }}
           size={36}
           // color={'#2C88D9'}
@@ -338,41 +338,11 @@ function App() {
                <Text style={{color:"#012554",fontSize:19,textAlign:"center"}}>Exit</Text>
             </View>
           </TouchableHighlight>
-          // <IconButton
-          // disabled={isRinseStatus}
-          //   onPress={()=>{
-          //     setNavigation(navigation);
-          //     setTimeout(()=>{
-          //       setRingseModal(true);
-          //     },600)
-          //   }}
-          //  icon={props=><AwesomeIcon 
-            
-          //   size={32}
-          //   // color={'#2C88D9'}
-          //   color={'#012554'}
-          //   style={{
-          //     transform: [
-          //       { scaleX: -1 }
-          //     ]
-          //   }} 
-          //   name="share-square-o"/>}
-          // />
+         
           ),
           
           headerLeftContainerStyle:{paddingLeft:10},
 
-          // headerRight:(()=><AwesomeIcon
-          // onPress={()=>{
-          //   // console.log(">>Click bluetooth")
-          //  setModalVisible(true);
-          // }}
-          // size={36}
-          // // color={'#2C88D9'}
-          // color='#012554'
-          // style={{paddingRight:20}}
-          // name="bluetooth-b"/>
-          // ),
           headerStyle:{height:50}
        })
        }/>
@@ -387,10 +357,7 @@ function App() {
           
           onPress={()=>{
             navigation.navigate('Dashboard');
-            // setNavigation(navigation);
-            // setTimeout(()=>{
-            //   setRingseModal(true);
-            // },600)
+         
           }}
           size={32}
           // color={'#2C88D9'}
@@ -424,33 +391,6 @@ function App() {
 }
 export default App;
 
-/*
-export default  App = () => {
-  return (
-    <>
-    <StatusBar barStyle="dark-content" />
-    <SafeAreaView></SafeAreaView>
-    <View>
-      <Text>Hello App</Text>
-    </View>
-    </>
-  );
-}
-  /*
-export default class App extends Component {
-  componentDidMount() {
-    SplashScreen.hide();
-  }
-  render() {
-    return (
-      <View style={{ height: '100%', width: '100%' }}>
-        <BleComponent />
-        <StackNavigator/>
-      </View>
-    );
-  }
-}
-*/
 const styles = StyleSheet.create({
   centeredView: {
     flex: 1,

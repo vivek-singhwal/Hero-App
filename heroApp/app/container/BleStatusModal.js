@@ -1,6 +1,6 @@
-import React,{ useEffect, useState } from 'react';
+import React from 'react';
 import { View, TextInput as Input,Linking,TouchableHighlight,StyleSheet ,Image} from 'react-native';
-import { Avatar, Button,Text ,Modal} from 'react-native-paper';
+import { Text ,Modal} from 'react-native-paper';
 
 export default BleStatusModal  = ({status,hideModal,containerStyle})=>{
     return(<Modal visible={status} onDismiss={hideModal} contentContainerStyle={containerStyle}>

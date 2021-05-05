@@ -1,47 +1,38 @@
 import React,{useEffect,useState,useContext} from 'react';
-import { View , StyleSheet, Text, TouchableOpacity, TextInput as Input,Image,FlatList,TouchableHighlight, ScrollView} from 'react-native';
-import { Button, Switch, ProgressBar, Modal, Portal, Provider, TextInput } from 'react-native-paper';
+import { View , StyleSheet, Text, BackHandler, TextInput as Input,Image,FlatList,TouchableHighlight, ScrollView} from 'react-native';
+import { Button } from 'react-native-paper';
 import {useRoute} from '@react-navigation/native';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import AwesomeIcon from 'react-native-vector-icons/FontAwesome';
-import AwesomeIcon5 from 'react-native-vector-icons/FontAwesome5';
 import Feather from 'react-native-vector-icons/Ionicons';
-import {getOperator,addSessionAPI, updateSessionAPI} from '../services/apiService';
-import {getReadingStatus, setSessionObjApiData,getSessionObjApiData,getDeviceData, 
-        setReadingStatus,setSessionId, sessionDataList,getOperatorData , getDeviceHWData,
-        setSessionDataList, currentSessionData, getSessionId, predefinedSessionData, setLocalSessionId, getLocalSessionId} from '../services/DataService';
+import {getReadingStatus, setReadingStatus,setSessionId, sessionDataList,getOperatorData , getDeviceHWData,
+         currentSessionData, setLocalSessionId, getLocalSessionId} from '../services/DataService';
 import SaveModal from './SaveModal';
 import { EventRegister } from 'react-native-event-listeners';
-import {initDB, addSession, getSessions, updateSessions, getSessionWithParam ,delsession,getDashboardSessions} from '../services/DBService';
-import {enableInterval,disableInterval} from '../services/BleService';
-import KeepAwake  from 'react-native-keep-awake';
+import { initDB, addSession, getSessions, updateSessions, getSessionWithParam ,getDashboardSessions } from '../services/DBService';
+import { enableInterval, disableInterval } from '../services/BleService';
+import KeepAwake from 'react-native-keep-awake';
 import AppContext from "../AppContext";
 import SubSession from './SubSession';
 
 let setStartTime ,setEndTime;
 
-export default  HomePage = ({navigation})=>{
-  let currentRoute = useRoute().name;
+export default HomePage = ({navigation})=>{
+
+    let currentRoute = useRoute().name;
     const [counter,setCounter] = useState(true);
     const [visible, setVisible] = useState(false);
     const [locationText, setLocationText] = useState('');
     const [locationImg, setLocationImg] = useState('');
     const [commentText, setCommentText] = useState('');
+    const [imageList, setImageList] = useState(Array.from(Array(12).keys()));
+    // const [s3UploadedImages, setS3UploadedImages] = useState([]);
+
     const [sessionList,setSessionList] = useState(sessionDataList);
-    const showModal = () => setVisible(true);
     const hideModal = () => setVisible(false);
     const [readingStatus,setReadStatus] = useState(getReadingStatus());
-    const [btryPerct] = useState(isNaN(parseInt(currentSessionData.getBatteryLevel))?'0':parseInt(currentSessionData.getBatteryLevel))
-    const [isSwitchEleOn, setIsSwitchEleOn] = useState(currentSessionData.getESVState == "On"?true:false);
-    const [isSwitchTrgOn, setIsSwitchTrgOn] = useState(currentSessionData.getTriggerLatchState == "On"?true:false);
-    const onToggleEleSwitch = () => setIsSwitchEleOn(!isSwitchEleOn);
     const appContext = useContext(AppContext);
     
-    const onToggleTrgSwitch = () => {
-      EventRegister.emit('BLECMD', { cmd: "setTriggerLatchState"});
-      setIsSwitchTrgOn(!isSwitchTrgOn);
-    }
-    const toggleSetReading = () => setReadStatus(preState=>!preState);
     function formatAMPM(date) {
       var hours = new Date(date).getHours();
       var minutes = new Date(date).getMinutes();
@@ -52,10 +43,43 @@ export default  HomePage = ({navigation})=>{
       var strTime = hours + ':' + minutes + ' ' + ampm;
       return strTime;
     }
-    var interval ;
    
+    var interval ;
+    function handleBackButtonClick() {
+     BackHandler.exitApp();
+    }
+   
+    var getSessionDBList = ()=>{
+      getSessions().then((resSessions)=>{
+        // console.log(">>Res ",resSessions);
+        var listSession = resSessions;
+        if(resSessions){
+          for(let i=0;i<listSession.length;i++){
+            // console.log(">>resSessions ",resSessions);
+            if(listSession[i].sessionData != undefined && listSession[i].sessionData != null){
+              listSession[i]['sessionData'] = JSON.parse(listSession[i]['sessionData']);
+            }
+          }
+          setSessionList(listSession);
+        }
+      })
+    }
+
     useEffect(()=>{
-      
+      BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
+      if(currentRoute == "SesstionStart" && readingStatus){
+        setReadingStatus(false);
+      }
+      const unsubscribe = navigation.addListener('focus', () => {
+        // do something
+        // console.log(">>currentRoute "+currentRoute);
+        if(currentRoute == "HomePage"){
+          getSessionDBList();
+          setReadingStatus(false);
+          appContext.doChangeRinseStatus(false);
+          setReadStatus(false);
+        }
+      });
       if(counter){
         initDB('sessions').then((res)=>{
           // delsession(8).then(()=>{})
@@ -71,32 +95,21 @@ export default  HomePage = ({navigation})=>{
                   if(listSession[i].sessionData !=undefined && listSession[i].sessionData != null){
                     listSession[i]['sessionData'] = JSON.parse(listSession[i]['sessionData']);
                   }
-                }
-                setSessionList(listSession);
-              }
-              // setSessionList(listSession);
-            })
-          }else{
-            getSessions(getOperatorData().serverId).then((resSessions)=>{
-              // console.log(">>Res ",resSessions);
-              var listSession = resSessions;
-              if(resSessions){
-                for(let i=0;i<listSession.length;i++){
-                  // console.log(">>resSessions ",resSessions);
-                  if(listSession[i].sessionData !=undefined && listSession[i].sessionData != null){
-                    listSession[i]['sessionData'] = JSON.parse(listSession[i]['sessionData']);
+                  if(listSession[i].locationImages !=undefined && listSession[i].locationImages != null){
+                    listSession[i]['locationImages'] = JSON.parse(listSession[i]['locationImages']);
                   }
                 }
                 setSessionList(listSession);
               }
               // setSessionList(listSession);
             })
+          }else{
+            getSessionDBList();
           } 
-          
         });
-        
         setCounter(false);
       }
+
       let listner = EventRegister.addEventListener('BLE_DATA', (value) => {
          console.log(">>BLE_STATUS ",value,readingStatus);
          if(value.event == 'completed' && readingStatus){
@@ -110,15 +123,18 @@ export default  HomePage = ({navigation})=>{
 
       return ()=>{
         EventRegister.removeEventListener(listner);
+        BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
+        unsubscribe;
     }  
     },[]);
-  
+    
     var addSessionList = (comment,location)=>{
     
       disableInterval();
       EventRegister.emit('StopInterval');
       KeepAwake.deactivate();
       // sessionDataList.push({location:'abc',comment:'',serverId:'0',startTime:this.sessionStartTime,endTime:Date.now()});
+      
       var sessionListAr = [...sessionList];
       var sessionObj = {
           // serverId:0,
@@ -128,55 +144,42 @@ export default  HomePage = ({navigation})=>{
           startTime: setStartTime,
           ozSparayed:parseInt(currentSessionData.getFlowRate)/29.57,
           endTime: setEndTime,
-          sessionLocation: 'Session-'+sessionList.length,
+          sessionLocation: locationText,
           sessionComment: commentText,
-          locationImages:locationImg,
+          locationImages:"", // set images after this session.
           // sessionData: JSON.stringify(currentSessionData),
           id: getLocalSessionId(),
           isSync:0,
           // isFinished:1,
           // isRinse:0,
           // appVersion:"1.1",
-
       } 
-      // addSession(sessionObj).then((res)=>{
-      //   console.log(">Added ",res);
-      // })
-      console.log(">>addSessionList ",currentSessionData);
+      sessionListAr.push({ sessionLocation: locationText, startTime: setStartTime, endTime: setEndTime, ozSparayed: parseInt(currentSessionData.getPumpedVolume)/29.57 })
+      sessionListAr = sessionListAr.sort((a,b)=> b.startTime - a.startTime)
+      setSessionList(sessionListAr); // 
+      console.log(">>Session set "+sessionListAr.length,sessionList.length);
       // update location,comment and endtime in sessions data.
       updateSessions(sessionObj).then((respUpdateSession)=>{
         console.log(">>Update session ",respUpdateSession);
-      })
-      sessionListAr.push({sessionLocation:'Session-'+sessionList.length, startTime:setStartTime, endTime: setEndTime, ozSparayed:parseInt(currentSessionData.getPumpedVolume)/29.57})
-      sessionListAr = sessionListAr.sort((a,b)=> b.startTime - a.startTime)
-      setSessionList(sessionListAr);
+      });
+      
+      // console.log(">>imageList "+JSON.stringify(imageList))
+      AsyncStorage.setItem(String(getLocalSessionId()),JSON.stringify(imageList));  
       setCommentText('');
       setLocationText('');
       setLocationImg('');
-      return;
-      var sessionObjApi =  getSessionObjApiData();
-      sessionObjApi.sessionLocation = locationText;
-      sessionObjApi.endTime = setEndTime;
-      sessionObjApi.id = getSessionId();
-      sessionObjApi.sessionComment = commentText;
-
-      console.log(">>sessionObjApi ",sessionObjApi);
-      
-      updateSessionAPI(sessionObjApi).then((resp)=>{
-        console.log(">>Resp success",resp)
-      })
-      
-     
-      // console.log("ADd request",commentText,locationText,currentSessionData,setStartTime,setEndTime,Math.ceil(Math.abs(new Date(setStartTime).getTime()-new Date(setEndTime).getTime()) / 1000));
-     
+      setImageList([]);
+      // console.log(">>Navigate ");
+      setTimeout(()=>{
+        navigation.navigate('HomePage');
+      },500);
     }
+
     var startReading=()=>{
       KeepAwake.activate();
-      // delsession(3).then(()=>{})
-      // return
       console.log(">>getLocalSessionId() ",getOperatorData(),getDeviceHWData());
     
-    var sessionObj = {
+     var sessionObj = {
       // serverId:0,
       operatorId: getOperatorData().serverId,
       sprayerId: getDeviceHWData().serverId,
@@ -226,7 +229,7 @@ export default  HomePage = ({navigation})=>{
     <View style={{height:"100%"}}>
       <View style={{flex:1,flexDirection:"column",height:"100%",backgroundColor:"#fff"}}>
           <View style={{height:"85%"}}>
-          {readingStatus ? 
+          {currentRoute == "HomePage" ? 
           // <View style={{padding:18}}>
           //      <View style={{flexDirection:"row",justifyContent:"space-between",marginBottom:20,width:"100%"}}>
           //       <Text style={{fontSize:20}}>Electrostatic</Text>
@@ -243,7 +246,7 @@ export default  HomePage = ({navigation})=>{
           //      <ProgressBar style={{height:10}} progress={btryPerct/100} color={'#012554'} />
           //   </View>
           <ScrollView>
-            <SubSession/>
+            <SubSession locationText={locationText} setLocationText={setLocationText} commentText={commentText} setCommentText={setCommentText} imageList={imageList} setImageList={setImageList}/>
             </ScrollView>
             :  
           <FlatList
@@ -295,20 +298,23 @@ export default  HomePage = ({navigation})=>{
              
             </TouchableHighlight>:readingStatus ?
             <TouchableHighlight 
+            disabled={locationText.length < 3}
             style={[styles.circle,{justifyContent:"center",marginTop:19}]}
             onPress={() => {
                   setEndTime = Date.now()
                   console.log(">>end ",setEndTime);
                   setReadStatus(false);
                   setReadingStatus(false);
+                  // uploadS3Images();
                   appContext.doChangeRinseStatus(false);
-                  showModal();
+                  addSessionList(commentText, locationText);
+
+                  // showModal();
               }}>
               <AwesomeIcon name={"stop"} 
               size={45}
               color={'#D8D8D8'}
               style={{alignSelf:"center",paddingLeft:"2%"}}/>
-             
             </TouchableHighlight>
            :
             <TouchableHighlight 
@@ -321,9 +327,10 @@ export default  HomePage = ({navigation})=>{
               setReadStatus(true);
               setReadingStatus(true);
               navigation.navigate('SesstionStart');
-            if(readingStatus){
-              showModal();
-             }}}>
+            // if(readingStatus){
+            //   showModal();
+            //  }
+             }}>
               <AwesomeIcon name={"play"} 
               size={50}
               color={'#D8D8D8'}

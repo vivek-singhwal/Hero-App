@@ -46,7 +46,7 @@ export var checkConnection = () => {
         )
 }
 
-export var uploadImage = (image) => {
+export var uploadImage = (images) => {
     /*
         {
         fieldname: 'demo_image',
@@ -61,7 +61,11 @@ export var uploadImage = (image) => {
     */
         const data = new FormData();
 
-        data.append("demo_image", { uri: image.uri, name: image.name, type: 'image/jpeg' });
+        // data.append("demo_image", { uri: image.uri, name: image.name, type: 'image/jpeg' });
+        for (const file of images) {
+            // data.append('files[]', file, file.name);
+            data.append("demo_image", { uri: file.uri, name: file.name, type: 'image/jpeg' });
+          }
     // console.log(">Form data ",data,image)
     return fetch(apiEndPoint+'/api/sessions/upload-image?90', {
             body: data,

@@ -2,7 +2,7 @@ import React,{useEffect,useState} from 'react';
 import { View, TextInput as Input,FlatList,Text,TouchableOpacity,StyleSheet ,Image, Animated , ScrollView} from 'react-native';
 import { Avatar, Button, ActivityIndicator,Modal } from 'react-native-paper';
 import Material from 'react-native-vector-icons/MaterialIcons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
 import Foundation from 'react-native-vector-icons/Foundation';
 import { EventRegister } from 'react-native-event-listeners';
 import { getOperatorData, setDeviceData, getDeviceHWData, setDeviceHWData , sessionDataList } from '../services/DataService';
@@ -18,13 +18,6 @@ export default DeviceConnection = ({navigation})=>{
     const [deviceList, setDeviceList] = useState([]);
     const [isDeviceConnected, setisDeviceConnected] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
-
-    // let rotateValue = new Animated.Value(0);
-    
-    // let rotation = rotateValue.interpolate({
-    //     inputRange: [0, 1],
-    //     outputRange: ["0deg", "360deg"],// degree of rotation
-    //   });
 
     listEmptyComponent = () => {
         return (
@@ -43,6 +36,7 @@ export default DeviceConnection = ({navigation})=>{
     }
 
     useEffect(()=>{
+      
         if(count){
             initDB('sprayers').then((res)=>{
               console.log(">>Res ",res);

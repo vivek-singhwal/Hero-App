@@ -11,6 +11,7 @@ import RNPickerSelect from 'react-native-picker-select';
 import BleStatusModal from './BleStatusModal';
 const BleManagerModule = NativeModules.BleManager;
 const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
+import BleManager from 'react-native-ble-manager';
 
 export default OperatorProfile= ({navigation}) =>{
     const [count,setCount] = useState(true);
@@ -27,7 +28,17 @@ export default OperatorProfile= ({navigation}) =>{
     const [bleModal, setBleModal] = useState(false);
     const hideBleModal = () => setBleModal(false);
     useEffect(()=>{
-     
+      // console.log(">>Status "+BleManager.checkState());
+      BleManager.checkState();
+      bleManagerEmitter.addListener("BleManagerDidUpdateState", (args) => {
+        console.log(">>Args "+args.state);
+        if(args.state == "off"){
+          setBtStatus(true);
+        }else{
+          setBtStatus(false);
+        }
+        // The new state: args.state
+      });
         if(count){
           initDB('operators').then((res)=>{
 
@@ -36,42 +47,16 @@ export default OperatorProfile= ({navigation}) =>{
             getOperators().then((result)=>{
                 console.log(">result ", result);
                 if(result && result.length > 0){
-                 
                   var operatorDat =  JSON.parse(JSON.stringify(result[0]));
-                  // console.log("addOperatorAPI" ,operatorDat.name, result[0].opName);
-                  // var operatorObj = {
-                  //   opName: operatorDat.opName,
-                  //   company: operatorDat.company,
-                  //   chemistryType: operatorDat.chemistryType
-                  // }
-                  // if(operatorDat.serverId == null && netInfo.isConnected){
-                  
-                    // addOperatorAPI(operatorObj).then((resOperator)=>{
-                    
-                    //   if(resOperator.result){
-                       
-                        // updateServerId('operators',resOperator.result.id).then((setOpData)=>{
-                        //   var opObj = {"chemistryType": operatorDat.chemistryType, "company": operatorDat.company, "opName": operatorDat.opName, "serverId": resOperator.result.serverId}
-                        //   setOperatorData(opObj);
-                        //   // navigation.navigate('FirstConnection')
-                        // })
-                    //   }
-                    
-                    // })
-                  // }
-                  // console.log("addOperatorAPI" ,operatorDat.name, result[0].opName);
                   var opObj = {"chemistryType": operatorDat.chemistryType, "company": operatorDat.company, "opName": operatorDat.opName, "serverId": operatorDat.serverId}
                   setOperatorData(opObj);
                   // console.log(getOperatorData())
-                 
                   navigation.navigate('DeviceConnection')
                 }
-               
             })
           });
-       
-        setCount(false);
-        }
+       setCount(false);
+      }
         return()=>{
           bleManagerEmitter.removeAllListeners('BleManagerDidUpdateState');
           // unsubscribe();
@@ -80,14 +65,6 @@ export default OperatorProfile= ({navigation}) =>{
 
     var addRecord = ()=>{
       setLoading(true);
-      // console.log(">result ", opName.length, opCompany.length);
-      // return;
-      // delOperator(0).then((data)=>{
-      //   console.log(">Data ",data);
-      // })
-      // getOperators().then((result)=>{
-      //   console.log(">result ",result);
-      // })
       if(opName.length > 2 && opCompany.length > 2){
         var operatorObj = {
           opName: opName,
@@ -133,17 +110,6 @@ export default OperatorProfile= ({navigation}) =>{
                     />
             </View>
             <View style={{marginBottom:40,borderColor:'#012554',borderWidth:1.8,borderRadius:5,width:250,alignSelf:"center",flexDirection:"row"}}>
-            {/* <Picker
-                selectedValue={opCompany}
-                mode={'dialog'}
-                itemStyle={{height:41,width:200,textAlign:"left",marginLeft:15,fontSize:18,color:"black"}}
-                style={{fontSize:16}}
-                onValueChange={(itemValue, itemIndex) =>setOpCompany(itemValue)
-                }>
-                <Picker.Item label="Company" value="company" />
-                <Picker.Item label="Lighthouse" value="lighthouse" />
-                </Picker>
-                <Entypo size={20} name="select-arrows" style={{alignSelf:"center"}}/> */}
                 <Input onFocus={()=> setTextFocusedChem(true)}
                         onBlur={()=> setTextFocusedChem(false)}
                         placeholder={'Company'}
@@ -153,24 +119,7 @@ export default OperatorProfile= ({navigation}) =>{
             </View>
             {/* <View style={{flexDirection:"row",marginBottom:40, borderColor:textFocusedChem?'#012554':'gray',borderWidth:1.8,height:45,borderRadius:5,width:250,justifyContent:"center"}}> */}
            
-               {/* <Input onFocus={()=> setTextFocusedChem(true)}
-                        onBlur={()=> setTextFocusedChem(false)}
-                        placeholder={'Chemistry'}
-                        style={{padding:10,marginTop:1,fontSize:20}}
-                        value={opChem}
-                        onChangeText={text => setOpChem(text)}/> */}
-              {/* <Picker
-                selectedValue={opChem}
-                mode={'dropdown'}
-                itemStyle={{height:41,textAlign:"left",fontSize:18,color:"black",width:230}}
-                style={{fontSize:16,justifyContent:"flex-start",}}
-                onValueChange={(itemValue, itemIndex) =>setOpChem(itemValue)
-                }>
-                <Picker.Item label="NaDCC" value="NaDCC" />
-                <Picker.Item label="AHP" value="AHP" />
-                </Picker>
-                <Entypo size={20} name="select-arrows" style={{alignSelf:"center"}}/> */}
-                <RNPickerSelect
+               <RNPickerSelect
                     // icon={<Entypo size={20} name="select-arrows" style={{alignSelf:"center"}}/>}
                     value={opChem}
                     placeholder={{}}
@@ -193,9 +142,7 @@ export default OperatorProfile= ({navigation}) =>{
                         bottom:42,
                         // marginBottom:10
                       },
-                      
                     }}
-                   
                     textInputProps={{ underlineColor: 'yellow' }}
                     // useNativeAndroidPickerStyle={false}
                     onValueChange={(value) => setOpChem(value)}
@@ -264,27 +211,6 @@ export default OperatorProfile= ({navigation}) =>{
             </TouchableHighlight>
             </View>
         </Modal>
-        
-        {/* <Modal visible={true} onDismiss={hideModal} contentContainerStyle={containerStyle}>
-          <View style={{alignSelf:"center",width:"95%",paddingTop:10,paddingBottom:10}}>
-          <Text style={styles.modalStyle}>Your mobile device's Bluetooth is</Text>
-          <Text style={styles.modalStyle}>turned OFF.</Text>
-          <Text></Text>
-          <Text></Text>
-          <Text style={styles.modalStyle}>Please open your device settings</Text>
-          <Text style={styles.modalStyle}>and turn bluetooth ON, then return</Text>
-          <Text style={styles.modalStyle}>to the Scout ES app.</Text>
-          <View style={{height:200,backgroundColor:"gray", marginTop:10}}/>
-            <TouchableHighlight
-                style={{ ...styles.openButton, backgroundColor: "#012554",width:170,alignSelf:"center",marginTop:20, }}
-                onPress={() => {
-                  Linking.openURL('App-Prefs:Bluetooth');
-                  // setVisible(false);
-                }}>
-                <Text style={[styles.modalStyle,{color: "white",fontWeight: "bold",textAlign: "center"}]}>Open Settings</Text>
-              </TouchableHighlight>
-            </View>
-        </Modal> */}
       <BleStatusModal status={bleModal} hideModal={hideBleModal} containerStyle={containerStyle}/>
     </>)
 }
