@@ -50,7 +50,7 @@ const MessageModal = ({modalVisible,setModalVisible}) => {
             <TouchableHighlight
               style={{ ...styles.openButton,backgroundColor: "#fff",marginRight:10 ,borderColor:'#012554',borderWidth:1}}
               onPress={() => {
-                EventRegister.emit('BLECMD',{cmd:'disconnect'}) 
+                EventRegister.emit('BLECMD',{cmd:'error'}) 
                 setModalVisible(!modalVisible);
               }}>
               <Text style={[styles.textStyle,{color:'#012554'}]}>Disconnect</Text>

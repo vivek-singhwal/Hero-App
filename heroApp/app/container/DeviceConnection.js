@@ -1,5 +1,5 @@
 import React,{useEffect,useState} from 'react';
-import { View, TextInput as Input,FlatList,Text,TouchableOpacity,StyleSheet ,Image, Animated , ScrollView} from 'react-native';
+import { View, TextInput as Input,FlatList,Text,TouchableOpacity,StyleSheet ,Image, TouchableHighlight , ScrollView} from 'react-native';
 import { Avatar, Button, ActivityIndicator,Modal } from 'react-native-paper';
 import Material from 'react-native-vector-icons/MaterialIcons';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -18,7 +18,7 @@ export default DeviceConnection = ({navigation})=>{
     const [deviceList, setDeviceList] = useState([]);
     const [isDeviceConnected, setisDeviceConnected] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
-
+    const [bleErrorModal,setBleErrorModal] = useState(false);
     listEmptyComponent = () => {
         return (
             <View>
@@ -56,6 +56,7 @@ export default DeviceConnection = ({navigation})=>{
               if(data.event == "error"){
                   setisDeviceConnected(false);
                   setDeviceStatus("Disconnected");
+                  setBleErrorModal(true);
                   navigation.navigate('DeviceConnection');
                 }
               if(data.event == "connected"){
@@ -116,6 +117,7 @@ export default DeviceConnection = ({navigation})=>{
     //     //    setDeviceList([]);
     // }
     return(<>
+    
     <ScrollView>
     <View style={{flex:1,width:"85%",height:"100%",alignSelf:"center",marginTop:30,marginBottom:10}}>
         <View style={{justifyContent:"space-between",flexDirection:"row"}}>  
@@ -217,7 +219,46 @@ export default DeviceConnection = ({navigation})=>{
             </Button>}
     </View>
     <LearnHow modalVisible={modalVisible} setModalVisible={setModalVisible}/>
+   
     </ScrollView>
+    <Modal
+        animationType="slide"
+        transparent={true}
+        visible={bleErrorModal}
+        onRequestClose={() => {
+          Alert.alert("Modal has been closed.");
+        }}>
+
+      <View
+        style={{
+          position: 'absolute',
+          // width: '100%',
+          // height: '100%',
+          justifyContent: 'center',
+          // backgroundColor: 'rgba(100,100,100, 0.5)',
+          padding: 40,
+        }}>
+
+          <View style={[styles.modalView]}>
+            {/* <Material name="logout" size={30} color={'red'}/> */}
+            <Text style={[styles.modalText,{fontSize:16}]}>Unable to establish bluetooth {'\n connection'}</Text>
+            <Text style={[styles.modalText,{fontSize:16,paddingBottom:15}]}>Make sure Scout is charged, {'\npowered ON, and in range.'}</Text>
+            <TouchableOpacity onPress={()=>{setModalVisible(true)}} style={{paddingBottom:10}}>
+            <Text style={{fontSize:18,color:"#012554", textDecorationLine:"underline",fontWeight:"700"}}>Learn how</Text>
+            </TouchableOpacity>
+        <View style={{flexDirection:"row", justifyContent:"space-between", marginTop:15, marginBottom:15}}>
+            
+            <TouchableHighlight
+              style={{ ...styles.openButton, backgroundColor: "#012554",paddingRight:25,paddingLeft:25 }}
+              onPress={() => {
+                setBleErrorModal(!bleErrorModal);
+              }}>
+              <Text style={styles.textStyle}>Try Again</Text>
+            </TouchableHighlight>
+          </View>
+        </View>
+      </View>
+    </Modal>
     </>)
 }
 
@@ -234,5 +275,44 @@ const styles = StyleSheet.create({
     title: {
       fontSize: 18,
     },
+    centeredView: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      marginTop: 22,
+      
+    },
+    modalView: {
+      margin: 40,
+      backgroundColor:"black",
+     
+      backgroundColor: "white",
+      borderRadius: 4,
+      padding: 15,
+      alignItems: "center",
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 2
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
+      // alignSelf:"center"
+    },
+    openButton: {
+      backgroundColor: "#F194FF",
+      borderRadius: 4,
+      padding: 10,
+      elevation: 2
+    },
+    textStyle: {
+      color: "white",
+      fontWeight: "bold",
+      textAlign: "center"
+    },
+    modalText: {
+      marginTop: 20,
+      textAlign: "center"
+    }
   });
-  

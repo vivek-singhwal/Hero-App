@@ -25,7 +25,8 @@ export default HomePage = ({navigation})=>{
     const [locationText, setLocationText] = useState('');
     const [locationImg, setLocationImg] = useState('');
     const [commentText, setCommentText] = useState('');
-    const [imageList, setImageList] = useState(Array.from(Array(12).keys()));
+    const [imageList, setImageList] = useState([]);
+    // const [imageList, setImageList] = useState(Array.from(Array(12).keys()));
     // const [s3UploadedImages, setS3UploadedImages] = useState([]);
 
     const [sessionList,setSessionList] = useState(sessionDataList);
@@ -229,7 +230,7 @@ export default HomePage = ({navigation})=>{
     <View style={{height:"100%"}}>
       <View style={{flex:1,flexDirection:"column",height:"100%",backgroundColor:"#fff"}}>
           <View style={{height:"85%"}}>
-          {currentRoute == "HomePage" ? 
+          {currentRoute == "SesstionStart" ? 
           // <View style={{padding:18}}>
           //      <View style={{flexDirection:"row",justifyContent:"space-between",marginBottom:20,width:"100%"}}>
           //       <Text style={{fontSize:20}}>Electrostatic</Text>

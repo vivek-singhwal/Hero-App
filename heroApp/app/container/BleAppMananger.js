@@ -422,7 +422,7 @@ export default class BleAppmanager extends Component {
             }, 20);
           }).catch((error) => {
             console.log('Notification error', error);
-            EventRegister.emit('BLE_STATUS', { event: "disconnected" });
+            EventRegister.emit('BLE_STATUS', { event: "error" });
           })
       }).catch((error) => {
         console.log('service error writeData', error);
