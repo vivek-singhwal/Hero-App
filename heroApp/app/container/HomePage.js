@@ -1,11 +1,12 @@
 import React,{useEffect,useState,useContext} from 'react';
-import { View , StyleSheet, Text, BackHandler, TextInput as Input,Image,FlatList,TouchableHighlight, ScrollView} from 'react-native';
+import { View , StyleSheet, Text, BackHandler, TextInput as Input,Image,FlatList,TouchableHighlight, ScrollView, TouchableOpacity} from 'react-native';
 import { Button } from 'react-native-paper';
 import {useRoute} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import Feather from 'react-native-vector-icons/Ionicons';
-import {getReadingStatus, setReadingStatus,setSessionId, sessionDataList,getOperatorData , getDeviceHWData,
+import Material from 'react-native-vector-icons/MaterialIcons';
+import {getReadingStatus, setReadingStatus, sessionDataList,getOperatorData , getDeviceHWData,
          currentSessionData, setLocalSessionId, getLocalSessionId} from '../services/DataService';
 import SaveModal from './SaveModal';
 import { EventRegister } from 'react-native-event-listeners';
@@ -13,11 +14,11 @@ import { initDB, addSession, getSessions, updateSessions, getSessionWithParam ,g
 import { enableInterval, disableInterval } from '../services/BleService';
 import KeepAwake from 'react-native-keep-awake';
 import AppContext from "../AppContext";
-import SubSession from './SubSession';
+import SubSession from './SessionList';
 
-let setStartTime ,setEndTime;
+let setStartTime, setEndTime;
 
-export default HomePage = ({navigation})=>{
+export default HomePage = ({ navigation })=>{
 
     let currentRoute = useRoute().name;
     const [counter,setCounter] = useState(true);
@@ -26,14 +27,14 @@ export default HomePage = ({navigation})=>{
     const [locationImg, setLocationImg] = useState('');
     const [commentText, setCommentText] = useState('');
     const [imageList, setImageList] = useState([]);
-    // const [imageList, setImageList] = useState(Array.from(Array(12).keys()));
-    // const [s3UploadedImages, setS3UploadedImages] = useState([]);
-
     const [sessionList,setSessionList] = useState(sessionDataList);
     const hideModal = () => setVisible(false);
     const [readingStatus,setReadStatus] = useState(getReadingStatus());
     const appContext = useContext(AppContext);
-    
+    const [elapsedTime, setElapsedTime] = useState("");
+    const [totalOZ, setTotalOZ] = useState("");
+    const [initialTime, setInitialTime] = useState("");
+
     function formatAMPM(date) {
       var hours = new Date(date).getHours();
       var minutes = new Date(date).getMinutes();
@@ -54,13 +55,28 @@ export default HomePage = ({navigation})=>{
       getSessions().then((resSessions)=>{
         // console.log(">>Res ",resSessions);
         var listSession = resSessions;
+        let calTotalTime = 0;
+        let initTime = "";
+        let ozSprayerd = 0;
         if(resSessions){
           for(let i=0;i<listSession.length;i++){
             // console.log(">>resSessions ",resSessions);
-            if(listSession[i].sessionData != undefined && listSession[i].sessionData != null){
+            if(listSession[i].sessionData !=undefined && listSession[i].sessionData != null){
               listSession[i]['sessionData'] = JSON.parse(listSession[i]['sessionData']);
             }
+            if(listSession[i].locationImages !=undefined && listSession[i].locationImages != null){
+              listSession[i]['locationImages'] = JSON.parse(listSession[i]['locationImages']);
+            }
+            if(i == 0){
+              initTime = listSession[i].startTime;
+            }
+            ozSprayerd +=  parseFloat(listSession[i].ozSparayed).toFixed(2)
+            calTotalTime += parseInt(listSession[i].startTime) - parseInt(listSession[i].endTime); // get milisecond diff 
           }
+          setTotalOZ(ozSprayerd);
+          setInitialTime(initTime);
+          setElapsedTime(convertTime(Math.ceil(Math.abs(calTotalTime) / 1000)))
+          // uncomment while build release
           setSessionList(listSession);
         }
       })
@@ -90,6 +106,9 @@ export default HomePage = ({navigation})=>{
             getDashboardSessions().then((resSessions)=>{
               // console.log(">>Res ",resSessions);
               var listSession = resSessions;
+              let calTotalTime = 0;
+              let initTime = "";
+              let ozSprayerd = 0;
               if(resSessions){
                 for(let i=0;i<listSession.length;i++){
                   // console.log(">>resSessions ",resSessions);
@@ -99,7 +118,16 @@ export default HomePage = ({navigation})=>{
                   if(listSession[i].locationImages !=undefined && listSession[i].locationImages != null){
                     listSession[i]['locationImages'] = JSON.parse(listSession[i]['locationImages']);
                   }
+                  if(i == 0){
+                    initTime = listSession[i].startTime;
+                  }
+                  ozSprayerd +=  parseFloat(listSession[i].ozSparayed).toFixed(2)
+                  calTotalTime += parseInt(listSession[i].startTime) - parseInt(listSession[i].endTime); // get milisecond diff 
                 }
+                setTotalOZ(ozSprayerd);
+                setInitialTime(initTime);
+                setElapsedTime(convertTime(Math.ceil(Math.abs(calTotalTime) / 1000)))
+                // convertTime(Math.ceil(Math.abs(new Date(item.startTime).getTime()-new Date(item.endTime).getTime()) / 1000))
                 setSessionList(listSession);
               }
               // setSessionList(listSession);
@@ -147,7 +175,7 @@ export default HomePage = ({navigation})=>{
           endTime: setEndTime,
           sessionLocation: locationText,
           sessionComment: commentText,
-          locationImages:"", // set images after this session.
+          locationImages: imageList.length ? JSON.stringify(imageList) :'', // set images after this session.
           // sessionData: JSON.stringify(currentSessionData),
           id: getLocalSessionId(),
           isSync:0,
@@ -155,7 +183,7 @@ export default HomePage = ({navigation})=>{
           // isRinse:0,
           // appVersion:"1.1",
       } 
-      sessionListAr.push({ sessionLocation: locationText, startTime: setStartTime, endTime: setEndTime, ozSparayed: parseInt(currentSessionData.getPumpedVolume)/29.57 })
+      sessionListAr.push({id:getLocalSessionId(),locationImages:sessionObj.locationImages ,sessionLocation: locationText, startTime: setStartTime, endTime: setEndTime, ozSparayed: parseInt(currentSessionData.getPumpedVolume)/29.57 })
       sessionListAr = sessionListAr.sort((a,b)=> b.startTime - a.startTime)
       setSessionList(sessionListAr); // 
       console.log(">>Session set "+sessionListAr.length,sessionList.length);
@@ -219,6 +247,25 @@ export default HomePage = ({navigation})=>{
       return hours+':'+min+':'+sec;
   }
 
+  var sessionHeader = () =>{
+    return<View style={{paddingTop:8,padding:7,backgroundColor:"#fff"}}>
+     <Text style={{fontWeight:"bold", fontSize:22, color:"#012554", paddingBottom:5}}>Your Session</Text>
+     <View style={{justifyContent:"space-between",flexDirection:"row",}}>
+      <View style={{width:"33%"}}>
+          <Text style={{fontSize:16}}>Start time</Text>
+          <Text style={{color:"#012554",fontSize:16}}>{initialTime}</Text>
+      </View>
+      <View style={{width:"33%"}}>
+          <Text style={{fontSize:16}}>Time elapsed</Text>
+          <Text style={{color:"#012554",fontSize:16}}>{elapsedTime}</Text>
+      </View>
+      <View style={{width:"33%",marginBottom:5}}>
+          <Text style={{fontSize:16}}>Oz Sparayed</Text>
+          <Text style={{color:"#012554",fontSize:16}}>{totalOZ}</Text>
+      </View>
+     </View>
+    </View>
+  }
     
     var emptyList=()=>{
       return( <View style={{backgroundColor:"#012554",padding:35}}>
@@ -252,27 +299,42 @@ export default HomePage = ({navigation})=>{
             :  
           <FlatList
            data={sessionList}
+           stickyHeaderIndices={[0]}
            ListEmptyComponent={emptyList}
+           ListHeaderComponent={sessionHeader}
            keyExtractor={(item, index) => String(index)}
            renderItem={({item,index})=>
-            <View key={index} style={{height:100,backgroundColor:item.isRinse == 1? item.isFinished ==  1?'red':'green':item.isFinished == 0?'#484848':item.sessionLocation?'#012554':'#a3780b',width:"100%",borderBottomColor:'#fff',borderBottomWidth:1,padding:15}}>
-              <Text style={{color:'#fff',fontSize:18,fontWeight:"bold",textTransform:'capitalize',marginStart:15,paddingBottom:4}}>{item.sessionLocation?item.sessionLocation:'Incomplete session'}</Text>
-                <View style={{justifyContent:"space-around",flexDirection:'row'}}>
-                  <View>
-                  <Text style={{color:'#fff',fontSize:13}}>Start time</Text>
-                  <Text style={{color:'#fff',fontSize:13}}>{formatAMPM(item.startTime)}</Text>
+            <TouchableOpacity onPress={()=>navigation.navigate('EditSession',{id:item.id})} key={index} style={{height:80,backgroundColor:item.isRinse == 1? item.isFinished ==  1?'red':'green':item.isFinished == 0?'#484848':item.sessionLocation?'#fff':'#a3780b',width:"97%",alignSelf:"center",borderColor:'#012554',borderWidth:1,padding:10,marginBottom:10,borderRadius:50,marginTop:5}}>
+              {/* <Text style={{color:'#012554',fontSize:18,fontWeight:"bold",textTransform:'capitalize',marginStart:15,paddingBottom:4}}>{item.sessionLocation?item.sessionLocation:'Incomplete session'}</Text> */}
+                <View style={{justifyContent:"space-between",flexDirection:'row'}}>
+                  <View style={{flexDirection:"row",alignSelf:"center"}}>
+                    <Image source={{uri:item.locationImages}} style={{height:60,width:60,borderRadius:60,alignSelf:"center"}}/>
+                    <Text style={{color:'#012554',fontSize:18,fontWeight:"bold",textTransform:'capitalize',marginStart:15,paddingBottom:4,alignSelf:"center"}}>{item.sessionLocation?item.sessionLocation:'Incomplete session'}</Text>
                   </View>
-                  {item.isRinse ?<View/>:<View>
-                    <Text style={{color:'#fff',fontSize:13}}>Time elapsed</Text>
-                    <Text style={{color:'#fff',fontSize:13}}>{item.endTime ? convertTime(Math.ceil(Math.abs(new Date(item.startTime).getTime()-new Date(item.endTime).getTime()) / 1000)):'00:00:00 '}</Text>
+                   <View style={{flexDirection:"row",alignSelf:"center"}}>
+                   {item.isRinse ?<View/>:<View>
+                    <Text style={{color:'#012554',fontSize:15,alignSelf:"center"}}>{formatAMPM(item.startTime)} - </Text>
+                    <Text style={{color:'#012554',fontSize:15,alignSelf:"center"}}>{formatAMPM(item.endTime)}</Text></View>
+                     }
+                   
+                    <Material 
+                    style={{alignSelf:"center"}}
+                  size={25}
+                  color={'#012554'}
+                  name="keyboard-arrow-right"/>
+                  </View>
+                  
+                {/*  {item.isRinse ?<View/>:<View>
+                    <Text style={{color:'#012554',fontSize:13}}>Time elapsed</Text>
+                    <Text style={{color:'#012554',fontSize:13}}>{item.endTime ? convertTime(Math.ceil(Math.abs(new Date(item.startTime).getTime()-new Date(item.endTime).getTime()) / 1000)):'00:00:00 '}</Text>
                   </View>}
 
                   <View>
-                    <Text style={{color:'#fff',fontSize:13}}>{item.isRinse?'Date':'Oz sprayed'}</Text>
-                    <Text style={{color:'#fff',fontSize:13}}>{item.isRinse? new Date(item.startTime).toLocaleDateString():item.ozSparayed != null ? parseFloat(item.ozSparayed).toFixed(2)+' Oz':'0.00 Oz'}</Text>
-                  </View>
+                    <Text style={{color:'#012554',fontSize:13}}>{item.isRinse?'Date':'Oz sprayed'}</Text>
+                    <Text style={{color:'#012554',fontSize:13}}>{item.isRinse? new Date(item.startTime).toLocaleDateString():item.ozSparayed != null ? parseFloat(item.ozSparayed).toFixed(2)+' Oz':'0.00 Oz'}</Text>
+                  </View> */}
                 </View>
-             </View>
+             </TouchableOpacity>
             }
          />
          }
