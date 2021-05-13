@@ -665,6 +665,29 @@ export var getOperators = function () {
     return promise;
   }
 
+  export var updateSessionsDetail = function (objSession) {
+    // console.log("getOperators");
+    let promise = new Promise((resolve, reject) => {
+        db.executeSql(
+            'UPDATE sessions SET sessionLocation=?,sessionComment=?,isSync=?, locationImages=? where id=?',[objSession.sessionLocation,objSession.sessionComment,objSession.isSync,objSession.locationImages,objSession.id]).then(
+          (results) => {
+              var records = [];
+            // console.log(">>Inside getOperators",results)
+            if(results[0].rows.length){
+                for (let i = 0; i < results[0].rows.length; ++i){
+                    records.push(results[0].rows.item(i))
+                    // console.log(">>results ",i,)
+                }
+            }
+            resolve(records);
+          }
+        )
+    }).catch(error => {
+      console.log(error);
+    });;
+    return promise;
+  }
+
   export var updateSessionsImage = function (objSession) {
     // console.log("getOperators");
     let promise = new Promise((resolve, reject) => {

@@ -14,7 +14,7 @@ import { initDB, addSession, getSessions, updateSessions, getSessionWithParam ,g
 import { enableInterval, disableInterval } from '../services/BleService';
 import KeepAwake from 'react-native-keep-awake';
 import AppContext from "../AppContext";
-import SubSession from './SessionList';
+import SubSession from './AddSession';
 
 let setStartTime, setEndTime;
 
@@ -112,10 +112,10 @@ export default HomePage = ({ navigation })=>{
               if(resSessions){
                 for(let i=0;i<listSession.length;i++){
                   // console.log(">>resSessions ",resSessions);
-                  if(listSession[i].sessionData !=undefined && listSession[i].sessionData != null){
+                  if(listSession[i].sessionData != undefined && listSession[i].sessionData != null){
                     listSession[i]['sessionData'] = JSON.parse(listSession[i]['sessionData']);
                   }
-                  if(listSession[i].locationImages !=undefined && listSession[i].locationImages != null){
+                  if(listSession[i].locationImages != undefined && listSession[i].locationImages != null){
                     listSession[i]['locationImages'] = JSON.parse(listSession[i]['locationImages']);
                   }
                   if(i == 0){
@@ -171,14 +171,14 @@ export default HomePage = ({ navigation })=>{
           sprayerId: getDeviceHWData().serverId,
           chemistryType: getOperatorData().chemistryType,
           startTime: setStartTime,
-          ozSparayed:parseInt(currentSessionData.getFlowRate)/29.57,
+          ozSparayed: parseInt(currentSessionData.getFlowRate)/29.57,
           endTime: setEndTime,
           sessionLocation: locationText,
           sessionComment: commentText,
           locationImages: imageList.length ? JSON.stringify(imageList) :'', // set images after this session.
           // sessionData: JSON.stringify(currentSessionData),
           id: getLocalSessionId(),
-          isSync:0,
+          isSync: 0,
           // isFinished:1,
           // isRinse:0,
           // appVersion:"1.1",
@@ -293,8 +293,8 @@ export default HomePage = ({ navigation })=>{
           //      </View>
           //      <ProgressBar style={{height:10}} progress={btryPerct/100} color={'#012554'} />
           //   </View>
-          <ScrollView>
-            <SubSession locationText={locationText} setLocationText={setLocationText} commentText={commentText} setCommentText={setCommentText} imageList={imageList} setImageList={setImageList}/>
+            <ScrollView>
+              <SubSession locationText={locationText} setLocationText={setLocationText} commentText={commentText} setCommentText={setCommentText} imageList={imageList} setImageList={setImageList}/>
             </ScrollView>
             :  
           <FlatList
@@ -304,24 +304,24 @@ export default HomePage = ({ navigation })=>{
            ListHeaderComponent={sessionHeader}
            keyExtractor={(item, index) => String(index)}
            renderItem={({item,index})=>
-            <TouchableOpacity onPress={()=>navigation.navigate('EditSession',{id:item.id})} key={index} style={{height:80,backgroundColor:item.isRinse == 1? item.isFinished ==  1?'red':'green':item.isFinished == 0?'#484848':item.sessionLocation?'#fff':'#a3780b',width:"97%",alignSelf:"center",borderColor:'#012554',borderWidth:1,padding:10,marginBottom:10,borderRadius:50,marginTop:5}}>
+            <TouchableOpacity onPress={()=>navigation.navigate('SessionDetail',{id:item.id})} key={index} style={{height:80,backgroundColor:item.isRinse == 1? item.isFinished ==  1?'red':'green':item.isFinished == 0?'#484848':item.sessionLocation?'#fff':'#a3780b',width:"97%",alignSelf:"center",borderColor:'#012554',borderWidth:1,padding:10,marginBottom:10,borderRadius:50,marginTop:5}}>
               {/* <Text style={{color:'#012554',fontSize:18,fontWeight:"bold",textTransform:'capitalize',marginStart:15,paddingBottom:4}}>{item.sessionLocation?item.sessionLocation:'Incomplete session'}</Text> */}
                 <View style={{justifyContent:"space-between",flexDirection:'row'}}>
                   <View style={{flexDirection:"row",alignSelf:"center"}}>
-                    <Image source={{uri:item.locationImages}} style={{height:60,width:60,borderRadius:60,alignSelf:"center"}}/>
+                  {item.locationImage != null && <Image source={{uri: item.locationImages[0] }} style={{height:60,width:60,borderRadius:60,alignSelf:"center"}}/>} 
                     <Text style={{color:'#012554',fontSize:18,fontWeight:"bold",textTransform:'capitalize',marginStart:15,paddingBottom:4,alignSelf:"center"}}>{item.sessionLocation?item.sessionLocation:'Incomplete session'}</Text>
                   </View>
                    <View style={{flexDirection:"row",alignSelf:"center"}}>
+                   
                    {item.isRinse ?<View/>:<View>
                     <Text style={{color:'#012554',fontSize:15,alignSelf:"center"}}>{formatAMPM(item.startTime)} - </Text>
-                    <Text style={{color:'#012554',fontSize:15,alignSelf:"center"}}>{formatAMPM(item.endTime)}</Text></View>
-                     }
-                   
+                    <Text style={{color:'#012554',fontSize:15,alignSelf:"center"}}>{formatAMPM(item.endTime)}</Text></View>}
+
                     <Material 
-                    style={{alignSelf:"center"}}
-                  size={25}
-                  color={'#012554'}
-                  name="keyboard-arrow-right"/>
+                      style={{alignSelf:"center"}}
+                      size={25}
+                      color={'#012554'}
+                      name="keyboard-arrow-right"/>
                   </View>
                   
                 {/*  {item.isRinse ?<View/>:<View>

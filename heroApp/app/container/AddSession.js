@@ -22,9 +22,8 @@ export default SubSession =({locationText,setLocationText,commentText,setComment
   
     var emptyList = ()=>{
       return(
-       <TouchableOpacity onPress={()=>{
-        addImages()
-        }} style={{borderColor:'#012554',borderWidth:1,width:95,height:90,justifyContent:"center"}}>
+       <TouchableOpacity onPress={()=>{ addImages() }} 
+          style={{borderColor:'#012554',borderWidth:1,width:95,height:90,justifyContent:"center"}}>
                 <MaterialIcons name="add" color={'#012554'} size={35} style={{alignSelf:"center"}}/>
               </TouchableOpacity>
       )
@@ -114,7 +113,6 @@ export default SubSession =({locationText,setLocationText,commentText,setComment
                         // setImageList(tempList);
                         setIndexVal(index);
                         setTimeout(()=> setModalVisible(true),300);
-                       
                         // console.log(">Hello",imageList);
                       }} 
                       name="circle-with-cross" 

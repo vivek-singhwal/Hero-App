@@ -7,7 +7,8 @@ import HomePage from './container/HomePage';
 import OfflineSync from './container/OfflineSync';
 import SettingPage from './container/SettingPage';
 import Profile from './container/OperatorProfile';
-import EditSession from './container/SessionDetail';
+import SessionDetail from './container/SessionDetail';
+import EditSession from './container/EditSession';
 import DeviceConnection from './container/DeviceConnection';
 import BleAppManager from './container/BleAppMananger';
 import AwesomeIcon from 'react-native-vector-icons/FontAwesome';
@@ -213,9 +214,20 @@ function App() {
     <Stack.Screen name="TestPageAPI" component={TestPageAPI} options={{headerShown: false}}/>
     <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }}/>
     <Stack.Screen name="RinseProcess" component={RinseProcess} options={{ headerShown: false }}/>
-    <Stack.Screen name="EditSession" component={EditSession} options={({navigation})=>({ title: 'SCOUT',headerTitleStyle:{fontWeight:"bold",fontSize:25,},headerLeft: ()=>
+    <Stack.Screen name="SessionDetail" component={SessionDetail} options={({navigation})=>({ title: 'SCOUT',headerTitleStyle:{fontWeight:"bold",fontSize:25,},headerLeft: ()=>
           <TouchableHighlight onPress={()=>{
               navigation.navigate('HomePage')
+              // setAlertModal(true);
+          }}>
+            <View style={{flexDirection:"row"}}>  
+                <Entypo name="chevron-left" size={25} style={{alignSelf:"center"}}/>
+               <Text style={{color:"#012554",fontSize:19,textAlign:"center"}}>Back</Text>
+            </View>
+          </TouchableHighlight>
+          })}/>
+      <Stack.Screen name="EditSession" component={EditSession} options={({navigation})=>({ title: 'SCOUT',headerTitleStyle:{fontWeight:"bold",fontSize:25,},headerLeft: ()=>
+          <TouchableHighlight onPress={()=>{
+              navigation.navigate('SessionDetail')
               // setAlertModal(true);
           }}>
             <View style={{flexDirection:"row"}}>  
