@@ -308,7 +308,7 @@ export default HomePage = ({ navigation })=>{
               {/* <Text style={{color:'#012554',fontSize:18,fontWeight:"bold",textTransform:'capitalize',marginStart:15,paddingBottom:4}}>{item.sessionLocation?item.sessionLocation:'Incomplete session'}</Text> */}
                 <View style={{justifyContent:"space-between",flexDirection:'row'}}>
                   <View style={{flexDirection:"row",alignSelf:"center"}}>
-                  {item.locationImage != null && <Image source={{uri: item.locationImages[0] }} style={{height:60,width:60,borderRadius:60,alignSelf:"center"}}/>} 
+                  {item.locationImages != null && <Image source={{uri: item.locationImages[0] }} style={{height:60,width:60,borderRadius:60,alignSelf:"center"}}/>} 
                     <Text style={{color:'#012554',fontSize:18,fontWeight:"bold",textTransform:'capitalize',marginStart:15,paddingBottom:4,alignSelf:"center"}}>{item.sessionLocation?item.sessionLocation:'Incomplete session'}</Text>
                   </View>
                    <View style={{flexDirection:"row",alignSelf:"center"}}>
