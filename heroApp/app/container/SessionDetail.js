@@ -2,11 +2,11 @@ import React,{useEffect,useState} from 'react';
 import { Text, View, TouchableOpacity ,Image,TextInput, FlatList, ScrollView} from 'react-native';
 import { getSessionByIdSync } from '../services/DBService';
 import {getOperatorData,getDeviceData,getDeviceHWData, setDeviceHWData, currentSessionData} from '../services/DataService';
-
+import DeleteSessionModal from './DeleteSessionModal';
 export default EditScreen = ({route, navigation}) =>{
     const { id } = route.params;
     const [ session, setSession] = useState({id:"0",locationImages:["https://scout-bucket-images.s3.us-west-2.amazonaws.com/images/E88AD04F-08D3-43CF-BCDB-749EAA130D1B.jpg","https://scout-bucket-images.s3.us-west-2.amazonaws.com/images/E88AD04F-08D3-43CF-BCDB-749EAA130D1B.jpg"], sessionLocation: 'Helo',sessionComment:'fsdfkshdkfad', startTime:  Date.now(), endTime:  Date.now(), ozSparayed: parseInt(25)/29.57 })
-    
+    const [deleteModal, setDeleteModal] = useState(false);
     useEffect(()=>{
         const unsubscribe = navigation.addListener('focus', () => {
             getSessionByIdSync(id).then((resSession)=>{
@@ -98,10 +98,11 @@ export default EditScreen = ({route, navigation}) =>{
          />
               
             </View>
-            <TouchableOpacity style={{ borderColor:"red",borderWidth:1, padding:10,marginBottom:10, marginTop:10}}>
+            <TouchableOpacity onPress={()=>setDeleteModal(true)} style={{ borderColor:"red",borderWidth:1, padding:10,marginBottom:10, marginTop:10}}>
                     <Text style={{ alignSelf:"center", color:"red", fontSize:18}}>Delete Session</Text>
             </TouchableOpacity>
     </View>
     </ScrollView>
+    <DeleteSessionModal deleteSucess={()=>{navigation.navigate('HomePage');}} sessionId={session.id} deleteModal={deleteModal} setDeleteModal={setDeleteModal}/>
     </>)
 }

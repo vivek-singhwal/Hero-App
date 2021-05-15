@@ -1,5 +1,5 @@
 import React,{useEffect,useState,useContext} from 'react';
-import { View , StyleSheet, Text, BackHandler, TextInput as Input,Image,FlatList,TouchableHighlight, ScrollView, TouchableOpacity} from 'react-native';
+import { View , StyleSheet, Text, BackHandler,Animated,Modal, TextInput as Input,Image,FlatList,TouchableHighlight, ScrollView, TouchableOpacity} from 'react-native';
 import { Button } from 'react-native-paper';
 import {useRoute} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -15,6 +15,8 @@ import { enableInterval, disableInterval } from '../services/BleService';
 import KeepAwake from 'react-native-keep-awake';
 import AppContext from "../AppContext";
 import SubSession from './AddSession';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
+import DeleteSessionModal from './DeleteSessionModal';
 
 let setStartTime, setEndTime;
 
@@ -23,6 +25,8 @@ export default HomePage = ({ navigation })=>{
     let currentRoute = useRoute().name;
     const [counter,setCounter] = useState(true);
     const [visible, setVisible] = useState(false);
+    const [deleteModal, setDeleteModal] = useState(false);
+    const [sessionPassId, setSessionPassId] = useState('');
     const [locationText, setLocationText] = useState('');
     const [locationImg, setLocationImg] = useState('');
     const [commentText, setCommentText] = useState('');
@@ -246,9 +250,15 @@ export default HomePage = ({ navigation })=>{
       (sec.toString().length == 1) ? sec = '0'+sec : void 0;    
       return hours+':'+min+':'+sec;
   }
-
+    const leftSwipe = (progress, dragX) => {
+     return (
+        <TouchableOpacity style={{backgroundColor:"#ff9999",width:"50%",borderRadius:50,height:80, marginTop:5}} >
+            <AwesomeIcon name="trash" style={{alignSelf:"flex-end",paddingTop:20, paddingRight:15}} size={30} color={'red'}/>
+         </TouchableOpacity>
+      );
+    };
   var sessionHeader = () =>{
-    return<View style={{paddingTop:8,padding:7,backgroundColor:"#fff"}}>
+    return <View style={{paddingTop:8,padding:7,backgroundColor:"#fff"}}>
      <Text style={{fontWeight:"bold", fontSize:22, color:"#012554", paddingBottom:5}}>Your Session</Text>
      <View style={{justifyContent:"space-between",flexDirection:"row",}}>
       <View style={{width:"33%"}}>
@@ -298,17 +308,23 @@ export default HomePage = ({ navigation })=>{
             </ScrollView>
             :  
           <FlatList
-           data={sessionList}
-           stickyHeaderIndices={[0]}
-           ListEmptyComponent={emptyList}
-           ListHeaderComponent={sessionHeader}
-           keyExtractor={(item, index) => String(index)}
-           renderItem={({item,index})=>
-            <TouchableOpacity onPress={()=>navigation.navigate('SessionDetail',{id:item.id})} key={index} style={{height:80,backgroundColor:item.isRinse == 1? item.isFinished ==  1?'red':'green':item.isFinished == 0?'#484848':item.sessionLocation?'#fff':'#a3780b',width:"97%",alignSelf:"center",borderColor:'#012554',borderWidth:1,padding:10,marginBottom:10,borderRadius:50,marginTop:5}}>
+            data={sessionList}
+            stickyHeaderIndices={[0]}
+            ListEmptyComponent={emptyList}
+            ListHeaderComponent={sessionHeader}
+            keyExtractor={(item, index) => String(index)}
+            renderItem={({item,index})=>
+            <Swipeable key={index} onSwipeableRightOpen={()=>{setSessionPassId(item.id);setTimeout(()=>setDeleteModal(true),300)}} renderRightActions={leftSwipe}>
+            <TouchableOpacity onPress={()=>{
+            //  if(!item.isRinse){
+              navigation.navigate('SessionDetail',{id:item.id})
+            //  }
+            }} 
+             key={index} style={{height:80,backgroundColor:item.isRinse == 1? item.isFinished ==  1?'red':'green':item.isFinished == 0?'#484848':item.sessionLocation?'#fff':'#a3780b',width:"97%",alignSelf:"center",borderColor:'#012554',borderWidth:1,padding:10,marginBottom:10,borderRadius:50,marginTop:5}}>
               {/* <Text style={{color:'#012554',fontSize:18,fontWeight:"bold",textTransform:'capitalize',marginStart:15,paddingBottom:4}}>{item.sessionLocation?item.sessionLocation:'Incomplete session'}</Text> */}
                 <View style={{justifyContent:"space-between",flexDirection:'row'}}>
                   <View style={{flexDirection:"row",alignSelf:"center"}}>
-                  {item.locationImages != null && <Image source={{uri: item.locationImages[0] }} style={{height:60,width:60,borderRadius:60,alignSelf:"center"}}/>} 
+                  {item.locationImages != null ? <Image source={{uri: item.locationImages[0] }} style={{height:60,width:60,borderRadius:60,alignSelf:"center"}}/>:<View style={{height:60,width:30,alignSelf:"center"}}/>} 
                     <Text style={{color:'#012554',fontSize:18,fontWeight:"bold",textTransform:'capitalize',marginStart:15,paddingBottom:4,alignSelf:"center"}}>{item.sessionLocation?item.sessionLocation:'Incomplete session'}</Text>
                   </View>
                    <View style={{flexDirection:"row",alignSelf:"center"}}>
@@ -335,6 +351,7 @@ export default HomePage = ({ navigation })=>{
                   </View> */}
                 </View>
              </TouchableOpacity>
+             </Swipeable>
             }
          />
          }
@@ -368,7 +385,6 @@ export default HomePage = ({ navigation })=>{
                   console.log(">>end ",setEndTime);
                   setReadStatus(false);
                   setReadingStatus(false);
-                  // uploadS3Images();
                   appContext.doChangeRinseStatus(false);
                   addSessionList(commentText, locationText);
 
@@ -400,25 +416,63 @@ export default HomePage = ({ navigation })=>{
               style={{alignSelf:"center",paddingLeft:"7%"}}/>
             </TouchableHighlight>
            }
-            
           </View>
           <View style={{marginTop:"10%",width:"30%"}}>
-     
-            </View>
         </View>
       </View>
+    </View>
   </View>
-  
+  <DeleteSessionModal deleteSucess={()=>{ console.log(">>here");getSessionDBList();}} sessionId={sessionPassId} deleteModal={deleteModal} setDeleteModal={setDeleteModal}/>
   <SaveModal locationImg={locationImg} setLocationImg={setLocationImg} addSessionList={addSessionList} setLocationText={setLocationText} locationText={locationText} commentText={commentText} setCommentText={setCommentText} visible={visible} hideModal={hideModal} SetReadingStatus={(isBack)=>{setReadStatus(isBack)}} />
-   {/* <RinseModal/> */}
-    </>)
+ </>)
 }
 
-const styles =StyleSheet.create({
+const styles = StyleSheet.create({
   circle: {
     width: 100,
     height: 100,
     borderRadius: 100 / 2,
     backgroundColor: "#012554",
   },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22
+  },
+
+  modalView: {
+    margin: 20,
+    backgroundColor:"black",
+    backgroundColor: "white",
+    borderRadius: 4,
+    padding: 15,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5
+  },
+
+  openButton: {
+    backgroundColor: "#F194FF",
+    borderRadius: 4,
+    padding: 10,
+    elevation: 2
+  },
+
+  textStyle: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center"
+  },
+
+  modalText: {
+    marginTop: 20,
+    textAlign: "center"
+  }
 });

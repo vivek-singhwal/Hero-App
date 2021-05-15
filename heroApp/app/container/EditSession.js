@@ -3,14 +3,14 @@ import { ScrollView, Image, TouchableOpacity,Text, View, Modal, StyleSheet,Touch
 import {updateSessionsDetail} from '../services/DBService';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import SubSession from './AddSession';
-
+import DeleteSessionModal from './DeleteSessionModal';
 export default EditSession=({ route , navigation})=>{
     const { id, comment,images,location } = route.params;
     // console.log(">>comment "+JSON.stringify(route.params))
     const [commentText, setCommentText] = useState(comment);
     const [locationText, setLocationText] = useState(location);
     const [imageList, setImageList] = useState(images);
-    const [modalVisible,setModalVisible] = useState(false);
+    const [deleteModal, setDeleteModal] = useState(false);
     var updateDetails=() =>{
         let sessionObj = {
             sessionLocation: locationText,
@@ -28,11 +28,12 @@ export default EditSession=({ route , navigation})=>{
   <ScrollView>
             <SubSession locationText={locationText} setLocationText={setLocationText} commentText={commentText} setCommentText={setCommentText} imageList={imageList} setImageList={setImageList}/>
             <View style={{flexDirection:"row",justifyContent:"space-around",paddingBottom:20}}>
-                <TouchableOpacity onPress={()=>{setModalVisible(true)}} style={{borderWidth:1,width:"35%", height:40,justifyContent:"center",borderColor:"red"}}><Text style={{alignSelf:"center",fontSize:17,color:"red"}}>Delete</Text></TouchableOpacity>
+                <TouchableOpacity onPress={()=>{setDeleteModal(true)}} style={{borderWidth:1,width:"35%", height:40,justifyContent:"center",borderColor:"red"}}><Text style={{alignSelf:"center",fontSize:17,color:"red"}}>Delete</Text></TouchableOpacity>
                 <TouchableOpacity onPress={()=>updateDetails()} style={{borderWidth:1,width:"35%",height:40,justifyContent:"center",borderColor:"#012554"}}><Text style={{alignSelf:"center",fontSize:17,color:"#012554"}}>Save</Text></TouchableOpacity>
             </View>
     </ScrollView>
-    <Modal
+    <DeleteSessionModal deleteSucess={()=>{navigation.navigate('HomePage');}} sessionId={id} deleteModal={deleteModal} setDeleteModal={setDeleteModal}/>
+    {/* <Modal
         animationType="slide"
         transparent={true}
         visible={modalVisible}
@@ -76,7 +77,8 @@ export default EditSession=({ route , navigation})=>{
           </View>
         </View>
       </View>
-    </Modal>
+    </Modal> */}
+    
     </>
     )
 }

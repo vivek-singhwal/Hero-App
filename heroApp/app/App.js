@@ -20,8 +20,9 @@ import Material from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import Entypo from 'react-native-vector-icons/Entypo';
-
+import KeepAwake from 'react-native-keep-awake';
 import AppCtx from './AppContext'
+import { disableInterval } from './services/BleService';
 
 const Stack = createStackNavigator();
 
@@ -71,52 +72,7 @@ const MessageModal = ({modalVisible,setModalVisible}) => {
   );
 };
 
-const AlertModal = ({modalVisible,setModalVisible}) => {
-  return (
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          Alert.alert("Modal has been closed.");
-        }}>
 
-      <View
-        style={{
-          position: 'absolute',
-          width: '100%',
-          height: '100%',
-          justifyContent: 'center',
-          backgroundColor: 'rgba(100,100,100, 0.5)',
-          padding: 40,
-        }}>
-
-          <View style={styles.modalView}>
-            <SimpleLineIcons name="logout" size={30} color={'red'}/>
-            <Text style={[styles.modalText,{fontSize:16}]}>Exit without saving ?</Text>
-            <Text style={[styles.modalText,{fontSize:16}]}>This session will not be saved.</Text>
-        <View style={{flexDirection:"row", justifyContent:"space-between", marginTop:35, marginBottom:15}}>
-            <TouchableHighlight
-              style={{ ...styles.openButton,backgroundColor: "#fff",marginRight:10 ,borderColor:'#012554',borderWidth:1}}
-              onPress={() => {
-                // EventRegister.emit('BLECMD',{cmd:'disconnect'}) 
-                setModalVisible(!modalVisible);
-              }}>
-              <Text style={[styles.textStyle,{color:'#012554'}]}>Cancel</Text>
-            </TouchableHighlight>
-            <TouchableHighlight
-              style={{ ...styles.openButton, backgroundColor: "#012554",paddingRight:25,paddingLeft:25 }}
-              onPress={() => {
-                setModalVisible(!modalVisible);
-              }}>
-              <Text style={styles.textStyle}>Exit</Text>
-            </TouchableHighlight>
-          </View>
-        </View>
-      </View>
-    </Modal>
-  );
-};
 
 function App() {
   // const rinseModalContext = { isRinseStart: false }
@@ -127,7 +83,57 @@ function App() {
   const [alertModal, setAlertModal] = React.useState(false);
   const [rinseModal, setRingseModal] = React.useState(false);
   const [navigation, setNavigation] = React.useState({}); 
+  const AlertModal = ({modalVisible,setModalVisible}) => {
+    return (
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            Alert.alert("Modal has been closed.");
+          }}>
   
+        <View
+          style={{
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            justifyContent: 'center',
+            backgroundColor: 'rgba(100,100,100, 0.5)',
+            padding: 40,
+          }}>
+  
+            <View style={styles.modalView}>
+              <SimpleLineIcons name="logout" size={30} color={'red'}/>
+              <Text style={[styles.modalText,{fontSize:16}]}>Exit without saving ?</Text>
+              <Text style={[styles.modalText,{fontSize:16}]}>This session will not be saved.</Text>
+          <View style={{flexDirection:"row", justifyContent:"space-between", marginTop:35, marginBottom:15}}>
+              <TouchableHighlight
+                style={{ ...styles.openButton,backgroundColor: "#fff",marginRight:10 ,borderColor:'#012554',borderWidth:1}}
+                onPress={() => {
+                 
+                  setModalVisible(!modalVisible);
+                }}>
+                <Text style={[styles.textStyle,{color:'#012554'}]}>Cancel</Text>
+              </TouchableHighlight>
+              <TouchableHighlight
+                style={{ ...styles.openButton, backgroundColor: "#012554",paddingRight:25,paddingLeft:25 }}
+                onPress={() => {
+                   disableInterval();
+                  EventRegister.emit('StopInterval');
+                  KeepAwake.deactivate();
+                  setModalVisible(!modalVisible);
+                  navigation.navigate('HomePage')
+                }}>
+                <Text style={styles.textStyle}>Exit</Text>
+              </TouchableHighlight>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
+
   const RinseModal = ({ modalVisible,setModalVisible})=>{
     return(  
     <Modal
@@ -354,7 +360,9 @@ function App() {
           headerTitleStyle: {fontSize:24,color:"#012554",fontWeight:"bold",fontStyle:"italic"},
           headerLeft: (()=>
           <TouchableHighlight onPress={()=>{
-              setAlertModal(true);
+            setNavigation(navigation);
+            setTimeout(()=>setAlertModal(true),300)
+              
           }}>
             <View style={{flexDirection:"row"}}>  
                 <Entypo name="chevron-left" size={25} style={{alignSelf:"center"}}/>
