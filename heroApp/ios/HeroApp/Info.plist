@@ -37,6 +37,8 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>UIUserInterfaceStyle</key>
+	<string>Light</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>App needs to connect bluetooth device</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
