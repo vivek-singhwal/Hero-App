@@ -4,14 +4,12 @@ import { Text ,Modal} from 'react-native-paper';
 
 export default BleStatusModal  = ({status,hideModal,containerStyle})=>{
     return(<Modal visible={status} onDismiss={hideModal} contentContainerStyle={containerStyle}>
-        <View style={{alignSelf:"center",width:"95%",paddingTop:10,paddingBottom:10}}>
-        <Text style={styles.modalStyle}>Your mobile device's Bluetooth is</Text>
-        <Text style={styles.modalStyle}>turned OFF.</Text>
+        <View style={{alignSelf:"center",width:"95%",paddingTop:0,paddingBottom:10}}>
+        <Text style={styles.modalStyle}>Your mobile device's Bluetooth is turned OFF.</Text>
         <Text></Text>
+        <Text style={styles.modalStyle}>Please open your device settings and turn bluetooth ON, then return
+        to the Scout ES app.</Text>
         <Text></Text>
-        <Text style={styles.modalStyle}>Please open your device settings</Text>
-        <Text style={styles.modalStyle}>and turn bluetooth ON, then return</Text>
-        <Text style={styles.modalStyle}>to the Scout ES app.</Text>
         {/* <View style={{height:200,backgroundColor:"gray", marginTop:10}}/> */}
         <Image source={require('../asset/bleStatus.png')} style={{alignSelf:"center",marginTop:10,height:"45%",width:"80%",borderWidth:0.7,borderColor:"gray"}}/>
           <TouchableHighlight
@@ -40,8 +38,8 @@ const styles = StyleSheet.create({
       elevation: 2
     },
     modalStyle:{
-      alignSelf:"center",
       fontSize:15,
-      paddingBottom:5
+      paddingBottom:5,
+      textAlign:'center'
     }
   });

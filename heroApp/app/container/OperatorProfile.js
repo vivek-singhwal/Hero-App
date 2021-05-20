@@ -186,7 +186,7 @@ export default OperatorProfile= ({navigation}) =>{
        {btStatus &&  <TouchableHighlight style={{alignSelf:"center",marginTop:10}} onPress={()=>{setBleModal(true);}}>
           <View style={{flexDirection:"row"}}>
           <Foundation color={'red'} size={22} name="alert" style={{paddingRight:10}}/>
-          <Text style={{fontSize:18, color:"red",textDecorationStyle:"dotted",textDecorationColor:"red",textDecorationLine:"underline"}}>
+          <Text style={{fontSize:18, color:"red",textDecorationStyle:"solid",textDecorationColor:"red",textDecorationLine:"underline"}}>
            Bluetooth is OFF 
           </Text>
           <Foundation color={'red'} size={22} name="bluetooth" style={{paddingLeft:10}}/>

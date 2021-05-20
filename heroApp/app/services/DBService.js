@@ -503,7 +503,7 @@ export var addOperator = function (data) {
     });;;
     return promise;
   }
-
+//users in local sqlite
 export var getOperators = function () {
     console.log("getOperators");
     let promise = new Promise((resolve, reject) => {

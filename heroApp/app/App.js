@@ -216,7 +216,6 @@ function App() {
     <NavigationContainer>
     <OfflineSync/>  
     <Stack.Navigator initialRouteName="Profile">
-    
     <Stack.Screen name="TestPageAPI" component={TestPageAPI} options={{headerShown: false}}/>
     <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }}/>
     <Stack.Screen name="RinseProcess" component={RinseProcess} options={{ headerShown: false }}/>
@@ -278,7 +277,6 @@ function App() {
               },600)
             }}
            icon={props=><AwesomeIcon 
-            
             size={32}
             // color={'#2C88D9'}
             color={'#012554'}
@@ -290,9 +288,7 @@ function App() {
             name="share-square-o"/>}
           />
           ),
-          
           headerLeftContainerStyle:{paddingLeft:20},
-
           headerRight:(()=><AwesomeIcon
           onPress={()=>{
             // console.log(">>Click bluetooth")

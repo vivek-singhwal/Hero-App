@@ -18,15 +18,15 @@ export default LearnHow = ({modalVisible,setModalVisible}) =>{
         }}>
          <View 
          style={{
-             alignSelf:"center",
+            alignSelf:"center",
             position: 'absolute',
             width: '100%',
             height: '100%',
             justifyContent: 'center',
             backgroundColor: 'rgba(100,100,100, 0.5)',
             padding: 50,
-            paddingTop: "25%",
-            paddingBottom: "25%",
+            paddingTop: "18%",
+            paddingBottom: "20%",
       }}>
 
       <Swiper 
@@ -38,7 +38,7 @@ export default LearnHow = ({modalVisible,setModalVisible}) =>{
         setIndexScroll(index)
       }}
       
-      buttonWrapperStyle={{backgroundColor: 'transparent', flexDirection: 'row', position: 'absolute', top:"40%", left: 0,  paddingHorizontal: 10, paddingVertical: 10, justifyContent: 'space-between',}}
+      buttonWrapperStyle={{backgroundColor: 'transparent', flexDirection: 'row', position: 'absolute', top:"42%", left: 0,  paddingHorizontal: 10, paddingVertical: 10, justifyContent: 'space-between',}}
       prevButton={indxScroll == 0 ?<></> : <Button
               color={'#012554'}
               icon={()=><Material 
@@ -46,7 +46,6 @@ export default LearnHow = ({modalVisible,setModalVisible}) =>{
                         color={'#fff'}
                         name="keyboard-arrow-left"/>} 
                         mode="contained"
-
                  >
                 {'Back'} 
               </Button>}
@@ -77,32 +76,32 @@ export default LearnHow = ({modalVisible,setModalVisible}) =>{
                 mode="contained">
           { 'Next' } 
         </Button> }>
-       <View style={{backgroundColor:"#fff",height:"100%",justifyContent:"center",paddingBottom:25}}>
+       <View style={{backgroundColor:"#fff",height:"100%", paddingTop:15,paddingBottom:25}}>
           <View style={{flexDirection:"row",justifyContent:"space-around",paddingBottom:10}}>
         <View style={{backgroundColor:"#012554",width:30,height:5,alignSelf:"center",}}/>
         <View style={{backgroundColor:indxScroll == 1?"#012554":"gray",width:30,height:5,alignSelf:"center"}}/>
         <View style={{backgroundColor:indxScroll == 2?"#012554":"gray",width:30,height:5,alignSelf:"center"}}/>
         </View>
-          <Text style={styles.text}>{'First, make sure your sprayer \n battery is charged and\n inserted correctly into the \n battery housing.'}</Text>
-          <Image style={{height:"50%",width:"80%",borderColor:"gray",borderWidth:0.7,alignSelf:"center",marginTop:10,marginBottom:10}} source={require('../asset/learn-more-device1.png')} />
+          <Text style={styles.text}>{'First, make sure your sprayer battery is charged and inserted correctly into the  battery housing.'}</Text>
+          <Image style={{height:"60%", width:"80%",borderColor:"gray",borderWidth:0.7,alignSelf:"center",marginTop:10}} source={require('../asset/learn-more-device1.png')} />
         </View>
-        <View style={{backgroundColor:"#fff",height:"100%",justifyContent:"center",paddingBottom:25}}>
+        <View style={{backgroundColor:"#fff",height:"100%",paddingTop:15,paddingBottom:25}}>
         <View style={{flexDirection:"row",justifyContent:"space-around",paddingBottom:10}}>
         <View style={{backgroundColor:"gray",width:30,height:5,alignSelf:"center",}}/>
         <View style={{backgroundColor:"#012554",width:30,height:5,alignSelf:"center"}}/>
         <View style={{backgroundColor:"gray",width:30,height:5,alignSelf:"center"}}/>
         </View>
-          <Text style={styles.text}> {'Next, make sure your sprayer\n is powered ON, Wait 5 seconds\n for your sprayer to enter\n paring mode.'}</Text>
-          <Image style={{height:"50%",width:"80%",borderColor:"gray",borderWidth:0.7,alignSelf:"center"}} source={require('../asset/learn-more-device2.png')} />
+          <Text style={styles.text}> {'Next, make sure your sprayer is powered ON, Wait 5 seconds for your sprayer to enter paring mode.'}</Text>
+          <Image style={{height:"60%",width:"80%",borderColor:"gray",borderWidth:0.7,alignSelf:"center"}} source={require('../asset/learn-more-device2.png')} />
         </View>
-        <View style={{backgroundColor:"#fff",height:"100%",justifyContent:"center",paddingBottom:25}}>
+        <View style={{backgroundColor:"#fff",height:"100%",paddingTop:15,paddingBottom:25}}>
         <View style={{flexDirection:"row",justifyContent:"space-around",paddingBottom:10}}>
         <View style={{backgroundColor:"gray",width:30,height:5,alignSelf:"center",}}/>
         <View style={{backgroundColor:"gray",width:30,height:5,alignSelf:"center"}}/>
         <View style={{backgroundColor:"#012554",width:30,height:5,alignSelf:"center"}}/>
         </View>
-          <Text style={[styles.text]}>{"Finally, turn your mobile device's bluetooth ON\n "} {'Return to the Scout ES mobile \n app and select the sprayer\n you want to connect with.'}</Text>
-          <Image style={{height:"50%",width:"80%",borderColor:"gray",borderWidth:0.7,alignSelf:"center"}} source={require('../asset/learn-more-device3.png')} />
+          <Text style={[styles.text]}>{"Finally, turn your mobile device's bluetooth ON "} {'Return to the Scout ES mobile \n app and select the sprayer\n you want to connect with.'}</Text>
+          <Image style={{height:"60%",width:"80%",borderColor:"gray",borderWidth:0.7,alignSelf:"center"}} source={require('../asset/learn-more-device3.png')} />
         </View>
       </Swiper>
       </View>
@@ -111,11 +110,12 @@ export default LearnHow = ({modalVisible,setModalVisible}) =>{
 }
 
 const styles = StyleSheet.create({
-  
     text: {
+        paddingLeft:1,
+        paddingRight:1,
+        paddingTop:6,
         fontSize: 17,
         textAlign:"center",
         paddingBottom:10
-    
     }
   });
