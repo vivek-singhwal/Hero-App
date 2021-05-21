@@ -29,7 +29,6 @@ let db = sqlite.openDatabase({ name: 'heroDatabase.db' });
 export var initDB = (reqTable) => {
     sqlite.DEBUG(false);
     sqlite.enablePromise(true);
-    let db;
     return new Promise((resolve) => {
     //   console.log("Plugin integrity check ...");
       sqlite.echoTest()
@@ -42,19 +41,7 @@ export var initDB = (reqTable) => {
               // console.log("Database OPEN");
               db.executeSql('SELECT * FROM ' + reqTable + ' LIMIT 1').then((result) => {
                 console.log("Database is ready ... executing query ...",reqTable);
-                if(reqTable === 'sessions'){
-                //   db.executeSql(
-                //     'PRAGMA table_info(sessions)').then(
-                //   (results) => {
-                //       // if(results[0].rows.length == 0){
-                //         for(let i=0;i<results[0].rows.length;i++){
-                //           console.log(">>Table structure ",results[0].rows.item(i).name)
-                //         }
-                         
-                //       // }
-                //   }
-                // )
-            
+                if(reqTable === 'sessions'){            
                 db.executeSql(
                   'SELECT locationImages FROM sessions').then(
                 (results) => {

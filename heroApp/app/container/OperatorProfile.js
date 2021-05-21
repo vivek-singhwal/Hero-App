@@ -1,5 +1,5 @@
 import React,{useEffect,useState} from 'react';
-import { View, TextInput as Input,ScrollView, Linking, KeyboardAvoidingView, NativeModules, NativeEventEmitter, StyleSheet,TouchableHighlight, Keyboard} from 'react-native';
+import { View, TextInput as Input,ScrollView, Linking, TouchableOpacity, KeyboardAvoidingView, NativeModules, NativeEventEmitter, StyleSheet,TouchableHighlight, Keyboard} from 'react-native';
 import { Avatar, Button,Text ,Modal} from 'react-native-paper';
 import AwesomeIcon5 from 'react-native-vector-icons/FontAwesome5';
 import Material from 'react-native-vector-icons/MaterialIcons';
@@ -27,11 +27,11 @@ export default OperatorProfile= ({navigation}) =>{
     const [btStatus, setBtStatus]=useState(false);
     const [bleModal, setBleModal] = useState(false);
     const hideBleModal = () => setBleModal(false);
+    const [blueToothOFF,setBlueToothON] = useState(false);
     useEffect(()=>{
       // console.log(">>Status "+BleManager.checkState());
       BleManager.checkState();
       bleManagerEmitter.addListener("BleManagerDidUpdateState", (args) => {
-        console.log(">>Args "+args.state);
         if(args.state == "off"){
           setBtStatus(true);
         }else{
@@ -41,16 +41,11 @@ export default OperatorProfile= ({navigation}) =>{
       });
         if(count){
           initDB('operators').then((res)=>{
-
-          // check and operator with api
-            // console.log(">>Res ",res);
             getOperators().then((result)=>{
-                console.log(">result ", result);
                 if(result && result.length > 0){
                   var operatorDat =  JSON.parse(JSON.stringify(result[0]));
                   var opObj = {"chemistryType": operatorDat.chemistryType, "company": operatorDat.company, "opName": operatorDat.opName, "serverId": operatorDat.serverId}
                   setOperatorData(opObj);
-                  // console.log(getOperatorData())
                   navigation.navigate('DeviceConnection')
                 }
             })
@@ -63,7 +58,15 @@ export default OperatorProfile= ({navigation}) =>{
         }
     },[])
 
-    var addRecord = ()=>{
+    goDevices = async () =>{
+      if(await BluetoothStatus.state()){
+        navigation.navigate('DeviceConnection')
+      }else{
+        setBlueToothON(true);
+        console.log(">> BlueTooth is Off");
+      }
+    }
+    var addRecord = async ()=>{
       setLoading(true);
       if(opName.length > 2 && opCompany.length > 2){
         var operatorObj = {
@@ -77,7 +80,7 @@ export default OperatorProfile= ({navigation}) =>{
               })
               var opObj = {"chemistryType": operatorObj.chemistryType, "company": operatorObj.company, "opName": operatorObj.opName, "serverId":null,}
               setOperatorData(opObj);
-              navigation.navigate('DeviceConnection')
+              goDevices();
               setLoading(false);
           }else{
             setLoading(false);
@@ -199,7 +202,7 @@ export default OperatorProfile= ({navigation}) =>{
     </View>
     <Modal visible={visible} onDismiss={hideModal} contentContainerStyle={containerStyle}>
         <View style={{alignSelf:"center",height:130,width:"95%"}}>
-        <Text>Please minimum 3 characters in below fields: </Text>
+        <Text>Please enter minimum 3 characters in below fields: </Text>
           {opName.length < 3 && <Text style={{fontWeight:"bold",paddingTop:4,paddingBottom:3}}>Name</Text>}
           {opCompany.length < 3 && <Text style={{fontWeight:"bold"}}>Company</Text>}
           <TouchableHighlight
@@ -211,6 +214,37 @@ export default OperatorProfile= ({navigation}) =>{
             </TouchableHighlight>
             </View>
         </Modal>
+        <Modal
+        animationType="slide"
+        transparent={true}
+        visible={blueToothOFF}
+        onRequestClose={() => {
+        }}>
+      <View
+        style={{
+          position: 'absolute',
+          justifyContent: 'center',
+          padding: 40,
+        }}>
+
+          <View style={[styles.modalView]}>
+            <Text style={[styles.modalText,{fontSize:16}]}>BlueTooth is off.</Text>
+            <Text style={[styles.modalText,{fontSize:16,paddingBottom:15}]}>Turn on bluetooth from Smart Phone settings.</Text>
+            <TouchableOpacity onPress={()=>{setModalVisible(true)}} style={{paddingBottom:10}}>
+            <Text style={{fontSize:18,color:"#012554", textDecorationLine:"underline",fontWeight:"700"}}>Learn how</Text>
+            </TouchableOpacity>
+            <View style={{flexDirection:"row", justifyContent:"space-between", marginTop:15, marginBottom:15}}>
+            <TouchableHighlight
+              style={{ ...styles.openButton, backgroundColor: "#012554",paddingRight:25,paddingLeft:25 }}
+              onPress={() => {
+                setBlueToothON(!blueToothOFF);
+              }}>
+              <Text style={styles.textStyle}>Try Again</Text>
+            </TouchableHighlight>
+          </View>
+        </View>
+      </View>
+    </Modal>
       <BleStatusModal status={bleModal} hideModal={hideBleModal} containerStyle={containerStyle}/>
     </>)
 }

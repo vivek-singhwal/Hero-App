@@ -52,7 +52,6 @@ export default class BleAppmanager extends Component {
   // })
   
   componentDidMount() {
-    
     NetInfo.configure({
       reachabilityUrl: 'https://hero-api.kesemsolutions.com',
       reachabilityTest: async (response) => response.status === 204,
@@ -101,9 +100,6 @@ export default class BleAppmanager extends Component {
       //clear OLD interval if pending
       clearInterval(this.readInterval);
       setSecondRead(true);
-      
-      // console.log(">>firstTimeRead ",getReadOk(),currentSessionData)
-     // if(getReadOk()){
       if(this.state.readSessionData == 0){
         
         // this.writeData('getSerial\r');
@@ -158,12 +154,6 @@ export default class BleAppmanager extends Component {
           //      "getTriggerLatchState":"TBD",
           //     "updateFirmware": "Under Development"
           // }
-            // 
-         console.log(">>sessionData ---=> ",sessionObjApi)
-
-        // EventRegister.emit('BLECMD', { event: "homepageEvent" , cmd:'getSerial\r'})
-        
-        // Add session data into DB
         var localSessionDtaObj = {};
         localSessionDtaObj.sessionData= JSON.stringify(sessionObjApi);
         localSessionDtaObj.isSync=0;
@@ -445,7 +435,7 @@ export default class BleAppmanager extends Component {
       // Failure code
       console.log("The user refuse to enable bluetooth");
       // EventRegister.emit('BLE_STATUS', { event: "error"});
-      //Alert.alert("Hero", "Please turn your bluetooth on.")
+      //Alert.alert("Scout App", "Please turn your bluetooth on.")
     });
   }
   retrieveConnected(){
@@ -500,15 +490,11 @@ export default class BleAppmanager extends Component {
     var localHw = {};
     if (peripheral){
       if (peripheral.connected){
-        console.log("connected",peripheral);
-        
+        console.log("connected",peripheral);    
         BleManager.disconnect(peripheral.id);
         EventRegister.emit('BLE_STATUS', { event: "error" });
-        EventRegister.emit('BLE_STATUS', { event: "error" });
-        //BleService.setPeripherial(null);
-        //this.setState({peripheral:null});
       }else{
-        //console.log(">>>>"+peripheral.id)
+        let deviceConnected = false;
         BleManager.connect(peripheral.id).then(() => {
           let peripherals = this.state.peripherals;
           let p = peripherals.get(peripheral.id);
@@ -519,21 +505,25 @@ export default class BleAppmanager extends Component {
             peripherals.set(peripheral.id, p);
           }
           EventRegister.emit('BLE_STATUS', { event: "connected" });
-          // Alert.alert("Hero", "Connected to "+peripheral.id  +"\n"+peripheral.name)
-
+          deviceConnected = true;
           localHw.sdName = peripheral.name;
           localHw.hardwareId = peripheral.id;
           localHw.sprayerName = peripheral.name;
           setDeviceHWData(localHw);
-          console.log('Connected to ' + peripheral.id +"\n"+peripheral.name);
-          // Command initiate level
           setTimeout(() => { 
             this.writeData('getSerial\r');
           }, 90);
 
         }).catch((error) => {
+          deviceConnected = true;
           console.log('Connection error', error);
         });
+        setTimeout(()=>{
+          if(!deviceConnected){
+            //device must be removed after scan
+            EventRegister.emit('BLE_STATUS', { event: "deviceNotAvaible" });
+          }
+        },2000)
       }
     }
   }

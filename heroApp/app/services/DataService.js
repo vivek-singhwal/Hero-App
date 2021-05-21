@@ -58,9 +58,7 @@ export var setDeviceHWData=(data)=>{
 }
 
 export var sessionList =[{location:'abc',comment:'',serverId:'0',startTime:Date.now(),endTime:Date.now(),ozSparayed:12.1,sessionData :{}},{location:'abc',comment:'',serverId:'0',startTime:Date.now(),endTime:Date.now(),ozSparayed:11.1,sessionData :{}}];
-
 export var predefinedSessionData = {};
-
 export var setPredefinedessionData=(data)=>{
     return predefinedSessionData = data;
 }
@@ -77,8 +75,6 @@ export var sessionDataList = [
     {id:"7",locationImages:["https://scout-bucket-images.s3.us-west-2.amazonaws.com/images/E88AD04F-08D3-43CF-BCDB-749EAA130D1B.jpg"], sessionLocation: 'Helo', startTime:  Date.now(), endTime:  Date.now(), ozSparayed: parseInt(25)/29.57 },
     {id:"8",locationImages:["https://scout-bucket-images.s3.us-west-2.amazonaws.com/images/E88AD04F-08D3-43CF-BCDB-749EAA130D1B.jpg"], sessionLocation: 'Helo', startTime:  Date.now(), endTime:  Date.now(), ozSparayed: parseInt(25)/29.57 },
     {id:"9",locationImages:["https://scout-bucket-images.s3.us-west-2.amazonaws.com/images/E88AD04F-08D3-43CF-BCDB-749EAA130D1B.jpg"], sessionLocation: 'Helo', startTime:  Date.now(), endTime:  Date.now(), ozSparayed: parseInt(25)/29.57 },
-    
-
 ];
 export var currentReadData = [];
 

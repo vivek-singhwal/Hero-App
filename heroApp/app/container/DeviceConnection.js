@@ -5,20 +5,22 @@ import Material from 'react-native-vector-icons/MaterialIcons';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 import Foundation from 'react-native-vector-icons/Foundation';
 import { EventRegister } from 'react-native-event-listeners';
+import { BluetoothStatus } from 'react-native-bluetooth-status';
 import { getOperatorData, setDeviceData, getDeviceHWData, setDeviceHWData , sessionDataList } from '../services/DataService';
 import {initDB, addSprayer, getSprayers, getSprayersByHwId, delSprayer} from '../services/DBService';
 import LearnHow from './LearnHow';
 
 let deviceListAr = [];
 export default DeviceConnection = ({navigation})=>{
-
+    var deviceArray = [];
     const [count,setCount] = useState(true);
     const [selectedId, setSelectedId] = useState(null);
     const [deviceStatus, setDeviceStatus] = useState('');
-    const [deviceList, setDeviceList] = useState([]);
+    const [deviceList, setDeviceList] = useState(deviceArray);
     const [isDeviceConnected, setisDeviceConnected] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const [bleErrorModal,setBleErrorModal] = useState(false);
+    const [blueToothOFF,setBlueToothON] = useState(false);
     listEmptyComponent = () => {
         return (
             <View>
@@ -36,7 +38,6 @@ export default DeviceConnection = ({navigation})=>{
     }
 
     useEffect(()=>{
-      
         if(count){
             initDB('sprayers').then((res)=>{
               console.log(">>Res ",res);
@@ -58,37 +59,33 @@ export default DeviceConnection = ({navigation})=>{
                   setDeviceStatus("Disconnected");
                   setBleErrorModal(true);
                   navigation.navigate('DeviceConnection');
+                }else if(data.event == "deviceNotAvaible"){
+                  setBleErrorModal(true);
+                  // empty array
+                  deviceArray.length = 0;
+                  deviceListAr.length = 0
+                  setDeviceList(deviceArray);
                 }
               if(data.event == "connected"){
                 setisDeviceConnected(true);
                 setDeviceStatus("Connected");
-                // hideModal()
-              //   setSessionDataList([]); // set temp
-  
-              }else if(data.event == "bleDevices"){
+              } else if(data.event == "bleDevices"){
                   console.log(">>devices ",data.devices);
                   deviceListAr.push(data.devices);
                   var arrayUniqueByKey = [...new Map(deviceListAr.map(item =>
                     [item['id'], item])).values()];
                   setDeviceList(arrayUniqueByKey);
-               
-              }else if(data.event == "reading"){
+              } else if(data.event == "reading"){
                 setDeviceStatus("Reading...");
-              }else if(data.event == "readOK"){
+              } else if(data.event == "readOK"){
                 setDeviceStatus("Ready");
-              }else if(data.event == "scanning"){
+              } else if(data.event == "scanning"){
                 setDeviceStatus("Scanning...");
                 // showModal();  
-              }else if(data.event == "disconnected"){
-                // setDefaultValue();
-              //   setSessionDataList([]); // set temp
+              } else if(data.event == "disconnected"){
                 setisDeviceConnected(false);
-                // navigation.navigate('Home');
                 setDeviceStatus("Disconnected");
                 navigation.navigate('DeviceConnection');
-              //   setTimeout(()=>{
-              //     setDeviceStatus("Disconnected");
-              //   },500)
               }else if(data.event ==='stopScan'){
                   // Alert.alert('HeroApp','No device found.')
                   setDeviceStatus("stopScan");
@@ -98,26 +95,8 @@ export default DeviceConnection = ({navigation})=>{
               EventRegister.removeEventListener(listener);
             //   BackHandler.removeEventListener('hardwareBackPress', () => true)
           }  
-    })
-    // let refreshDeviceList = ()=>{
-    //      Animated.loop(
-    //         Animated.timing(
-    //           rotateValue,
-    //           {
-    //            toValue: 1,
-    //            duration: 1000,
-    //            easing: Easing.linear,
-    //            useNativeDriver: true
-    //           }
-    //         )
-    //        ).start();
-    //        EventRegister.emit('BLECMD', { cmd: 'startScan' });
-    //        setDeviceStatus('');
-    //        setSelectedId(null);
-    //     //    setDeviceList([]);
-    // }
-    return(<>
-    
+    },[]);
+  return(<>  
     <ScrollView>
     <View style={{flex:1,width:"85%",height:"100%",alignSelf:"center",marginTop:30,marginBottom:10}}>
         <View style={{justifyContent:"space-between",flexDirection:"row"}}>  
@@ -126,7 +105,6 @@ export default DeviceConnection = ({navigation})=>{
             <Text style={{fontSize:18,color:"#012554", textDecorationLine:"underline",fontWeight:"700"}}>Learn how</Text>
             </TouchableOpacity>
         </View>
-        
         <Image source={require('../asset/sprayDevice.png')} style={{alignSelf:"center",width:"100%",borderWidth:0.7,borderColor:"gray"}}/>
         <View style={{flexDirection:"row",justifyContent:"space-between",paddingBottom:10,marginTop:20}}>
             <Text style={{fontSize:18}}>Select sprayer</Text>
@@ -154,7 +132,6 @@ export default DeviceConnection = ({navigation})=>{
                 keyExtractor={(item) => item.id}
                 extraData={selectedId}
         />
-       
         </View>
         {deviceList.length > 0 ?<Button 
                 style={{flexDirection:"row",borderRadius:4,height:47,justifyContent:"center",marginTop:30}}
@@ -181,7 +158,6 @@ export default DeviceConnection = ({navigation})=>{
                             isSync:0,
                             sprayerName:getDeviceHWData().sprayerName
                         }
-                      
                         getSprayersByHwId(getDeviceHWData().hardwareId).then((resDevice)=>{
                           if(resDevice.length){
                               console.log(">>resDevice",resDevice);
@@ -195,7 +171,12 @@ export default DeviceConnection = ({navigation})=>{
                           setDeviceHWData(deviceObj);
                           navigation.navigate('HomePage');
                         })
-                    }
+                    }/*else if (deviceStatus == 'Disconnected'){
+                      setBleErrorModal(true);
+                    }else if (deviceStatus == 'stopScan'){
+                      EventRegister.emit('BLECMD', { cmd: 'startScan' });
+                      setDeviceList([]);
+                    }*/
                 }}>
               {deviceStatus == "Reading..." || deviceStatus == 'Connected' || deviceStatus=='Ready'?deviceStatus:'Connect'}
             </Button>:<Button 
@@ -210,16 +191,17 @@ export default DeviceConnection = ({navigation})=>{
                     color={'#fff'}
                     name="keyboard-arrow-right"/>}
                 contentStyle={{flexDirection:"row-reverse",paddingTop:1,height:47,width:"90%",alignSelf:"center"}}
-                onPress={()=>{
-                    // if(deviceStatus != 'Connected' && deviceStatus != 'Ready'){
-                      EventRegister.emit('BLECMD', { cmd: 'startScan' });
-                    // }
+                onPress={ async()=> {
+                  if(await BluetoothStatus.state()){
+                    EventRegister.emit('BLECMD', { cmd: 'startScan' });
+                  }else{
+                    setBlueToothON(true);
+                  }
                 }}>
               {deviceStatus == 'Scanning...'?deviceStatus:'Scan'}
             </Button>}
     </View>
     <LearnHow modalVisible={modalVisible} setModalVisible={setModalVisible}/>
-   
     </ScrollView>
     <Modal
         animationType="slide"
@@ -232,26 +214,59 @@ export default DeviceConnection = ({navigation})=>{
       <View
         style={{
           position: 'absolute',
-          // width: '100%',
-          // height: '100%',
           justifyContent: 'center',
           // backgroundColor: 'rgba(100,100,100, 0.5)',
           padding: 40,
         }}>
-
           <View style={[styles.modalView]}>
             {/* <Material name="logout" size={30} color={'red'}/> */}
-            <Text style={[styles.modalText,{fontSize:16}]}>Unable to establish bluetooth {'\n connection'}</Text>
-            <Text style={[styles.modalText,{fontSize:16,paddingBottom:15}]}>Make sure Scout is charged, {'\npowered ON, and in range.'}</Text>
+            <Text style={[styles.modalText,{fontSize:16}]}>Unable to establish bluetooth connection</Text>
+            <Text style={[styles.modalText,{fontSize:16,paddingBottom:15}]}>Make sure Scout is charged,powered ON, and in range.</Text>
             <TouchableOpacity onPress={()=>{setModalVisible(true)}} style={{paddingBottom:10}}>
             <Text style={{fontSize:18,color:"#012554", textDecorationLine:"underline",fontWeight:"700"}}>Learn how</Text>
             </TouchableOpacity>
-        <View style={{flexDirection:"row", justifyContent:"space-between", marginTop:15, marginBottom:15}}>
-            
+            <View style={{flexDirection:"row", justifyContent:"space-between", marginTop:15, marginBottom:15}}>
             <TouchableHighlight
               style={{ ...styles.openButton, backgroundColor: "#012554",paddingRight:25,paddingLeft:25 }}
-              onPress={() => {
+              onPress={async () => {
                 setBleErrorModal(!bleErrorModal);
+                if(await BluetoothStatus.state()){
+                  EventRegister.emit('BLECMD', { cmd: 'startScan' });
+                }
+              }}>
+              <Text style={styles.textStyle}>Try Again</Text>
+            </TouchableHighlight>
+          </View>
+        </View>
+      </View>
+    </Modal>
+    <Modal
+        animationType="slide"
+        transparent={true}
+        visible={blueToothOFF}
+        onRequestClose={() => {
+          Alert.alert("Modal has been closed.");
+        }}>
+      <View
+        style={{
+          position: 'absolute',
+          justifyContent: 'center',
+          padding: 40,
+        }}>
+          <View style={[styles.modalView]}>
+            <Text style={[styles.modalText,{fontSize:16}]}>BlueTooth is off.</Text>
+            <Text style={[styles.modalText,{fontSize:16,paddingBottom:15}]}>Turn on bluetooth from Smart Phone settings.</Text>
+            <TouchableOpacity onPress={()=>{setModalVisible(true)}} style={{paddingBottom:10}}>
+            <Text style={{fontSize:18,color:"#012554", textDecorationLine:"underline",fontWeight:"700"}}>Learn how</Text>
+            </TouchableOpacity>
+            <View style={{flexDirection:"row", justifyContent:"space-between", marginTop:15, marginBottom:15}}>
+            <TouchableHighlight
+              style={{ ...styles.openButton, backgroundColor: "#012554",paddingRight:25,paddingLeft:25 }}
+              onPress={async() => {
+                setBlueToothON(!blueToothOFF);
+                if(await BluetoothStatus.state()){
+                  EventRegister.emit('BLECMD', { cmd: 'startScan' });
+                }
               }}>
               <Text style={styles.textStyle}>Try Again</Text>
             </TouchableHighlight>
@@ -268,9 +283,7 @@ const styles = StyleSheet.create({
       marginTop: 10,
     },
     item: {
-    //   padding: 20,
       marginVertical: 8,
-    //   marginHorizontal: 16,
     },
     title: {
       fontSize: 18,
@@ -280,10 +293,9 @@ const styles = StyleSheet.create({
       justifyContent: "center",
       alignItems: "center",
       marginTop: 22,
-      
     },
     modalView: {
-      margin: 40,
+      margin: 20,
       backgroundColor:"black",
      
       backgroundColor: "white",
