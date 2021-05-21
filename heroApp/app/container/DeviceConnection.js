@@ -1,6 +1,6 @@
 import React,{useEffect,useState} from 'react';
 import { View, TextInput as Input,FlatList,Text,TouchableOpacity,StyleSheet ,Image, TouchableHighlight , ScrollView} from 'react-native';
-import { Avatar, Button, ActivityIndicator,Modal } from 'react-native-paper';
+import { Button,Modal } from 'react-native-paper';
 import Material from 'react-native-vector-icons/MaterialIcons';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 import Foundation from 'react-native-vector-icons/Foundation';
