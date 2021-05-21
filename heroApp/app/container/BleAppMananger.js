@@ -302,7 +302,6 @@ export default class BleAppmanager extends Component {
         EventRegister.emit('BLE_STATUS', { event: "readOK" });
         EventRegister.emit('BLE_DATA', { event: "completed" });
         // setDeviceData(JSON.parse(JSON.stringify(bleResults)));
-        console.log(JSON.stringify(bleResults));
         var batteryLevel = Number(bleResults['getBatteryLevel\r']);
         console.log("Battery is:"+batteryLevel+":");
         if(!isNaN(batteryLevel) && batteryLevel < 11 && batteryLevel > 0 ){

@@ -21,7 +21,6 @@ import DeleteSessionModal from './DeleteSessionModal';
 let setStartTime, setEndTime;
 
 export default HomePage = ({ navigation })=>{
-
     let currentRoute = useRoute().name;
     const [counter,setCounter] = useState(true);
     const [visible, setVisible] = useState(false);
@@ -48,23 +47,18 @@ export default HomePage = ({ navigation })=>{
       minutes = minutes < 10 ? '0'+minutes : minutes;
       var strTime = hours + ':' + minutes + ' ' + ampm;
       return strTime;
-    }
-   
-    var interval ;
+    } 
     function handleBackButtonClick() {
      BackHandler.exitApp();
     }
-   
     var getSessionDBList = ()=>{
       getSessions().then((resSessions)=>{
-        // console.log(">>Res ",resSessions);
         var listSession = resSessions;
         let calTotalTime = 0;
         let initTime = "";
         let ozSprayerd = 0;
-        if(resSessions){
+        if(resSessions){ //request Sessions
           for(let i=0;i<listSession.length;i++){
-            // console.log(">>resSessions ",resSessions);
             if(listSession[i].sessionData !=undefined && listSession[i].sessionData != null){
               listSession[i]['sessionData'] = JSON.parse(listSession[i]['sessionData']);
             }
@@ -131,7 +125,6 @@ export default HomePage = ({ navigation })=>{
                 setTotalOZ(ozSprayerd);
                 setInitialTime(initTime);
                 setElapsedTime(convertTime(Math.ceil(Math.abs(calTotalTime) / 1000)))
-                // convertTime(Math.ceil(Math.abs(new Date(item.startTime).getTime()-new Date(item.endTime).getTime()) / 1000))
                 setSessionList(listSession);
               }
               // setSessionList(listSession);
@@ -162,12 +155,14 @@ export default HomePage = ({ navigation })=>{
     },[]);
     
     var addSessionList = (comment,location)=>{
-    
       disableInterval();
       EventRegister.emit('StopInterval');
       KeepAwake.deactivate();
       // sessionDataList.push({location:'abc',comment:'',serverId:'0',startTime:this.sessionStartTime,endTime:Date.now()});
-      
+      var dbImageLocation = [];
+      imageList.map(item=>{
+        dbImageLocation.push(item.path); //db is capturing image path
+      })
       var sessionListAr = [...sessionList];
       var sessionObj = {
           // serverId:0,
@@ -179,7 +174,7 @@ export default HomePage = ({ navigation })=>{
           endTime: setEndTime,
           sessionLocation: locationText,
           sessionComment: commentText,
-          locationImages: imageList.length ? JSON.stringify(imageList) :'', // set images after this session.
+          locationImages: dbImageLocation.length ? JSON.stringify(dbImageLocation) :'', // set images after this session.
           // sessionData: JSON.stringify(currentSessionData),
           id: getLocalSessionId(),
           isSync: 0,
@@ -190,13 +185,12 @@ export default HomePage = ({ navigation })=>{
       sessionListAr.push({id:getLocalSessionId(),locationImages:sessionObj.locationImages ,sessionLocation: locationText, startTime: setStartTime, endTime: setEndTime, ozSparayed: parseInt(currentSessionData.getPumpedVolume)/29.57 })
       sessionListAr = sessionListAr.sort((a,b)=> b.startTime - a.startTime)
       setSessionList(sessionListAr); // 
-      console.log(">>Session set "+sessionListAr.length,sessionList.length);
       // update location,comment and endtime in sessions data.
       updateSessions(sessionObj).then((respUpdateSession)=>{
         console.log(">>Update session ",respUpdateSession);
       });
       
-      // console.log(">>imageList "+JSON.stringify(imageList))
+      console.log(">>imageList "+JSON.stringify(imageList))
       AsyncStorage.setItem(String(getLocalSessionId()),JSON.stringify(imageList));  
       setCommentText('');
       setLocationText('');
@@ -238,9 +232,9 @@ export default HomePage = ({ navigation })=>{
        EventRegister.emit('StartInterval')
     })
   })
-     }
+}
 
-    function convertTime(sec) {
+    var  convertTime = (sec) => {
       var hours = Math.floor(sec/3600);
       (hours >= 1) ? sec = sec - (hours*3600) : hours = '00';
       var min = Math.floor(sec/60);
@@ -288,21 +282,6 @@ export default HomePage = ({ navigation })=>{
       <View style={{flex:1,flexDirection:"column",height:"100%",backgroundColor:"#fff"}}>
           <View style={{height:"85%"}}>
           {currentRoute == "SesstionStart" ? 
-          // <View style={{padding:18}}>
-          //      <View style={{flexDirection:"row",justifyContent:"space-between",marginBottom:20,width:"100%"}}>
-          //       <Text style={{fontSize:20}}>Electrostatic</Text>
-          //       <Switch value={isSwitchEleOn} onValueChange={onToggleEleSwitch} color={'#012554'}/>
-          //      </View>
-          //      <View style={{flexDirection:"row",justifyContent:"space-between",marginBottom:20}}>
-          //       <Text style={{fontSize:20}}>Trigger Lock</Text>
-          //       <Switch value={isSwitchTrgOn} onValueChange={onToggleTrgSwitch} color={'#012554'}/>
-          //      </View>
-          //      <View style={{flexDirection:"row",justifyContent:"space-between",paddingBottom:20}}>
-          //       <Text style={{fontSize:20,}}>Battery</Text>
-          //       <Text style={{fontSize:18,}}>{btryPerct} %</Text>
-          //      </View>
-          //      <ProgressBar style={{height:10}} progress={btryPerct/100} color={'#012554'} />
-          //   </View>
             <ScrollView>
               <SubSession locationText={locationText} setLocationText={setLocationText} commentText={commentText} setCommentText={setCommentText} imageList={imageList} setImageList={setImageList}/>
             </ScrollView>
@@ -316,9 +295,7 @@ export default HomePage = ({ navigation })=>{
             renderItem={({item,index})=>
             <Swipeable key={index} onSwipeableRightOpen={()=>{setSessionPassId(item.id);setTimeout(()=>setDeleteModal(true),300)}} renderRightActions={leftSwipe}>
             <TouchableOpacity onPress={()=>{
-            //  if(!item.isRinse){
               navigation.navigate('SessionDetail',{id:item.id})
-            //  }
             }} 
              key={index} style={{height:80,backgroundColor:item.isRinse == 1? item.isFinished ==  1?'red':'green':item.isFinished == 0?'#484848':item.sessionLocation?'#fff':'#a3780b',width:"97%",alignSelf:"center",borderColor:'#012554',borderWidth:1,padding:10,marginBottom:10,borderRadius:50,marginTop:5}}>
               {/* <Text style={{color:'#012554',fontSize:18,fontWeight:"bold",textTransform:'capitalize',marginStart:15,paddingBottom:4}}>{item.sessionLocation?item.sessionLocation:'Incomplete session'}</Text> */}
@@ -387,7 +364,6 @@ export default HomePage = ({ navigation })=>{
                   setReadingStatus(false);
                   appContext.doChangeRinseStatus(false);
                   addSessionList(commentText, locationText);
-
                   // showModal();
               }}>
               <AwesomeIcon name={"stop"} 
@@ -422,7 +398,7 @@ export default HomePage = ({ navigation })=>{
       </View>
     </View>
   </View>
-  <DeleteSessionModal deleteSucess={()=>{ console.log(">>here");getSessionDBList();}} sessionId={sessionPassId} deleteModal={deleteModal} setDeleteModal={setDeleteModal}/>
+  <DeleteSessionModal deleteSucess={()=>{ getSessionDBList();}} sessionId={sessionPassId} deleteModal={deleteModal} setDeleteModal={setDeleteModal}/>
   <SaveModal locationImg={locationImg} setLocationImg={setLocationImg} addSessionList={addSessionList} setLocationText={setLocationText} locationText={locationText} commentText={commentText} setCommentText={setCommentText} visible={visible} hideModal={hideModal} SetReadingStatus={(isBack)=>{setReadStatus(isBack)}} />
  </>)
 }
