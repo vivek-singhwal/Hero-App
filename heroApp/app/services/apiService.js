@@ -2,9 +2,6 @@ import {getDeviceHWData} from '../services/DataService';
 import CryptoJS from "react-native-crypto-js";
 import {apiEndPoint,IV} from './constants';
 
-// const apiEndPoint = "https://hero-api.kesemsolutions.com";
-// const IV = "5183555c72eec9e4"; // set random initialisation vector
-
 var currentMonth = new Date().getMonth();
 var MONTH = currentMonth > 9? currentMonth.toString() :String("0"+ (currentMonth+1));
 var DAY = new Date().getDate() > 9?new Date().getDate().toString():"0"+new Date().getDate();
@@ -40,7 +37,7 @@ export var checkConnection = () => {
                 return result.result;
             },
             (error) => {
-                console.log(">>Eror checkConnection ", error)
+                console.log(">>Error checkConnection ", error)
                 return error;
             }
         )
@@ -79,7 +76,7 @@ export var uploadImage = (images) => {
                 return result;
             },
             (error) => {
-                console.log(">>Eror checkConnection ", error)
+                console.log(">>Error checkConnection ", error)
                 return error;
             }
         )
@@ -88,7 +85,6 @@ export var uploadImage = (images) => {
 export var getOperatorAPI = () => {
     return fetch(apiEndPoint+'/api/operators', {
             method: "GET",
-            // body: JSON.stringify(data),
             headers: { 'Content-Type': 'application/json' ,'Authorization':encryptToken()},
         })
         .then(res => res.json())
@@ -97,7 +93,7 @@ export var getOperatorAPI = () => {
                 return result.result;
             },
             (error) => {
-                console.log(">>Eror getOperatorAPI ", error)
+                console.log(">>Error getOperatorAPI ", error)
                 return error;
             }
         )
@@ -114,7 +110,26 @@ export var getSessionAPI = () => {
                 return result.result;
             },
             (error) => {
-                console.log(">>Eror getSessionAPI", error)
+                console.log(">>Error getSessionAPI", error)
+                return error;
+            }
+        )
+    }
+
+export var deleteSessionAPI = (sessionId) => {
+    //delete esample
+    ///api/sessions/8e761d2a-03e1-4daa-9c30-9090764be701
+    return fetch(apiEndPoint+'/api/sessions/'+sessionId, {
+            method: "DELETE",
+            headers: { 'Content-Type': 'application/json' ,'Authorization':encryptToken()},
+        })
+        .then(res => res.json())
+        .then(
+            (result) => {
+                return result;
+            },
+            (error) => {
+                console.log(">>Error deleteSessionAPI", error)
                 return error;
             }
         )
@@ -131,7 +146,7 @@ export var getSessionDataAPI = () => {
                 return result.result;
             },
             (error) => {
-                console.log(">>Eror getSessionDataAPI", error)
+                console.log(">>Error getSessionDataAPI", error)
                 return error;
             }
         )

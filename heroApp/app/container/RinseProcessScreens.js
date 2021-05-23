@@ -2,7 +2,7 @@ import React,{useEffect,useState} from 'react';
 import { View , StyleSheet, Text, TextInput as Input,Image, Alert, TouchableHighlight} from 'react-native';
 import Material from 'react-native-vector-icons/MaterialIcons';
 import MaterialCom from 'react-native-vector-icons/MaterialCommunityIcons';
-import { addRinseProcessSession, updateIsFinished,delsession,updateFininshedSession,getSessionWithParam } from '../services/DBService';
+import { addRinseProcessSession,updateFininshedSession,getSessionWithParam } from '../services/DBService';
 import { Button, Switch, ProgressBar, Modal, Portal, Provider, TextInput } from 'react-native-paper';
 export default RinseProcess = ({navigation}) =>{
     const [counter,setCounter] = useState(1);
@@ -36,8 +36,6 @@ export default RinseProcess = ({navigation}) =>{
             appVersion:'1.0.4',
             // rinseId:0,
         }
-        // delsession(16).then(()=>{})
-        // delsession(17).then(()=>{})
         addRinseProcessSession(sessionObj).then((res)=>{
           
           // updateIsFinished(s)
@@ -123,8 +121,6 @@ export default RinseProcess = ({navigation}) =>{
             // rinseId:0,
         }
         console.log(">>sessionObjAr ",JSON.stringify(sessionObjAr))
-        // delsession(16).then(()=>{})
-        // delsession(17).then(()=>{})
         addRinseProcessSession(sessionObjAr).then((res)=>{
           updateFininshedSession().then(()=>{
             console.log(">Added ",res);

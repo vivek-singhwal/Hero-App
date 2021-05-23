@@ -1,7 +1,8 @@
 import React,{ useState } from 'react';
 import { View , StyleSheet, Text, Modal, TextInput as Input,TouchableHighlight } from 'react-native';
 import AwesomeIcon from 'react-native-vector-icons/FontAwesome';
-import {delsession} from '../services/DBService';
+import {delSession} from '../services/DBService';
+import {deleteSessionAPI} from '../services/apiService';
 
 export default DeleteSessionModal = ({deleteSucess,sessionId,deleteModal,setDeleteModal}) => {
     return(<Modal
@@ -40,9 +41,10 @@ export default DeleteSessionModal = ({deleteSucess,sessionId,deleteModal,setDele
               onPress={() => {
                   console.log(">Indx val"+sessionId);
                   if(sessionId){
-                    // delsession(sessionId).then(()=>{
+                    delSession(sessionId).then(()=>{
                         deleteSucess();
-                    // })
+                        deleteSessionAPI(sessionId);
+                     })
                   }
                  
                   setDeleteModal(!deleteModal);

@@ -830,7 +830,8 @@ export var getOperators = function () {
     return promise;
   }
 
-  export var delsession = function (id) {
+  export var delSession = function (id) {
+    console.log("delete session:"+id);
     let promise = new Promise((resolve, reject) => {
       db.transaction((tx) => {
         tx.executeSql(

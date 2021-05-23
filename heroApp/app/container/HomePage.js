@@ -97,9 +97,6 @@ export default HomePage = ({ navigation })=>{
       });
       if(counter){
         initDB('sessions').then((res)=>{
-          // delsession(8).then(()=>{})
-          // delsession(9).then(()=>{})
-          // delsession(10).then(()=>{})
           if(currentRoute == "Dashboard"){
             getDashboardSessions().then((resSessions)=>{
               // console.log(">>Res ",resSessions);

@@ -358,7 +358,6 @@ function App() {
           <TouchableHighlight onPress={()=>{
             setNavigation(navigation);
             setTimeout(()=>setAlertModal(true),300)
-              
           }}>
             <View style={{flexDirection:"row"}}>  
                 <Entypo name="chevron-left" size={25} style={{alignSelf:"center"}}/>
