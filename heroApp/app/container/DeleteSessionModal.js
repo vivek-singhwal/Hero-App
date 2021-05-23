@@ -39,14 +39,12 @@ export default DeleteSessionModal = ({deleteSucess,sessionId,deleteModal,setDele
             <TouchableHighlight
               style={{ ...styles.openButton, backgroundColor: "red",paddingRight:18, paddingLeft:18 }}
               onPress={() => {
-                  console.log(">Indx val"+sessionId);
                   if(sessionId){
                     delSession(sessionId).then(()=>{
                         deleteSucess();
                         deleteSessionAPI(sessionId);
                      })
                   }
-                 
                   setDeleteModal(!deleteModal);
               }}>
               <Text style={styles.textStyle}>Delete</Text>

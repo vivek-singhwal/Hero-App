@@ -49,7 +49,7 @@ export default DeviceConnection = ({navigation})=>{
         }
         
         var listener = EventRegister.addEventListener('BLE_STATUS', (data) => {
-            console.log(">>BLE_STATUS ",data);
+            //console.log(">>BLE_STATUS ",data);
             if(data.event == "Data_Recieved"){
                 console.log(data.value);
               }
@@ -108,10 +108,9 @@ export default DeviceConnection = ({navigation})=>{
         <Image source={require('../asset/sprayDevice.png')} style={{alignSelf:"center",width:"100%",borderWidth:0.7,borderColor:"gray"}}/>
         <View style={{flexDirection:"row",justifyContent:"space-between",paddingBottom:10,marginTop:20}}>
             <Text style={{fontSize:18}}>Select sprayer</Text>
-            {/* {
-            <Animated.View style={{transform:[{ rotate: rotation }]}}>
-               <FontAwesome onPress={()=>refreshDeviceList()} name="refresh" size={22}/>
-            </Animated.View>}  */}
+            <TouchableOpacity onPress={()=>{navigation.navigate('HomePage')}} style={{paddingBottom:2}}>
+            <Text style={{fontSize:18, textDecorationLine:"underline",}}>Sessions</Text>
+            </TouchableOpacity>
         </View>
         <View style={{height:200,backgroundColor:"white",padding:15,paddingLeft:20,borderWidth:0.7,borderColor:"gray"}}> 
             <FlatList

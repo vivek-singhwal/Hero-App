@@ -820,7 +820,7 @@ export var getOperators = function () {
           'DELETE FROM operators where id=?',
           [id],
           (tx, results) => {
-            console.log('Results', results.rowsAffected);
+            //console.log('Results', results.rowsAffected);
             resolve(results);
           })
       })
@@ -838,7 +838,7 @@ export var getOperators = function () {
           'DELETE FROM sessions where id=?',
           [id],
           (tx, results) => {
-            console.log('Results', results.rowsAffected);
+            //console.log('Results', results.rowsAffected);
             resolve(results);
           })
       })
@@ -889,7 +889,7 @@ export var getOperators = function () {
           'UPDATE sessionData SET serverId=?,serverSessionId=?,isSync=1 where id=?',
           [serverId,severSessionId,id],
           (tx, results) => {
-            console.log('Results', results.rowsAffected);
+            //console.log('Results', results.rowsAffected);
             resolve(results);
           })
       })

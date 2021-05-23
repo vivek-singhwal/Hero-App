@@ -75,6 +75,7 @@ export default HomePage = ({ navigation })=>{
           setInitialTime(initTime);
           setElapsedTime(convertTime(Math.ceil(Math.abs(calTotalTime) / 1000)))
           // uncomment while build release
+          //setSessionList([]);
           setSessionList(listSession);
         }
       })
@@ -288,7 +289,7 @@ export default HomePage = ({ navigation })=>{
             stickyHeaderIndices={[0]}
             ListEmptyComponent={emptyList}
             ListHeaderComponent={sessionHeader}
-            keyExtractor={(item, index) => String(index)}
+            keyExtractor={(item, index) => String(item.id)}
             renderItem={({item,index})=>
             <Swipeable key={index} onSwipeableRightOpen={()=>{setSessionPassId(item.id);setTimeout(()=>setDeleteModal(true),300)}} renderRightActions={leftSwipe}>
             <TouchableOpacity onPress={()=>{
