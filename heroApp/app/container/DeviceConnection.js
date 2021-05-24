@@ -70,7 +70,6 @@ export default DeviceConnection = ({navigation})=>{
                 setisDeviceConnected(true);
                 setDeviceStatus("Connected");
               } else if(data.event == "bleDevices"){
-                  console.log(">>devices ",data.devices);
                   deviceListAr.push(data.devices);
                   var arrayUniqueByKey = [...new Map(deviceListAr.map(item =>
                     [item['id'], item])).values()];
@@ -191,6 +190,7 @@ export default DeviceConnection = ({navigation})=>{
                     name="keyboard-arrow-right"/>}
                 contentStyle={{flexDirection:"row-reverse",paddingTop:1,height:47,width:"90%",alignSelf:"center"}}
                 onPress={ async()=> {
+                  console.log("BluetoothStatus.state()::"+BluetoothStatus.state());
                   if(await BluetoothStatus.state()){
                     EventRegister.emit('BLECMD', { cmd: 'startScan' });
                   }else{

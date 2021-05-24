@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, StatusBar, NativeModules, NativeEventEmitter ,SafeAreaView,StyleSheet, Alert, TouchableHighlight,Modal, Image} from 'react-native';
+import { View, StatusBar, NativeModules, NativeEventEmitter ,SafeAreaView,StyleSheet, Alert, TouchableHighlight,TouchableOpacity, Modal, Image} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import TestPageAPI from './container/TestPageAPI';
@@ -47,13 +47,17 @@ const MessageModal = ({modalVisible,setModalVisible}) => {
         }}>
 
           <View style={styles.modalView}>
-            <Text style={styles.modalText}>Bluetooth is currently {'\n'} connected.</Text>
+           <AwesomeIcon name="exclamation-triangle"
+                        size={29}
+                        color="red"
+                      />
+            <Text style={styles.modalText}>Bluetooth is connected.</Text>
             <Text style={[styles.modalText]}>Would you like to disconnect ?</Text>
-        <View style={{flexDirection:"row",justifyContent:"space-between",marginTop:35,marginBottom:15}}>
+          <View style={{flexDirection:"row",justifyContent:"space-between",marginTop:35,marginBottom:15}}>
             <TouchableHighlight
               style={{ ...styles.openButton,backgroundColor: "#fff",marginRight:10 ,borderColor:'#012554',borderWidth:1}}
               onPress={() => {
-                EventRegister.emit('BLECMD',{cmd:'error'}) 
+                EventRegister.emit('BLECMD',{cmd:'doDisconnect'}) 
                 setModalVisible(!modalVisible);
               }}>
               <Text style={[styles.textStyle,{color:'#012554'}]}>Disconnect</Text>
@@ -72,14 +76,48 @@ const MessageModal = ({modalVisible,setModalVisible}) => {
   );
 };
 
+const BatteryModal = ({modalVisible,setModalVisible, batteryPercent}) => {
+  return (
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          //Alert.alert("Modal has been closed.");
+        }}>
 
+      <View
+        style={{
+          position: 'absolute',
+          width: '100%',
+          height: '100%',
+          justifyContent: 'center',
+          backgroundColor: 'rgba(100,100,100, 0.5)',
+          padding: 40,
+        }}>
+          <View style={styles.modalView}>
+           <AwesomeIcon name="battery-quarter" size={29} color="red" />
+            <Text style={styles.modalText}>Scout's battery is less than 10%</Text>
+            <Text style={[styles.modalText]}>Please charge or replace the sprayer battery soon.</Text>
+          <View style={{flexDirection:"row",justifyContent:"space-between",marginTop:35,marginBottom:15}}>
+            <TouchableHighlight
+              style={{ ...styles.openButton, width:'80%', backgroundColor: "#fff",marginRight:10 ,borderColor:'#012554',borderWidth:1}}
+              onPress={() => {
+                setModalVisible(!modalVisible);
+              }}>
+              <Text style={[styles.textStyle,{color:'#012554'}]}>Dismiss</Text>
+            </TouchableHighlight>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+};
 
 function App() {
-  // const rinseModalContext = { isRinseStart: false }
-  // const contextData = React.useContext(GlbContext);
-  // console.log(">>contextData ",contextData)
   const [isRinseStatus, setRinseStatus] = React.useState(false);
   const [modalVisible, setModalVisible] = React.useState(false);
+  const [batteryModalVisible, setBatteryModalVisible] = React.useState(false);
   const [alertModal, setAlertModal] = React.useState(false);
   const [rinseModal, setRingseModal] = React.useState(false);
   const [navigation, setNavigation] = React.useState({}); 
@@ -116,7 +154,7 @@ function App() {
                 }}>
                 <Text style={[styles.textStyle,{color:'#012554'}]}>Cancel</Text>
               </TouchableHighlight>
-              <TouchableHighlight
+              <TouchableOpacity
                 style={{ ...styles.openButton, backgroundColor: "#012554",paddingRight:25,paddingLeft:25 }}
                 onPress={() => {
                    disableInterval();
@@ -126,7 +164,7 @@ function App() {
                   navigation.navigate('HomePage')
                 }}>
                 <Text style={styles.textStyle}>Exit</Text>
-              </TouchableHighlight>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -188,11 +226,16 @@ function App() {
   </Modal>)
   }
   React.useEffect(()=>{
-      initDB('sessions').then((res)=>{});
+    initDB('sessions').then((res)=>{});
     initDB('sprayers').then((res)=>{});
     initDB('sessionData').then((res)=>{});
-   
-  })
+    let unsubscribe = EventRegister.addEventListener('BATTERY', (value) => {
+      setBatteryModalVisible(true);
+     });
+     return ()=>{
+      EventRegister.removeEventListener(unsubscribe);
+    } 
+  },[]);
   if(navigation && navigation.dangerouslyGetState && navigation.dangerouslyGetState().routes &&  navigation.dangerouslyGetState().routes[0].params){
     console.log(">>Inside if")
     setRingseModal(true);
@@ -208,6 +251,7 @@ function App() {
         }}
       >
     <MessageModal modalVisible={modalVisible} setModalVisible={setModalVisible}/>
+    <BatteryModal modalVisible={batteryModalVisible} setModalVisible={setBatteryModalVisible}/>
     <AlertModal modalVisible={alertModal} setModalVisible={setAlertModal}/>
     <StatusBar barStyle="dark-content" />
     <SafeAreaView></SafeAreaView>

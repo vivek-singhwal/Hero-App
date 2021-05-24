@@ -337,21 +337,20 @@ export var addOperator = function (data) {
           'INSERT INTO operators VALUES (?,?, ?, ?, ?,?)',
           [,data.serverId,data.opName,data.company,data.chemistryType,data.isSync],
           (tx, results) => {
-            // console.log('Results', results.rowsAffected);
+             console.log('Results', JSON.stringify(results));
             var success = "true";
             resolve(results);
               if (results.rowsAffected > 0) {
                 resolve(success);
               } else {
-                alert('Registration Failed');
+                //alert('Registration Failed');
               }
           }
         );
-        // alert("Complete")
       });
     }).catch(error => {
       console.log(error);
-    });;;
+    });
     return promise;
   }
 

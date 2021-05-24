@@ -1,5 +1,5 @@
 import React,{ useState } from 'react';
-import { View,  Text, TouchableOpacity,TouchableHighlight, TextInput as Input, Image,FlatList, Modal,StyleSheet} from 'react-native';
+import { View,  Text, TouchableOpacity,ScrollView,TouchableHighlight, TextInput as Input, Image,FlatList, Modal,StyleSheet} from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -14,9 +14,9 @@ export default SubSession =({locationText,setLocationText,commentText,setComment
 
     var getIndexVal=(index)=>{
       if(imageList.length == 3 || imageList.length == 6 || imageList.length == 9){
-        return imageList.length - 3 == index
+        return imageList.length - 3 == index;
       }else{
-        return imageList.length - 1 == index
+        return imageList.length - 1 == index;
       } 
     }
   
@@ -54,7 +54,7 @@ export default SubSession =({locationText,setLocationText,commentText,setComment
           .then(respImg => {
             // console.log(">response compressed  img ",respImg);
               let tempList = [...imageList];
-              tempList.push(respImg)
+              tempList.push(respImg.uri)
               setImageList(tempList);
           })
           .catch(err => {
@@ -63,7 +63,10 @@ export default SubSession =({locationText,setLocationText,commentText,setComment
         }
       });
     }
- 
+    
+    imageList.map((item)=>{
+      console.log("Image Item::"+JSON.stringify(item));
+    })
   return <>
     <View style={{padding:25}}>
        <Text style={{fontSize:17,color:"#4A4A4A",paddingBottom:5}}>Location*</Text>
@@ -80,7 +83,7 @@ export default SubSession =({locationText,setLocationText,commentText,setComment
             <TouchableOpacity
               activeOpacity={1}
               onPress={()=>inputBox.focus()}>
-              <View style={{borderColor:textFocused?'#012554':'gray',borderWidth:1.8,height:130,borderRadius:5}}>
+              <View style={{borderColor:textFocused?'#012554':'gray',borderWidth:1.8,height:100,borderRadius:5}}>
                     <Input
                         onFocus={()=> setTextFocused(true)}
                         onBlur={()=> setTextFocused(false)}
@@ -94,14 +97,14 @@ export default SubSession =({locationText,setLocationText,commentText,setComment
               </View>
             </TouchableOpacity>
             <Text style={{fontSize:17,color:"#4A4A4A",paddingBottom:10,paddingTop:15}}>Photos</Text>
-            <View style={{borderColor:textFocused?'#012554':'gray',borderWidth:1.8,height:450,borderRadius:5,padding:10}}>
+            <ScrollView style={{borderColor:textFocused?'#012554':'gray',borderWidth:1.8,height:320,borderRadius:5,padding:10}}>
             <FlatList
             scrollEnabled={false}
             numColumns={3}
             data={imageList}
             // data={Array.from(Array(12).keys())}
              ListEmptyComponent={emptyList}
-            keyExtractor={(item, index) => String(index)}
+            keyExtractor={(item, index) => String(item.id)}
             contentContainerStyle={{justifyContent: 'flex-start',width:"90%",}}
             renderItem={({item,index})=>
                 <View key={index} style={{width:"32%", margin:7,flexDirection: imageList.length == 3 || imageList.length == 6 || imageList.length == 9?'column':'row' }}>
@@ -118,8 +121,7 @@ export default SubSession =({locationText,setLocationText,commentText,setComment
                       name="circle-with-cross" 
                       size={25} 
                       style={{position:"absolute",top:-8, right:(imageList.length == 3 || imageList.length == 6 || imageList.length == 9)?0:-9 ,alignSelf:"flex-end",zIndex:1,backgroundColor:"#fff",borderRadius:15,overflow: 'hidden',}}/>
-                    <Image style={{width:85,height:90,borderColor:'#012554',borderWidth:1}} source={{uri:item.uri}}/>
-                    
+                    <Image style={{width:85,height:90,borderColor:'#012554',borderWidth:1}} source={{uri:item}}/>
                   </View>
                   { imageList.length < 12 && getIndexVal(index) && <TouchableOpacity onPress={()=>{
                     addImages()
@@ -130,8 +132,7 @@ export default SubSession =({locationText,setLocationText,commentText,setComment
                 </View>
            }
          />
-              
-            </View>
+            </ScrollView>
     </View>
     <Modal
         animationType="slide"
@@ -150,7 +151,6 @@ export default SubSession =({locationText,setLocationText,commentText,setComment
           backgroundColor: 'rgba(100,100,100, 0.5)',
           padding: 40,
         }}>
-
           <View style={styles.modalView}>
             <FontAwesome name="trash" size={30} color={'red'}/>
             <Text style={[styles.modalText,{fontSize:16}]}>Are you sure you want to {'\ndelete this Photo ?'}</Text>
@@ -167,7 +167,6 @@ export default SubSession =({locationText,setLocationText,commentText,setComment
             <TouchableHighlight
               style={{ ...styles.openButton, backgroundColor: "red",paddingRight:18, paddingLeft:18 }}
               onPress={() => {
-                    // console.log(">Indx val"+indexVal);
                     let tempList = [...imageList];
                     tempList.splice(indexVal,1);
                     setImageList(tempList);

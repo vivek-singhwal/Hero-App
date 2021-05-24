@@ -7,10 +7,10 @@ import BleService, {getInterval, getReadOk, setReadOk , getCurrentCmd,setCurrent
 import { predefinedSessionData,setPredefinedessionData ,
         setDeviceHWData,currentSessionData,setCurrentSessionData,
         getLocalSessionId,setBtStatus,
-         getSessionId, setSecondRead,secondRead,setDeviceData, setInternetConnection,currentReadData,setCurrentReadData} from '../services/DataService';
-import { addSessionDataAPI,addSessionAPI } from '../services/apiService';
+         getSessionId, setSecondRead,getSecondRead, secondRead,setDeviceData, setInternetConnection,currentReadData,setCurrentReadData} from '../services/DataService';
 import NetInfo from "@react-native-community/netinfo";
 import { addSessionDataDB } from '../services/DBService';
+import { apiEndPoint } from '../services/constants';
 
 const window = Dimensions.get('window');
 const BleManagerModule = NativeModules.BleManager;
@@ -18,7 +18,6 @@ const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
 var BLE_SPP_Service = BleService.bleService;
 var BLE_SPP_Notify_Characteristic = BleService.TXCharacteristic;
 var BLE_SPP_Write_Characteristic = BleService.RXCharacteristic;
-//var BLE_SPP_AT_Characteristic = BleService.UART;
 
 export default class BleAppmanager extends Component {
   constructor(props){
@@ -40,20 +39,10 @@ export default class BleAppmanager extends Component {
   sessionData = {};
   currentReadData=[]
   sessionStartTime = {};
-  // firstTimeRead = false;
-  
-  //  unsubscribe = NetInfo.addEventListener(state => {
-  //   console.log("Connection type", state.type);
-  //   console.log("Is connected?", state.isConnected);
-  //   console.log("Is isInternetReachable?", state.isInternetReachable);
-  //   if(state.isInternetReachable == false){
-  //     setInternetConnection(true);
-  //   }
-  // })
   
   componentDidMount() {
     NetInfo.configure({
-      reachabilityUrl: 'https://hero-api.kesemsolutions.com',
+      reachabilityUrl: apiEndPoint,
       reachabilityTest: async (response) => response.status === 204,
       reachabilityLongTimeout: 60 * 1000, // 60s
       reachabilityShortTimeout: 5 * 1000, // 5s
@@ -133,26 +122,6 @@ export default class BleAppmanager extends Component {
           sessionObjApi.timeStamp = Date.now();
           sessionObjApi.sessionId = getSessionId();
             this.writeData('getPumpTime\r');
-          //this.writeData('getPumpTime\r');
-          //   this.sessionData = {
-          //     "getBatteryLevel": "000",
-          //     "getESVState": "On",
-          //     "getFirmware": "1.20",
-          //     "getFlow": "00000000",
-          //     "getFlowRate": "00000000",
-          //     "getHWVersion": "Alpha0001",
-          //     "getModel": "V2020-SEP",
-          //     "getPumpState": "Off",
-          //     "getPumpTime": "00000000",
-          //     "getPumpedVolume": "00000360",
-          //     "getSerial": "2020-000001",
-          //     "getTriggerLatchMode": "Under Development",
-          //     "getUnitName": "2020-000001",
-          //     "resetPump": "OK",
-          //     "setUnitName": "OK",
-          //      "getTriggerLatchState":"TBD",
-          //     "updateFirmware": "Under Development"
-          // }
         var localSessionDtaObj = {};
         localSessionDtaObj.sessionData= JSON.stringify(sessionObjApi);
         localSessionDtaObj.isSync=0;
@@ -186,6 +155,10 @@ export default class BleAppmanager extends Component {
           peripherals.set(data.device.id, data.device);
           this.connect(data.device);
           }
+        else if (data.cmd == "doDisconnect"){
+          this.BleDisconnect();
+            //this.connect(BleService.getPeripherial());
+        } 
         else if (data.cmd == "disconnect"){
           this.connect(BleService.getPeripherial());
         } 
@@ -222,33 +195,21 @@ export default class BleAppmanager extends Component {
 
   //not working
   BleDisconnect(){
+    console.log("do BleDisconnect");
     BleManager.disconnect(BleService.getPeripherial().id)
         .then(() => {
-          //bleService.setPeripheral(null);
-          //EventRegister.emit('BLE_STATUS', { event: "disconnected" })
+          EventRegister.emit('BLE_STATUS', { event: "disconnected" });
+          setSecondRead(false); //for reset 
+          setReadOk(false); //for reset 
           console.log("Successfully Disconnected");
         })
         .catch((error) => {
-          // Failure code
           console.log(error);
         });
   }
   handleAppStateChange(nextAppState) {
     if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
       console.log('App has come to the foreground!',nextAppState)
-      // BleManager.getConnectedPeripherals([]).then((peripheralsArray) => {
-      //   console.log('Connected peripherals: ' + peripheralsArray.length);
-      //   var peripherals = this.state.peripherals;
-      //   if(peripheralsArray.length){
-      //     peripherals.connected = true;
-      //     peripherals.set(peripheralsArray[0].id, peripheralsArray[0]);
-      //     this.setState({peripherals});
-      //     EventRegister.emit('BLE_STATUS', { event: "connected" });
-      //     setTimeout(() => { 
-      //       this.writeData('getSerial\r');
-      //     }, 90);
-      //   }
-      // });
     }
     this.setState({appState: nextAppState});
   }
@@ -257,8 +218,6 @@ export default class BleAppmanager extends Component {
     this.handlerStop.remove();
     this.handlerDisconnect.remove();
     this.handlerUpdate.remove();
-    // this.unsubscribe();
-
   }
   handleDisconnectedPeripheral(data) {
     let peripherals = this.state.peripherals;
@@ -273,15 +232,13 @@ export default class BleAppmanager extends Component {
   }
   handleUpdateValueForCharacteristic(data) {
     if(getCurrentCmd() !=""){
-      //console.log(JSON.stringify(data))
       bleResults[getCurrentCmd()] = this.getStringFromAscii(data.value);
       this.sessionStartTime = Date.now();
       this.sessionData[getCurrentCmd().replace(/(\r\n|\n|\r)/gm, "")] = this.getStringFromAscii(data.value).replace(/(\r\n|\n|\r)/gm, "")
       this.currentReadData.push(this.currentReadData);
     }
     
-    // console.log("currentCMD: "+ getCurrentCmd(),initCmdSeq.indexOf(getCurrentCmd()));
-    if( !getReadOk() && initCmdSeq.indexOf(getCurrentCmd()) >= 0 && !secondRead) {
+     if( !getReadOk() && initCmdSeq.indexOf(getCurrentCmd()) >= 0 && !secondRead) {
       let cmdIndex = initCmdSeq.indexOf(getCurrentCmd());
       let nextCmd = initCmdSeq[cmdIndex +1];
       
@@ -294,29 +251,16 @@ export default class BleAppmanager extends Component {
         // firstTimeRead =true;
         setCurrentSessionData(this.sessionData);
         setPredefinedessionData(this.sessionData);
-        setCurrentReadData(this.currentReadData);
-        // clearInterval(this.readInterval);
-        // EventRegister.emit('StartInterval');
-        
+        setCurrentReadData(this.currentReadData);        
         this.sessionData = {};
         EventRegister.emit('BLE_STATUS', { event: "readOK" });
         EventRegister.emit('BLE_DATA', { event: "completed" });
-        // setDeviceData(JSON.parse(JSON.stringify(bleResults)));
         var batteryLevel = Number(bleResults['getBatteryLevel\r']);
-        console.log("Battery is:"+batteryLevel+":");
         if(!isNaN(batteryLevel) && batteryLevel < 11 && batteryLevel > 0 ){
-          Alert.alert("Low Battery", 
-          "Scout's battery is at 10%, Please charge or replace the sprayer battery soon.", [
-            {
-              text: "Dismiss",
-              onPress: () => console.log("Cancel Pressed"),
-              style: "cancel"
-            }
-          ]);
+          EventRegister.emit('BATTERY', { value:batteryLevel });
         }
       }
     }
-    //  console.log(">secondRead >",secondRead ,dataCmdSeq.indexOf(getCurrentCmd()),getCurrentCmd()) 
     if(secondRead && dataCmdSeq.indexOf(getCurrentCmd() >= 0)){
      // console.log(">secondRead >",dataCmdSeq.indexOf(getCurrentCmd()),getCurrentCmd())
       let cmdIndex = dataCmdSeq.indexOf(getCurrentCmd());
@@ -327,22 +271,17 @@ export default class BleAppmanager extends Component {
       }else{
         console.log('final result...');
         setReadOk(true);
-       
         // firstTimeRead =true;
         setCurrentSessionData(this.sessionData);
-        // clearInterval(this.readInterval);
-        // EventRegister.emit('StartInterval');
         this.sessionData = {};
         // setCurrentSessionData({});
         this.state.readSessionData = 0;
         EventRegister.emit('BLE_STATUS', { event: "readOK" });
         EventRegister.emit('BLE_DATA', { event: "completed" });
-        // setDeviceData(JSON.parse(JSON.stringify(bleResults)));
         console.log(JSON.stringify(bleResults));
       }
     }
-    EventRegister.emit('BLE_STATUS', 
-    { event: "Data_Recieved" , value:this.getStringFromAscii(data.value)});
+    EventRegister.emit('BLE_STATUS', { event: "Data_Recieved" , value:this.getStringFromAscii(data.value)});
   }
   handleStopScan() {
     console.log('Scan is stopped');
@@ -350,7 +289,6 @@ export default class BleAppmanager extends Component {
     this.setState({ scanning: false });
   }
   startScan() {
-    //console.log(">>>> "+BleService.getPeripherial().isConnectable);
     if (BleService.getPeripherial().isConnectable == undefined) {
       this.setState({ peripherals: new Map() });
       //scan for 20 seconds
@@ -366,7 +304,6 @@ export default class BleAppmanager extends Component {
     }
   }
   writeSingleData = function(writeCommand){
-    //console.log("write cmd >>>>"+writeCommand);
     var peripheral = BleService.getPeripherial();
     if(writeCommand != null){
        BleManager.retrieveServices(peripheral.id).then((peripheralInfo) => {
@@ -393,6 +330,7 @@ export default class BleAppmanager extends Component {
     }
   };
   writeData = (writeCommand) => {
+  console.log(">> writeData: "+writeCommand);
    setCurrentCmd(writeCommand);
    var peripheral = BleService.getPeripherial();
    if(this.state.btStatus){
@@ -451,9 +389,6 @@ export default class BleAppmanager extends Component {
       }
     });
   }
-/*
- {"advertising": {"isConnectable": true, "localName": "GhostBaster_V1", "manufacturerData": {"CDVType": "ArrayBuffer", "bytes": [Array], "data": "AgEGDwlHaG9zdEJhc3Rlcl9WMQUSZADoAwIKCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="}, "serviceData": {}, "serviceUUIDs": [], "txPowerLevel": 8}, "id": "00:80:E1:00:00:AA", "name": "GhostBaster_V1", "rssi": -66}
-*/
   handleDiscoverPeripheral(peripheral){
     //console.log("handleDiscoverPeripheral>>>"+peripheral.name)
     var peripherals = this.state.peripherals;
@@ -507,7 +442,7 @@ export default class BleAppmanager extends Component {
         });
         setTimeout(()=>{
           if(!deviceConnected){
-            //device must be removed after scan
+            //App must be reload after scan if not connected
             EventRegister.emit('BLE_STATUS', { event: "deviceNotAvaible" });
           }
         },2000)

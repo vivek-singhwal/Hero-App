@@ -5,7 +5,8 @@ import {getOperatorData,getDeviceData,getDeviceHWData, setDeviceHWData, currentS
 import DeleteSessionModal from './DeleteSessionModal';
 export default EditScreen = ({route, navigation}) =>{
     const { id } = route.params;
-    const [ session, setSession] = useState({id:"0",locationImages:["https://scout-bucket-images.s3.us-west-2.amazonaws.com/images/E88AD04F-08D3-43CF-BCDB-749EAA130D1B.jpg","https://scout-bucket-images.s3.us-west-2.amazonaws.com/images/E88AD04F-08D3-43CF-BCDB-749EAA130D1B.jpg"], sessionLocation: 'Helo',sessionComment:'fsdfkshdkfad', startTime:  Date.now(), endTime:  Date.now(), ozSparayed: parseInt(25)/29.57 })
+    const [ session, setSession] = useState(
+        {id:"0",locationImages:["https://scout-bucket-images.s3.us-west-2.amazonaws.com/images/E88AD04F-08D3-43CF-BCDB-749EAA130D1B.jpg","https://scout-bucket-images.s3.us-west-2.amazonaws.com/images/E88AD04F-08D3-43CF-BCDB-749EAA130D1B.jpg"], sessionLocation: 'Helo',sessionComment:'fsdfkshdkfad', startTime:  Date.now(), endTime:  Date.now(), ozSparayed: parseInt(25)/29.57 })
     const [deleteModal, setDeleteModal] = useState(false);
     useEffect(()=>{
         const unsubscribe = navigation.addListener('focus', () => {
@@ -41,10 +42,6 @@ export default EditScreen = ({route, navigation}) =>{
     return(<>
     <ScrollView>
     <View style={{flexDirection:"column",padding:15}}>
-        {/* <View style={{flexDirection:"row",justifyContent:"space-between"}}>
-            <Text style={{fontSize:18,fontWeight:"bold"}}>{session.sessionLocation}</Text>
-            <Text>{id}</Text>
-        </View> */}
          <View style={{flexDirection:"row",justifyContent:"space-between"}}>
                     <Text style={{fontSize:22,fontWeight:"bold"}}>{session.sessionLocation}</Text>
                     <TouchableOpacity onPress={()=>navigation.navigate('EditSession',{id:session.id,images: session.locationImages, comment: session.sessionComment, location:session.sessionLocation})} style={{fontSize:18}}> 
@@ -70,8 +67,7 @@ export default EditScreen = ({route, navigation}) =>{
                  <Text style={{paddingTop:15,fontSize:18,paddingBottom:7}}>
                      Comments
                  </Text>
-                
-                <View style={{borderColor:'#012554',borderWidth:1,height:130,borderRadius:5}}>
+                <View style={{borderColor:'#012554',borderWidth:1,height:100,borderRadius:5}}>
                     <TextInput
                         editable={false}
                         style={{padding:10,marginTop:5,fontSize:16}}
@@ -81,7 +77,7 @@ export default EditScreen = ({route, navigation}) =>{
                         // ref = {(input) => inputBox = input}
                     />
               </View>
-              <View style={{ borderColor:'#012554', borderWidth:1, height:450, borderRadius:5, padding:10 ,marginTop:15}}>
+              <ScrollView style={{ borderColor:'#012554', borderWidth:1, height:320, borderRadius:5, padding:10 ,marginTop:15}}>
             <FlatList
             scrollEnabled={false}
             numColumns={3}
@@ -97,7 +93,7 @@ export default EditScreen = ({route, navigation}) =>{
            }
          />
               
-            </View>
+            </ScrollView>
             <TouchableOpacity onPress={()=>setDeleteModal(true)} style={{ borderColor:"red",borderWidth:1, padding:10,marginBottom:10, marginTop:10}}>
                     <Text style={{ alignSelf:"center", color:"red", fontSize:18}}>Delete Session</Text>
             </TouchableOpacity>

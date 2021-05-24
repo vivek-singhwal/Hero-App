@@ -19,7 +19,6 @@ import Swipeable from 'react-native-gesture-handler/Swipeable';
 import DeleteSessionModal from './DeleteSessionModal';
 
 let setStartTime, setEndTime;
-
 export default HomePage = ({ navigation })=>{
     let currentRoute = useRoute().name;
     const [counter,setCounter] = useState(true);
@@ -39,6 +38,9 @@ export default HomePage = ({ navigation })=>{
     const [initialTime, setInitialTime] = useState("");
 
     function formatAMPM(date) {
+      if (date == null || date ==""){
+        return "";
+      }
       var hours = new Date(date).getHours();
       var minutes = new Date(date).getMinutes();
       var ampm = hours >= 12 ? 'PM' : 'AM';
@@ -52,6 +54,7 @@ export default HomePage = ({ navigation })=>{
      BackHandler.exitApp();
     }
     var getSessionDBList = ()=>{
+      console.log(">> getSessionDBList..");
       getSessions().then((resSessions)=>{
         var listSession = resSessions;
         let calTotalTime = 0;
@@ -68,11 +71,17 @@ export default HomePage = ({ navigation })=>{
             if(i == 0){
               initTime = listSession[i].startTime;
             }
-            ozSprayerd +=  parseFloat(listSession[i].ozSparayed).toFixed(2)
-            calTotalTime += parseInt(listSession[i].startTime) - parseInt(listSession[i].endTime); // get milisecond diff 
+            if(listSession[i].ozSparayed != null){
+              ozSprayerd =  parseFloat(ozSprayerd) + parseFloat(listSession[i].ozSparayed)
+            }
+            if(listSession[i].startTime != null && listSession[i].endTime){
+              calTotalTime += parseInt(listSession[i].endTime) - parseInt(listSession[i].startTime); // get milisecond diff       
+            }
           }
+          ozSprayerd = ozSprayerd.toFixed(2);
           setTotalOZ(ozSprayerd);
-          setInitialTime(initTime);
+          console.log("initTime 01"+initTime);
+          setInitialTime(formatAMPM(initTime));
           setElapsedTime(convertTime(Math.ceil(Math.abs(calTotalTime) / 1000)))
           // uncomment while build release
           //setSessionList([]);
@@ -135,7 +144,6 @@ export default HomePage = ({ navigation })=>{
       }
 
       let listner = EventRegister.addEventListener('BLE_DATA', (value) => {
-         console.log(">>BLE_STATUS ",value,readingStatus);
          if(value.event == 'completed' && readingStatus){
           // EventRegister.emit('StopInterval');
           // EventRegister.emit('BLECMD', { event: "homepageEvent" , cmd:'getSerial\r'})
@@ -197,7 +205,7 @@ export default HomePage = ({ navigation })=>{
       // console.log(">>Navigate ");
       setTimeout(()=>{
         navigation.navigate('HomePage');
-      },500);
+      },300);
     }
 
     var startReading=()=>{
@@ -263,7 +271,7 @@ export default HomePage = ({ navigation })=>{
       </View>
       <View style={{width:"33%",marginBottom:5}}>
           <Text style={{fontSize:16}}>Oz Sparayed</Text>
-          <Text style={{color:"#012554",fontSize:16}}>{totalOZ}</Text>
+          <Text style={{color:"#012554",fontSize:16}}>{totalOZ} Oz</Text>
       </View>
      </View>
     </View>
@@ -291,22 +299,22 @@ export default HomePage = ({ navigation })=>{
             ListHeaderComponent={sessionHeader}
             keyExtractor={(item, index) => String(item.id)}
             renderItem={({item,index})=>
-            <Swipeable key={index} onSwipeableRightOpen={()=>{setSessionPassId(item.id);setTimeout(()=>setDeleteModal(true),300)}} renderRightActions={leftSwipe}>
+            <Swipeable key={index} onSwipeableRightOpen={()=>{setSessionPassId(item.id);setTimeout(()=>setDeleteModal(true),200)}} renderRightActions={leftSwipe}>
             <TouchableOpacity onPress={()=>{
               navigation.navigate('SessionDetail',{id:item.id})
             }} 
              key={index} style={{height:80,backgroundColor:item.isRinse == 1? item.isFinished ==  1?'red':'green':item.isFinished == 0?'#484848':item.sessionLocation?'#fff':'#a3780b',width:"97%",alignSelf:"center",borderColor:'#012554',borderWidth:1,padding:10,marginBottom:10,borderRadius:50,marginTop:5}}>
               {/* <Text style={{color:'#012554',fontSize:18,fontWeight:"bold",textTransform:'capitalize',marginStart:15,paddingBottom:4}}>{item.sessionLocation?item.sessionLocation:'Incomplete session'}</Text> */}
                 <View style={{justifyContent:"space-between",flexDirection:'row'}}>
-                  <View style={{flexDirection:"row",alignSelf:"center"}}>
+                  <View style={{flexDirection:"row",alignSelf:"center", maxWidth:120}}>
                   {item.locationImages != null ? <Image source={{uri: item.locationImages[0] }} style={{height:60,width:60,borderRadius:60,alignSelf:"center"}}/>:<View style={{height:60,width:30,alignSelf:"center"}}/>} 
                     <Text style={{color:'#012554',fontSize:18,fontWeight:"bold",textTransform:'capitalize',marginStart:15,paddingBottom:4,alignSelf:"center"}}>{item.sessionLocation?item.sessionLocation:'Incomplete session'}</Text>
                   </View>
                    <View style={{flexDirection:"row",alignSelf:"center"}}>
                    
                    {item.isRinse ?<View/>:<View>
-                    <Text style={{color:'#012554',fontSize:15,alignSelf:"center"}}>{formatAMPM(item.startTime)} - </Text>
-                    <Text style={{color:'#012554',fontSize:15,alignSelf:"center"}}>{formatAMPM(item.endTime)}</Text></View>}
+                    <Text style={{color:'#012554',fontSize:16,alignSelf:"center", padding:3}}>{formatAMPM(item.startTime)} - {formatAMPM(item.endTime)}</Text>
+                    </View>}
 
                     <Material 
                       style={{alignSelf:"center"}}
@@ -314,16 +322,6 @@ export default HomePage = ({ navigation })=>{
                       color={'#012554'}
                       name="keyboard-arrow-right"/>
                   </View>
-                  
-                {/*  {item.isRinse ?<View/>:<View>
-                    <Text style={{color:'#012554',fontSize:13}}>Time elapsed</Text>
-                    <Text style={{color:'#012554',fontSize:13}}>{item.endTime ? convertTime(Math.ceil(Math.abs(new Date(item.startTime).getTime()-new Date(item.endTime).getTime()) / 1000)):'00:00:00 '}</Text>
-                  </View>}
-
-                  <View>
-                    <Text style={{color:'#012554',fontSize:13}}>{item.isRinse?'Date':'Oz sprayed'}</Text>
-                    <Text style={{color:'#012554',fontSize:13}}>{item.isRinse? new Date(item.startTime).toLocaleDateString():item.ozSparayed != null ? parseFloat(item.ozSparayed).toFixed(2)+' Oz':'0.00 Oz'}</Text>
-                  </View> */}
                 </View>
              </TouchableOpacity>
              </Swipeable>
@@ -339,7 +337,7 @@ export default HomePage = ({ navigation })=>{
             </View>
           <View style={{bottom:70,}}>
             {currentRoute == "HomePageRinse"? 
-            <TouchableHighlight 
+            <TouchableOpacity 
             style={[styles.circle,{justifyContent:"center",marginTop:19}]}
             onPress={() => {
                  navigation.navigate('Dashboard')
@@ -350,14 +348,12 @@ export default HomePage = ({ navigation })=>{
               size={45}
               color={'#D8D8D8'}
               style={{alignSelf:"center",paddingLeft:"5%"}}/>
-             
-            </TouchableHighlight>:readingStatus ?
-            <TouchableHighlight 
+            </TouchableOpacity>:readingStatus ?
+            <TouchableOpacity 
             disabled={locationText.length < 3}
             style={[styles.circle,{justifyContent:"center",marginTop:19}]}
             onPress={() => {
                   setEndTime = Date.now()
-                  console.log(">>end ",setEndTime);
                   setReadStatus(false);
                   setReadingStatus(false);
                   appContext.doChangeRinseStatus(false);
@@ -368,13 +364,12 @@ export default HomePage = ({ navigation })=>{
               size={45}
               color={'#D8D8D8'}
               style={{alignSelf:"center",paddingLeft:"2%"}}/>
-            </TouchableHighlight>
+            </TouchableOpacity>
            :
-            <TouchableHighlight 
+            <TouchableOpacity 
             style={[styles.circle,{justifyContent:"center",marginTop:19}]}
             onPress={() => {
               setStartTime = Date.now()
-              console.log(">>start ",setStartTime);
               startReading();
               appContext.doChangeRinseStatus(true);
               setReadStatus(true);
@@ -388,7 +383,7 @@ export default HomePage = ({ navigation })=>{
               size={50}
               color={'#D8D8D8'}
               style={{alignSelf:"center",paddingLeft:"7%"}}/>
-            </TouchableHighlight>
+            </TouchableOpacity>
            }
           </View>
           <View style={{marginTop:"10%",width:"30%"}}>

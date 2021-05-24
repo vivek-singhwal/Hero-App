@@ -10,7 +10,7 @@ export default function Home({navigation}){
   useEffect(()=>{
       var listener = EventRegister.addEventListener('BLE_STATUS', (data) => {
       if(data.event == "Data_Recieved"){
-        console.log(data.value);
+        console.log("Data_Recieved"+data.value);
       }
       if(data.event == "connected"){
         setisDeviceConnected(true);
@@ -25,7 +25,7 @@ export default function Home({navigation}){
           if(deviceStatus == "Scanning..."){
             setDeviceStatus("");
           }
-        },10000)
+        },5000)
       }else if(data.event == "disconnected"){
         setDefaultValue();
         setisDeviceConnected(false);

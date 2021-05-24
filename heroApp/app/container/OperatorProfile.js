@@ -9,6 +9,7 @@ import { getOperators, initDB , addOperator } from '../services/DBService';
 import { setOperatorData } from '../services/DataService';
 import RNPickerSelect from 'react-native-picker-select';
 import BleStatusModal from './BleStatusModal';
+import { BluetoothStatus } from 'react-native-bluetooth-status';
 const BleManagerModule = NativeModules.BleManager;
 const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
 import BleManager from 'react-native-ble-manager';
@@ -67,8 +68,10 @@ export default OperatorProfile= ({navigation}) =>{
       }
     }
     var addRecord = async ()=>{
+      
       setLoading(true);
       if(opName.length > 2 && opCompany.length > 2){
+        console.log(">>addRecord");
         var operatorObj = {
           opName: opName,
           company: opCompany,
@@ -257,7 +260,6 @@ const styles = StyleSheet.create({
     textAlign: "center"
   },
   openButton: {
-    backgroundColor: "#F194FF",
     borderRadius: 4,
     padding: 10,
     elevation: 2
