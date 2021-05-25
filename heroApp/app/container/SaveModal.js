@@ -69,16 +69,6 @@ import ImageResizer from 'react-native-image-resizer';
           <ScrollView keyboardShouldPersistTaps='never'>
             <View style={{flexDirection:"column"}}>
             <Text style={{fontSize:17,color:"#4A4A4A",paddingBottom:5}}>Upload spread area picture</Text>
-{/*       <Input
-                        onFocus={()=> setTextFocused(true)}
-                        onBlur={()=> setTextFocused(false)}
-                        placeholder={'Where did you spray?'}
-                        style={{padding:10,marginTop:5,fontSize:16,borderWidth:1,paddingRight:10,borderColor:'#012554',borderRadius:4}}
-                        // multiline={true}
-                        defaultValue={locationText}
-                        onChangeText={text => setLocationText(text)}
-                        // ref = {(input) => this.input = input}
-                    /> */}
             <TouchableOpacity onPress={()=>openlaunchCamera()} style={{flexDirection:"row",justifyContent:"space-between",padding:10,marginTop:5,fontSize:16,borderWidth:1,paddingRight:10,borderColor:'#012554',borderRadius:4}}>
                 <Text style={{alignSelf:"center",fontSize:18}}>Capture image</Text>
                 <MaterialCom 
@@ -122,7 +112,6 @@ import ImageResizer from 'react-native-image-resizer';
                 }}>
               Back
             </Button>
-             
              <Button 
               color={'#012554'}
               mode={'contained'}
@@ -141,7 +130,6 @@ import ImageResizer from 'react-native-image-resizer';
               >
                End
              </Button>
-
           </View>
           </ScrollView>
           </Modal>

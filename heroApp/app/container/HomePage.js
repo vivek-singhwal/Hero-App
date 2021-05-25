@@ -143,7 +143,7 @@ export default HomePage = ({ navigation })=>{
         setCounter(false);
       }
 
-      let listner = EventRegister.addEventListener('BLE_DATA', (value) => {
+      let listener = EventRegister.addEventListener('BLE_DATA', (value) => {
          if(value.event == 'completed' && readingStatus){
           // EventRegister.emit('StopInterval');
           // EventRegister.emit('BLECMD', { event: "homepageEvent" , cmd:'getSerial\r'})
@@ -154,7 +154,7 @@ export default HomePage = ({ navigation })=>{
         });
 
       return ()=>{
-        EventRegister.removeEventListener(listner);
+        EventRegister.removeEventListener(listener);
         BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
         unsubscribe;
     }  
@@ -164,7 +164,6 @@ export default HomePage = ({ navigation })=>{
       disableInterval();
       EventRegister.emit('StopInterval');
       KeepAwake.deactivate();
-      // sessionDataList.push({location:'abc',comment:'',serverId:'0',startTime:this.sessionStartTime,endTime:Date.now()});
       var dbImageLocation = [];
       imageList.map(item=>{
         dbImageLocation.push(item.path); //db is capturing image path
@@ -181,12 +180,8 @@ export default HomePage = ({ navigation })=>{
           sessionLocation: locationText,
           sessionComment: commentText,
           locationImages: dbImageLocation.length ? JSON.stringify(dbImageLocation) :'', // set images after this session.
-          // sessionData: JSON.stringify(currentSessionData),
           id: getLocalSessionId(),
           isSync: 0,
-          // isFinished:1,
-          // isRinse:0,
-          // appVersion:"1.1",
       } 
       sessionListAr.push({id:getLocalSessionId(),locationImages:sessionObj.locationImages ,sessionLocation: locationText, startTime: setStartTime, endTime: setEndTime, ozSparayed: parseInt(currentSessionData.getPumpedVolume)/29.57 })
       sessionListAr = sessionListAr.sort((a,b)=> b.startTime - a.startTime)
@@ -205,7 +200,7 @@ export default HomePage = ({ navigation })=>{
       // console.log(">>Navigate ");
       setTimeout(()=>{
         navigation.navigate('HomePage');
-      },300);
+      },100);
     }
 
     var startReading=()=>{
@@ -252,8 +247,8 @@ export default HomePage = ({ navigation })=>{
   }
     const leftSwipe = (progress, dragX) => {
      return (
-        <TouchableOpacity style={{backgroundColor:"#ff9999",width:"50%",borderRadius:50,height:80, marginTop:5}} >
-            <AwesomeIcon name="trash" style={{alignSelf:"flex-end",paddingTop:20, paddingRight:15}} size={30} color={'red'}/>
+        <TouchableOpacity style={{backgroundColor:"#ff9999",width:"30%",borderRadius:50,height:80, marginTop:5}} >
+            <AwesomeIcon name="trash" style={{alignSelf:"flex-end",paddingTop:20, paddingRight:40}} size={30} color={'red'}/>
          </TouchableOpacity>
       );
     };
@@ -299,7 +294,10 @@ export default HomePage = ({ navigation })=>{
             ListHeaderComponent={sessionHeader}
             keyExtractor={(item, index) => String(item.id)}
             renderItem={({item,index})=>
-            <Swipeable key={index} onSwipeableRightOpen={()=>{setSessionPassId(item.id);setTimeout(()=>setDeleteModal(true),200)}} renderRightActions={leftSwipe}>
+            <Swipeable key={index} 
+              onSwipeableRightOpen={()=>{ setSessionPassId(item.id); 
+              setTimeout(()=>setDeleteModal(true),200)}} 
+              renderRightActions={leftSwipe}>
             <TouchableOpacity onPress={()=>{
               navigation.navigate('SessionDetail',{id:item.id})
             }} 
@@ -375,9 +373,6 @@ export default HomePage = ({ navigation })=>{
               setReadStatus(true);
               setReadingStatus(true);
               navigation.navigate('SesstionStart');
-            // if(readingStatus){
-            //   showModal();
-            //  }
              }}>
               <AwesomeIcon name={"play"} 
               size={50}

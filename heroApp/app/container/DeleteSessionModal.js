@@ -22,16 +22,14 @@ export default DeleteSessionModal = ({deleteSucess,sessionId,deleteModal,setDele
           backgroundColor: 'rgba(100,100,100, 0.5)',
           padding: 40,
         }}>
-
           <View style={styles.modalView}>
             <AwesomeIcon name="trash" size={30} color={'red'}/>
             <Text style={[styles.modalText,{fontSize:16}]}>Are you sure you want to {'\ndelete this session ?'}</Text>
             <Text style={[styles.modalText,{fontSize:16}]}>{'This cannot be undone.'}</Text>
-        <View style={{flexDirection:"row", justifyContent:"space-between", marginTop:35, marginBottom:15}}>
+            <View style={{flexDirection:"row", justifyContent:"space-between", marginTop:35, marginBottom:15}}>
             <TouchableHighlight
               style={{ ...styles.openButton,backgroundColor: "#fff",marginRight:10 ,borderColor:'#012554',borderWidth:1}}
               onPress={() => {
-                // EventRegister.emit('BLECMD',{cmd:'disconnect'}) 
                 setDeleteModal(!deleteModal);
               }}>
               <Text style={[styles.textStyle,{color:'#012554'}]}>Cancel</Text>
