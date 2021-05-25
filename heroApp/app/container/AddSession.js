@@ -115,7 +115,6 @@ export default SubSession =({locationText,setLocationText,commentText,setComment
                         tempList.splice(index,1);
                         setImageList(tempList);
                         setIndexVal(index);
-                        setTimeout(()=> setModalVisible(true),300);
                       }} 
                       name="circle-with-cross" 
                       size={25} 

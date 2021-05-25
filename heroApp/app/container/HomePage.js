@@ -159,7 +159,6 @@ export default HomePage = ({ navigation })=>{
     },[]);
     
     var addSessionList = (comment,location)=>{
-      console.log(">> addSessionList..");
       disableInterval();
       EventRegister.emit('StopInterval');
       KeepAwake.deactivate();
@@ -169,6 +168,10 @@ export default HomePage = ({ navigation })=>{
         dbImageLocation.push(item); //db is capturing image path
       })
       var sessionListAr = [...sessionList];
+      var newRecordId = getLocalSessionId();
+      if(newRecordId == ""){
+        newRecordId = Date.now()+"";
+      }
       var sessionObj = {
           // serverId:0,
           operatorId: getOperatorData().serverId,
@@ -180,20 +183,18 @@ export default HomePage = ({ navigation })=>{
           sessionLocation: locationText,
           sessionComment: commentText,
           locationImages: dbImageLocation.length ? JSON.stringify(dbImageLocation) :'', // set images after this session.
-          id: getLocalSessionId(),
+          id: newRecordId,
           isSync: 0,
       } 
       sessionListAr.push({id:getLocalSessionId(),locationImages:sessionObj.locationImages ,sessionLocation: locationText, startTime: setStartTime, endTime: setEndTime, ozSparayed: parseInt(currentSessionData.getPumpedVolume)/29.57 })
       sessionListAr = sessionListAr.sort((a,b)=> b.startTime - a.startTime)
-      console.log("sessionListAr::",sessionListAr);
       setSessionList(sessionListAr); // 
       // update location,comment and endtime in sessions data.
       updateSessions(sessionObj).then((respUpdateSession)=>{
         console.log(">>Update session ",respUpdateSession);
       });
       
-      console.log(">>imageList 000"+JSON.stringify(imageList))
-      AsyncStorage.setItem(String(getLocalSessionId()),JSON.stringify(imageList));  
+      AsyncStorage.setItem(String(newRecordId),JSON.stringify(imageList));  
       setCommentText('');
       setLocationText('');
       setLocationImg('');
@@ -208,7 +209,6 @@ export default HomePage = ({ navigation })=>{
       KeepAwake.activate();
       console.log(">>getLocalSessionId() ",getOperatorData(),getDeviceHWData());
      var sessionObj = {
-      // serverId:0,
       operatorId: getOperatorData().serverId,
       sprayerId: getDeviceHWData().serverId,
       chemistryType: getOperatorData().chemistryType,
