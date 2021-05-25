@@ -225,6 +225,8 @@ export default class BleAppmanager extends Component {
     if (peripheral) {
       peripheral.connected = false;
       peripherals.set(peripheral.id, peripheral);
+      setSecondRead(false); //for reset 
+      setReadOk(false); //for reset 
       this.setState({peripherals});
     }
     console.log('Disconnected from ' + data.peripheral);
