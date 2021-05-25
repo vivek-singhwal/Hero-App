@@ -10,7 +10,7 @@ import {getReadingStatus, setReadingStatus, sessionDataList,getOperatorData , ge
          currentSessionData, setLocalSessionId, getLocalSessionId} from '../services/DataService';
 import SaveModal from './SaveModal';
 import { EventRegister } from 'react-native-event-listeners';
-import { initDB, addSession, getSessions, updateSessions, getSessionWithParam ,getDashboardSessions } from '../services/DBService';
+import { initDB, addSession, getSessionsDisplay, updateSessions, getSessionWithParam ,getDashboardSessions } from '../services/DBService';
 import { enableInterval, disableInterval } from '../services/BleService';
 import KeepAwake from 'react-native-keep-awake';
 import AppContext from "../AppContext";
@@ -20,6 +20,7 @@ import DeleteSessionModal from './DeleteSessionModal';
 
 let setStartTime, setEndTime;
 export default HomePage = ({ navigation })=>{
+    var listSession = [];
     let currentRoute = useRoute().name;
     const [counter,setCounter] = useState(true);
     const [visible, setVisible] = useState(false);
@@ -29,7 +30,7 @@ export default HomePage = ({ navigation })=>{
     const [locationImg, setLocationImg] = useState('');
     const [commentText, setCommentText] = useState('');
     const [imageList, setImageList] = useState([]);
-    const [sessionList,setSessionList] = useState(sessionDataList);
+    const [sessionList,setSessionList] = useState(listSession);
     const hideModal = () => setVisible(false);
     const [readingStatus,setReadStatus] = useState(getReadingStatus());
     const appContext = useContext(AppContext);
@@ -54,9 +55,13 @@ export default HomePage = ({ navigation })=>{
      BackHandler.exitApp();
     }
     var getSessionDBList = ()=>{
-      console.log(">> getSessionDBList..");
-      getSessions().then((resSessions)=>{
-        var listSession = resSessions;
+      console.log(">> getSessionDBList..99999");
+      getSessionsDisplay().then((resSessions)=>{
+        listSession.length = 0; //clean array
+        resSessions.map((item)=>{
+          listSession.push(item);
+        })
+        listSession = resSessions;
         let calTotalTime = 0;
         let initTime = "";
         let ozSprayerd = 0;
@@ -67,6 +72,8 @@ export default HomePage = ({ navigation })=>{
             }
             if(listSession[i].locationImages !=undefined && listSession[i].locationImages != null){
               listSession[i]['locationImages'] = JSON.parse(listSession[i]['locationImages']);
+            }else{
+              listSession[i].locationImages = [];
             }
             if(i == 0){
               initTime = listSession[i].startTime;
@@ -80,12 +87,10 @@ export default HomePage = ({ navigation })=>{
           }
           ozSprayerd = ozSprayerd.toFixed(2);
           setTotalOZ(ozSprayerd);
-          console.log("initTime 01"+initTime);
           setInitialTime(formatAMPM(initTime));
           setElapsedTime(convertTime(Math.ceil(Math.abs(calTotalTime) / 1000)))
-          // uncomment while build release
-          //setSessionList([]);
           setSessionList(listSession);
+          //Error: Invalid key - must be at least one character.  Key: 
         }
       })
     }
@@ -105,7 +110,6 @@ export default HomePage = ({ navigation })=>{
           setReadStatus(false);
         }
       });
-      if(counter){
         initDB('sessions').then((res)=>{
           if(currentRoute == "Dashboard"){
             getDashboardSessions().then((resSessions)=>{
@@ -115,9 +119,8 @@ export default HomePage = ({ navigation })=>{
               let initTime = "";
               let ozSprayerd = 0;
               if(resSessions){
-                for(let i=0;i<listSession.length;i++){
-                  // console.log(">>resSessions ",resSessions);
-                  if(listSession[i].sessionData != undefined && listSession[i].sessionData != null){
+               for(let i=0;i<listSession.length;i++){
+                   if(listSession[i].sessionData != undefined && listSession[i].sessionData != null){
                     listSession[i]['sessionData'] = JSON.parse(listSession[i]['sessionData']);
                   }
                   if(listSession[i].locationImages != undefined && listSession[i].locationImages != null){
@@ -136,13 +139,8 @@ export default HomePage = ({ navigation })=>{
               }
               // setSessionList(listSession);
             })
-          }else{
-            getSessionDBList();
           } 
         });
-        setCounter(false);
-      }
-
       let listener = EventRegister.addEventListener('BLE_DATA', (value) => {
          if(value.event == 'completed' && readingStatus){
           // EventRegister.emit('StopInterval');
@@ -156,17 +154,19 @@ export default HomePage = ({ navigation })=>{
       return ()=>{
         EventRegister.removeEventListener(listener);
         BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
-        unsubscribe;
+        unsubscribe();
     }  
     },[]);
     
     var addSessionList = (comment,location)=>{
+      console.log(">> addSessionList..");
       disableInterval();
       EventRegister.emit('StopInterval');
       KeepAwake.deactivate();
       var dbImageLocation = [];
       imageList.map(item=>{
-        dbImageLocation.push(item.path); //db is capturing image path
+        console.log("item::",item);
+        dbImageLocation.push(item); //db is capturing image path
       })
       var sessionListAr = [...sessionList];
       var sessionObj = {
@@ -185,13 +185,14 @@ export default HomePage = ({ navigation })=>{
       } 
       sessionListAr.push({id:getLocalSessionId(),locationImages:sessionObj.locationImages ,sessionLocation: locationText, startTime: setStartTime, endTime: setEndTime, ozSparayed: parseInt(currentSessionData.getPumpedVolume)/29.57 })
       sessionListAr = sessionListAr.sort((a,b)=> b.startTime - a.startTime)
+      console.log("sessionListAr::",sessionListAr);
       setSessionList(sessionListAr); // 
       // update location,comment and endtime in sessions data.
       updateSessions(sessionObj).then((respUpdateSession)=>{
         console.log(">>Update session ",respUpdateSession);
       });
       
-      console.log(">>imageList "+JSON.stringify(imageList))
+      console.log(">>imageList 000"+JSON.stringify(imageList))
       AsyncStorage.setItem(String(getLocalSessionId()),JSON.stringify(imageList));  
       setCommentText('');
       setLocationText('');
@@ -206,16 +207,12 @@ export default HomePage = ({ navigation })=>{
     var startReading=()=>{
       KeepAwake.activate();
       console.log(">>getLocalSessionId() ",getOperatorData(),getDeviceHWData());
-    
      var sessionObj = {
       // serverId:0,
       operatorId: getOperatorData().serverId,
       sprayerId: getDeviceHWData().serverId,
       chemistryType: getOperatorData().chemistryType,
       startTime: setStartTime,
-      // endTime: setEndTime,
-      // sessionLocation: locationText,
-      // sessionComment: commentText,
       sessionData: JSON.stringify(currentSessionData),
       ozSparayed: parseInt(currentSessionData.getFlowRate)/29.57,
       isSync: 0,
@@ -294,14 +291,14 @@ export default HomePage = ({ navigation })=>{
             ListHeaderComponent={sessionHeader}
             keyExtractor={(item, index) => String(item.id)}
             renderItem={({item,index})=>
-            <Swipeable key={index} 
+            <Swipeable key={index +item.id} 
               onSwipeableRightOpen={()=>{ setSessionPassId(item.id); 
               setTimeout(()=>setDeleteModal(true),200)}} 
               renderRightActions={leftSwipe}>
             <TouchableOpacity onPress={()=>{
               navigation.navigate('SessionDetail',{id:item.id})
             }} 
-             key={index} style={{height:80,backgroundColor:item.isRinse == 1? item.isFinished ==  1?'red':'green':item.isFinished == 0?'#484848':item.sessionLocation?'#fff':'#a3780b',width:"97%",alignSelf:"center",borderColor:'#012554',borderWidth:1,padding:10,marginBottom:10,borderRadius:50,marginTop:5}}>
+             key={index+"30"} style={{height:80,backgroundColor:item.isRinse == 1? item.isFinished ==  1?'red':'green':item.isFinished == 0?'#484848':item.sessionLocation?'#fff':'#a3780b',width:"97%",alignSelf:"center",borderColor:'#012554',borderWidth:1,padding:10,marginBottom:10,borderRadius:50,marginTop:5}}>
               {/* <Text style={{color:'#012554',fontSize:18,fontWeight:"bold",textTransform:'capitalize',marginStart:15,paddingBottom:4}}>{item.sessionLocation?item.sessionLocation:'Incomplete session'}</Text> */}
                 <View style={{justifyContent:"space-between",flexDirection:'row'}}>
                   <View style={{flexDirection:"row",alignSelf:"center", maxWidth:120}}>

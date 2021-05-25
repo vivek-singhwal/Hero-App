@@ -19,10 +19,8 @@ export default EditScreen = ({route, navigation}) =>{
                 setSession(resSession[0]);
             });
           });
-        return ()=>{
-            unsubscribe;
-        }  
-    })
+        return unsubscribe;
+    },[]);
 
     function formatAMPM(date) {
         var hours = new Date(date).getHours();

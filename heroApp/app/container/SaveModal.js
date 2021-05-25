@@ -16,7 +16,6 @@ import ImageResizer from 'react-native-image-resizer';
   //  const [imageUri,setImageUri] = useState('');
     const containerStyle = {backgroundColor: 'white', padding: 20};
    var openlaunchCamera = () => {
-     console.log("Here")
       let options = {
         
         storageOptions: {
@@ -25,12 +24,11 @@ import ImageResizer from 'react-native-image-resizer';
         },
       };
       launchImageLibrary(options,(response)=>{
-        console.log('Response = ', response);
 
       })
       // return
       launchCamera(options, (response) => {
-        console.log('Response = ', response);
+        console.log('Response = 03', response);
         setIsClickable(false);
         if (response.didCancel) {
           console.log('User cancelled image picker');
@@ -40,12 +38,10 @@ import ImageResizer from 'react-native-image-resizer';
           console.log('User tapped custom button: ', response.customButton);
           alert(response.customButton);
         } else {
-          console.log(">Resp",JSON.stringify(response));
           ImageResizer.createResizedImage(response.uri, 1000, 1000, 'JPEG', 50)
           .then(respImg => {
             // console.log(">response compressed  img ",respImg);
             uploadImage(respImg).then((resp)=>{
-                console.log(">Re  sp",JSON.stringify(resp));
                 if(resp.image){
                   let imageuri = resp.image.replace('/opt/data/','');
                 // setImageUri(imageuri);
@@ -133,7 +129,6 @@ import ImageResizer from 'react-native-image-resizer';
           </View>
           </ScrollView>
           </Modal>
-         
         </Portal>
       </Provider>
     );

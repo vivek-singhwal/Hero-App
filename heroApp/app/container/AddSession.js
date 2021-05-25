@@ -24,8 +24,8 @@ export default SubSession =({locationText,setLocationText,commentText,setComment
       return(
        <TouchableOpacity onPress={()=>{ addImages() }} 
           style={{borderColor:'#012554',borderWidth:1,width:95,height:90,justifyContent:"center"}}>
-                <MaterialIcons name="add" color={'#012554'} size={35} style={{alignSelf:"center"}}/>
-              </TouchableOpacity>
+            <MaterialIcons name="add" color={'#012554'} size={35} style={{alignSelf:"center"}}/>
+        </TouchableOpacity>
       )
     }
   
@@ -39,7 +39,7 @@ export default SubSession =({locationText,setLocationText,commentText,setComment
      
       // return
       launchCamera(options, (response) => {
-        console.log('Response = ', response);
+        console.log('Response = 01 ', response);
         // setIsClickable(false);
         if (response.didCancel) {
           // console.log('User cancelled image picker');
@@ -52,7 +52,7 @@ export default SubSession =({locationText,setLocationText,commentText,setComment
           // console.log(">Resp",JSON.stringify(response));
           ImageResizer.createResizedImage(response.uri, 1000, 1000, 'JPEG', 50)
           .then(respImg => {
-            // console.log(">response compressed  img ",respImg);
+             console.log(">response compressed  img ",respImg);
               let tempList = [...imageList];
               tempList.push(respImg.uri)
               setImageList(tempList);
@@ -63,10 +63,11 @@ export default SubSession =({locationText,setLocationText,commentText,setComment
         }
       });
     }
-    
-    imageList.map((item)=>{
-      console.log("Image Item::"+JSON.stringify(item));
-    })
+    if(imageList != null && typeof imageList.map != 'undefined' ){
+      imageList.map((item)=>{
+        console.log("Image Item::"+JSON.stringify(item));
+      });
+    }
   return <>
     <View style={{padding:25}}>
        <Text style={{fontSize:17,color:"#4A4A4A",paddingBottom:5}}>Location*</Text>
@@ -102,21 +103,19 @@ export default SubSession =({locationText,setLocationText,commentText,setComment
             scrollEnabled={false}
             numColumns={3}
             data={imageList}
-            // data={Array.from(Array(12).keys())}
-             ListEmptyComponent={emptyList}
-            keyExtractor={(item, index) => String(item.id)}
+            ListEmptyComponent={emptyList}
+            keyExtractor={(item, index) => String(item.id + index)}
             contentContainerStyle={{justifyContent: 'flex-start',width:"90%",}}
             renderItem={({item,index})=>
                 <View key={index} style={{width:"32%", margin:7,flexDirection: imageList.length == 3 || imageList.length == 6 || imageList.length == 9?'column':'row' }}>
                   <View>
                     <Entypo color={'gray'} 
                     onPress={()=>{
-                        // let tempList = [...imageList];
-                        // tempList.splice(index,1);
-                        // setImageList(tempList);
+                        let tempList = [...imageList];
+                        tempList.splice(index,1);
+                        setImageList(tempList);
                         setIndexVal(index);
                         setTimeout(()=> setModalVisible(true),300);
-                        // console.log(">Hello",imageList);
                       }} 
                       name="circle-with-cross" 
                       size={25} 
@@ -125,7 +124,6 @@ export default SubSession =({locationText,setLocationText,commentText,setComment
                   </View>
                   { imageList.length < 12 && getIndexVal(index) && <TouchableOpacity onPress={()=>{
                     addImages()
-                    
                   }} style={(imageList.length == 3 || imageList.length == 6 || imageList.length == 9)?{marginTop:15,borderColor:'#012554',borderWidth:1,width:85,height:90,justifyContent:"center"}:{marginLeft:22,borderColor:'#012554',borderWidth:1,width:85,height:90,justifyContent:"center"}}>
                       <MaterialIcons name="add" color={'#012554'} size={35} style={{alignSelf:"center"}}/>
                     </TouchableOpacity>}

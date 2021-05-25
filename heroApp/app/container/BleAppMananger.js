@@ -330,7 +330,7 @@ export default class BleAppmanager extends Component {
     }
   };
   writeData = (writeCommand) => {
-  console.log(">> writeData: "+writeCommand);
+  //console.log(">> writeData: "+writeCommand);
    setCurrentCmd(writeCommand);
    var peripheral = BleService.getPeripherial();
    if(this.state.btStatus){
@@ -356,9 +356,6 @@ export default class BleAppmanager extends Component {
    }else{
      console.log("Command null");
    }
-   }else{
-     console.log(">>Bt not connected.")
-      // EventRegister.emit('BLE_STATUS', { event: "error"});
    }
   }
   turnOnBle() {
@@ -368,8 +365,6 @@ export default class BleAppmanager extends Component {
     }).catch((error) => {
       // Failure code
       console.log("The user refuse to enable bluetooth");
-      // EventRegister.emit('BLE_STATUS', { event: "error"});
-      //Alert.alert("Scout App", "Please turn your bluetooth on.")
     });
   }
   retrieveConnected(){

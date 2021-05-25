@@ -64,7 +64,8 @@ export var setPredefinedessionData=(data)=>{
 }
 
 export var currentSessionData = {};
-export var sessionDataList = [/*
+export var sessionDataList = [];
+/*
     {id:"0",locationImages:["https://scout-bucket-images.s3.us-west-2.amazonaws.com/images/E88AD04F-08D3-43CF-BCDB-749EAA130D1B.jpg"], sessionLocation: 'Helo', startTime:  Date.now(), endTime:  Date.now(), ozSparayed: parseInt(25)/29.57 },
     {id:"1",locationImages:["https://scout-bucket-images.s3.us-west-2.amazonaws.com/images/E88AD04F-08D3-43CF-BCDB-749EAA130D1B.jpg"], sessionLocation: 'Helo', startTime:  Date.now(), endTime:  Date.now(), ozSparayed: parseInt(25)/29.57 },
     {id:"2",locationImages:["https://scout-bucket-images.s3.us-west-2.amazonaws.com/images/E88AD04F-08D3-43CF-BCDB-749EAA130D1B.jpg"], sessionLocation: 'Helo', startTime:  Date.now(), endTime:  Date.now(), ozSparayed: parseInt(25)/29.57 },
@@ -76,7 +77,6 @@ export var sessionDataList = [/*
     {id:"8",locationImages:["https://scout-bucket-images.s3.us-west-2.amazonaws.com/images/E88AD04F-08D3-43CF-BCDB-749EAA130D1B.jpg"], sessionLocation: 'Helo', startTime:  Date.now(), endTime:  Date.now(), ozSparayed: parseInt(25)/29.57 },
     {id:"9",locationImages:["https://scout-bucket-images.s3.us-west-2.amazonaws.com/images/E88AD04F-08D3-43CF-BCDB-749EAA130D1B.jpg"], sessionLocation: 'Helo', startTime:  Date.now(), endTime:  Date.now(), ozSparayed: parseInt(25)/29.57 }
 */
-];
 export var currentReadData = [];
 
 export var setCurrentReadData=(data)=>{

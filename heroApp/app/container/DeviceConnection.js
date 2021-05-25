@@ -51,7 +51,7 @@ export default DeviceConnection = ({navigation})=>{
         var listener = EventRegister.addEventListener('BLE_STATUS', (data) => {
             //console.log(">>BLE_STATUS ",data);
             if(data.event == "Data_Recieved"){
-                console.log(data.value);
+                //console.log("Data_Recieved:",data.value);
               }
              
               if(data.event == "error"){
@@ -127,7 +127,7 @@ export default DeviceConnection = ({navigation})=>{
                         </TouchableOpacity>
                     );
                   }}
-                keyExtractor={(item) => item.id}
+                keyExtractor={(item) => String(item.id)}
                 extraData={selectedId}
         />
         </View>
@@ -282,7 +282,8 @@ const styles = StyleSheet.create({
       marginTop: 10,
     },
     item: {
-      marginVertical: 8,
+      marginVertical: 12,
+      minWidth:300
     },
     title: {
       fontSize: 18,

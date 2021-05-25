@@ -98,7 +98,7 @@ export default OfflineSync = () =>{
              
           }
         })
-         console.log(">>imageList "+imageList);
+         console.log(">>imageList 01"+imageList);
        }
     
   }

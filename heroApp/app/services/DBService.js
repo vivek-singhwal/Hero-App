@@ -16,16 +16,6 @@ var openCB=()=> {
   }
 
 let db = sqlite.openDatabase({ name: 'heroDatabase.db' });
-
-// var initDB = (tableName) =>{
-//     console.log(">>tableName",tableName);
-//    return new Promise((resolve)=>{
-//    db.transaction((tx) => {
-//      tx.executeSql('CREATE TABLE IF NOT EXISTS operator (id INTEGER(10) AUTOINCREMENT PRIMARY KEY NOT NULL,serverId VARCHAR(25), name VARCHAR(25),company VARCHAR(25),chemistry VARCHAR(25))');
-//      resolve(db);
-//     })
-//   })
-// }
 export var initDB = (reqTable) => {
     sqlite.DEBUG(false);
     sqlite.enablePromise(true);
@@ -652,7 +642,7 @@ export var getOperators = function () {
   }
 
   export var updateSessionsDetail = function (objSession) {
-    // console.log("getOperators");
+    console.log("updateSessionsDetail....",objSession);
     let promise = new Promise((resolve, reject) => {
         db.executeSql(
             'UPDATE sessions SET sessionLocation=?,sessionComment=?,isSync=?, locationImages=? where id=?',[objSession.sessionLocation,objSession.sessionComment,objSession.isSync,objSession.locationImages,objSession.id]).then(
@@ -725,6 +715,30 @@ export var getOperators = function () {
     let promise = new Promise((resolve, reject) => {
         db.executeSql(
             'SELECT * FROM sessions ORDER BY startTime desc').then(
+          (results) => {
+              var records = [];
+            // console.log(">>Inside getOperators",results)
+            if(results[0].rows.length){
+                for (let i = 0; i < results[0].rows.length; ++i){
+                    records.push(results[0].rows.item(i))
+                    // console.log(">>results ",i,)
+                }
+            }
+            resolve(records);
+          }
+        )
+    }).catch(error => {
+      console.log(error);
+    });;
+    return promise;
+  }
+
+
+  export var getSessionsDisplay = function () {
+    // console.log("getSessions");
+    let promise = new Promise((resolve, reject) => {
+        db.executeSql(
+            'SELECT id,operatorId,locationImages,isRinse,isSync,isFinished,startTime,endTime,chemistryType,serverId,sessionLocation,sprayerId FROM sessions ORDER BY startTime desc').then(
           (results) => {
               var records = [];
             // console.log(">>Inside getOperators",results)

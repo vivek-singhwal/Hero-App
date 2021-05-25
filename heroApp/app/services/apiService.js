@@ -37,13 +37,32 @@ export var checkConnection = () => {
                 return result.result;
             },
             (error) => {
-                console.log(">>Error checkConnection ", error)
+                console.log(">>Error checkNetworkConnection API ", error)
                 return error;
             }
         )
 }
 
 export var uploadImage = (images) => {
+    console.log("uploadImag start 001 ",images);
+    var imagesObj = []; 
+	if(images != null && typeof(images.map) == 'function' 
+		&& images.length > 0 && typeof (images[0]) == 'string')   {
+        images.map((imageItem)=>{
+            if(typeof(imageItem) == 'string'){
+                if(imageItem.startsWith("file://")){
+                    let image = {};
+                	image.path = imageItem.substr(7);
+                	image.uri = imageItem;
+                	let lastIndex = imageItem.lastIndexOf("/");
+                	image.name = imageItem.substr(lastIndex + 1); 
+                	imagesObj.push(image);
+                }
+            }
+        })
+    }else{
+        imagesObj = images;
+    }
     /*
         {
         fieldname: 'demo_image',
@@ -57,13 +76,12 @@ export var uploadImage = (images) => {
         }
     */
         const data = new FormData();
-
         // data.append("demo_image", { uri: image.uri, name: image.name, type: 'image/jpeg' });
-        for (const file of images) {
+        for (const file of imagesObj) {
+            console.log("file::",file)
             // data.append('files[]', file, file.name);
             data.append("demo_image", { uri: file.uri, name: file.name, type: 'image/jpeg' });
           }
-    // console.log(">Form data ",data,image)
     return fetch(apiEndPoint+'/api/sessions/upload-image?90', {
             body: data,
             method: "POST",
@@ -72,11 +90,11 @@ export var uploadImage = (images) => {
         .then(res =>  res.json())
         .then(
             (result) => {
-                // console.log("result ",result)
+                 console.log("result ",result)
                 return result;
             },
             (error) => {
-                console.log(">>Error checkConnection ", error)
+                console.log(">>Error checkConnection uploadImage:", error)
                 return error;
             }
         )
