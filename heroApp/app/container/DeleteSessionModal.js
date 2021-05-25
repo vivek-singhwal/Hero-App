@@ -1,5 +1,5 @@
 import React,{ useState } from 'react';
-import { View , StyleSheet, Text, Modal, TextInput as Input,TouchableHighlight } from 'react-native';
+import { View , StyleSheet, Text, Modal, TextInput as Input,TouchableHighlight, TouchableOpacity } from 'react-native';
 import AwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import {delSession} from '../services/DBService';
 import {deleteSessionAPI} from '../services/apiService';
@@ -27,14 +27,14 @@ export default DeleteSessionModal = ({deleteSucess,sessionId,deleteModal,setDele
             <Text style={[styles.modalText,{fontSize:16}]}>Are you sure you want to {'\ndelete this session ?'}</Text>
             <Text style={[styles.modalText,{fontSize:16}]}>{'This cannot be undone.'}</Text>
             <View style={{flexDirection:"row", justifyContent:"space-between", marginTop:35, marginBottom:15}}>
-            <TouchableHighlight
+            <TouchableOpacity
               style={{ ...styles.openButton,backgroundColor: "#fff",marginRight:10 ,borderColor:'#012554',borderWidth:1}}
               onPress={() => {
                 setDeleteModal(!deleteModal);
               }}>
               <Text style={[styles.textStyle,{color:'#012554'}]}>Cancel</Text>
-            </TouchableHighlight>
-            <TouchableHighlight
+            </TouchableOpacity>
+            <TouchableOpacity
               style={{ ...styles.openButton, backgroundColor: "red",paddingRight:18, paddingLeft:18 }}
               onPress={() => {
                   if(sessionId){
@@ -46,7 +46,7 @@ export default DeleteSessionModal = ({deleteSucess,sessionId,deleteModal,setDele
                   setDeleteModal(!deleteModal);
               }}>
               <Text style={styles.textStyle}>Delete</Text>
-            </TouchableHighlight>
+            </TouchableOpacity>
           </View>
         </View>
       </View>

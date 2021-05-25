@@ -42,7 +42,7 @@ const MessageModal = ({modalVisible,setModalVisible}) => {
           width: '100%',
           height: '100%',
           justifyContent: 'center',
-          backgroundColor: 'rgba(100,100,100, 0.5)',
+          backgroundColor: 'rgba(100,100,100, 100)',
           padding: 40,
         }}>
 
@@ -54,21 +54,21 @@ const MessageModal = ({modalVisible,setModalVisible}) => {
             <Text style={styles.modalText}>Bluetooth is connected.</Text>
             <Text style={[styles.modalText]}>Would you like to disconnect ?</Text>
           <View style={{flexDirection:"row",justifyContent:"space-between",marginTop:35,marginBottom:15}}>
-            <TouchableHighlight
+            <TouchableOpacity
               style={{ ...styles.openButton,backgroundColor: "#fff",marginRight:10 ,borderColor:'#012554',borderWidth:1}}
               onPress={() => {
                 EventRegister.emit('BLECMD',{cmd:'doDisconnect'}) 
                 setModalVisible(!modalVisible);
               }}>
               <Text style={[styles.textStyle,{color:'#012554'}]}>Disconnect</Text>
-            </TouchableHighlight>
-            <TouchableHighlight
+            </TouchableOpacity>
+            <TouchableOpacity
               style={{ ...styles.openButton, backgroundColor: "#012554" }}
               onPress={() => {
                 setModalVisible(!modalVisible);
               }}>
               <Text style={styles.textStyle}>Cancel</Text>
-            </TouchableHighlight>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -146,14 +146,14 @@ function App() {
               <Text style={[styles.modalText,{fontSize:16}]}>Exit without saving ?</Text>
               <Text style={[styles.modalText,{fontSize:16}]}>This session will not be saved.</Text>
           <View style={{flexDirection:"row", justifyContent:"space-between", marginTop:35, marginBottom:15}}>
-              <TouchableHighlight
+              <TouchableOpacity
                 style={{ ...styles.openButton,backgroundColor: "#fff",marginRight:10 ,borderColor:'#012554',borderWidth:1}}
                 onPress={() => {
                  
                   setModalVisible(!modalVisible);
                 }}>
                 <Text style={[styles.textStyle,{color:'#012554'}]}>Cancel</Text>
-              </TouchableHighlight>
+              </TouchableOpacity>
               <TouchableOpacity
                 style={{ ...styles.openButton, backgroundColor: "#012554",paddingRight:25,paddingLeft:25 }}
                 onPress={() => {
@@ -197,13 +197,13 @@ function App() {
           <Text style={[styles.modalText]}>Time to do rinse cycle !</Text>
           <Image style={{height:150,width:150,marginTop:20}} source={require('./asset/spray-icon.png')}/>
       <View style={{flexDirection:"row",marginTop:35,marginBottom:15}}>
-          <TouchableHighlight
+          <TouchableOpacity
             style={{ ...styles.openButton,backgroundColor: "#fff",marginRight:10 ,borderColor:'#012554',borderWidth:1}}
             onPress={() => {
               setModalVisible(false);
             }}>
             <Text style={[styles.textStyle,{color:'#012554',}]}>Cancel</Text>
-          </TouchableHighlight>
+          </TouchableOpacity>
           <Button
           style={{justifyContent:"center",width:"40%",paddingStart:5}}
           color={'#012554'}
@@ -264,7 +264,7 @@ function App() {
     <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }}/>
     <Stack.Screen name="RinseProcess" component={RinseProcess} options={{ headerShown: false }}/>
     <Stack.Screen name="SessionDetail" component={SessionDetail} options={({navigation})=>({ title: 'SCOUT',headerTitleStyle:{fontWeight:"bold",fontSize:25,},headerLeft: ()=>
-          <TouchableHighlight onPress={()=>{
+          <TouchableOpacity onPress={()=>{
               navigation.navigate('HomePage')
               // setAlertModal(true);
           }}>
@@ -272,10 +272,10 @@ function App() {
                 <Entypo name="chevron-left" size={25} style={{alignSelf:"center"}}/>
                <Text style={{color:"#012554",fontSize:19,textAlign:"center"}}>Back</Text>
             </View>
-          </TouchableHighlight>
+          </TouchableOpacity>
           })}/>
       <Stack.Screen name="EditSession" component={EditSession} options={({navigation})=>({ title: 'SCOUT',headerTitleStyle:{fontWeight:"bold",fontSize:25,},headerLeft: ()=>
-          <TouchableHighlight onPress={()=>{
+          <TouchableOpacity onPress={()=>{
               navigation.navigate('SessionDetail')
               // setAlertModal(true);
           }}>
@@ -283,7 +283,7 @@ function App() {
                 <Entypo name="chevron-left" size={25} style={{alignSelf:"center"}}/>
                <Text style={{color:"#012554",fontSize:19,textAlign:"center"}}>Back</Text>
             </View>
-          </TouchableHighlight>
+          </TouchableOpacity>
           })}/>
     <Stack.Screen name="DeviceConnection" component={DeviceConnection} options={{ title: 'SCOUT', headerTitleStyle:{fontWeight:"bold",fontSize:25,},headerBackTitleVisible:false,headerLeft: ()=> null }}/>
     <Stack.Screen 
@@ -399,7 +399,7 @@ function App() {
           headerBackTitleVisible:true,
           headerTitleStyle: {fontSize:24,color:"#012554",fontWeight:"bold",fontStyle:"italic"},
           headerLeft: (()=>
-          <TouchableHighlight onPress={()=>{
+          <TouchableOpacity onPress={()=>{
             setNavigation(navigation);
             setTimeout(()=>setAlertModal(true),300)
           }}>
@@ -407,7 +407,7 @@ function App() {
                 <Entypo name="chevron-left" size={25} style={{alignSelf:"center"}}/>
                <Text style={{color:"#012554",fontSize:19,textAlign:"center"}}>Exit</Text>
             </View>
-          </TouchableHighlight>
+          </TouchableOpacity>
           ),
           headerLeftContainerStyle:{paddingLeft:10},
           headerStyle:{height:50}
