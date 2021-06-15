@@ -96,6 +96,7 @@ export default HomePage = ({ navigation })=>{
     }
 
     useEffect(()=>{
+      
       if(!getIsDeviceConnected()){
         // only show db if not connected
         getSessionDBList();
@@ -160,8 +161,15 @@ export default HomePage = ({ navigation })=>{
           BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
           unsubscribe();
       }  
-      }
+      
 
+    
+    
+    
+    
+    
+    
+      }
     },[]);
     
     var addSessionList = (comment,location)=>{
@@ -300,7 +308,7 @@ export default HomePage = ({ navigation })=>{
        </TouchableOpacity>:readingStatus ?
        <TouchableOpacity 
        disabled={locationText.length < 3}
-       style={[styles.circle,{justifyContent:"center",marginTop:19}]}
+       style={[styles.circle,{ backgroundColor: "#E9A2AD",justifyContent:"center",marginTop:19}]}
        onPress={() => {
              setEndTime = Date.now()
              setReadStatus(false);
@@ -312,7 +320,7 @@ export default HomePage = ({ navigation })=>{
          <AwesomeIcon name={"stop"} 
          size={45}
          // color={'#D8D8D8'}
-         color={'#D8D8D8'}
+         color={'#D3455B'}
          style={{alignSelf:"center",paddingLeft:"2%"}}/>
        </TouchableOpacity>
      :
