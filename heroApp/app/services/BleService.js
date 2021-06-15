@@ -222,5 +222,14 @@ service.diconnectDevice = function(){
     }
 };
 
+var isDeviceConnected = false;
+
+export var getIsDeviceConnected = () => {
+    return isDeviceConnected;
+}
+
+export var setIsDeviceConnected = (val) => {
+    isDeviceConnected = val;
+}
 export default service;
 

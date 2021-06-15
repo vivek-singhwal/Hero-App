@@ -11,7 +11,7 @@ import {getReadingStatus, setReadingStatus, sessionDataList,getOperatorData , ge
 import SaveModal from './SaveModal';
 import { EventRegister } from 'react-native-event-listeners';
 import { initDB, addSession, getSessionsDisplay, updateSessions, getSessionWithParam ,getDashboardSessions } from '../services/DBService';
-import { enableInterval, disableInterval } from '../services/BleService';
+import { enableInterval, disableInterval,getIsDeviceConnected } from '../services/BleService';
 import KeepAwake from 'react-native-keep-awake';
 import AppContext from "../AppContext";
 import SubSession from './AddSession';
@@ -96,66 +96,72 @@ export default HomePage = ({ navigation })=>{
     }
 
     useEffect(()=>{
-      BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
-      if(currentRoute == "SesstionStart" && readingStatus){
-        setReadingStatus(false);
-      }
-      const unsubscribe = navigation.addListener('focus', () => {
-        // do something
-        // console.log(">>currentRoute "+currentRoute);
-        if(currentRoute == "HomePage"){
-          getSessionDBList();
+      if(!getIsDeviceConnected()){
+        // only show db if not connected
+        getSessionDBList();
+      }else{
+        BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
+        if(currentRoute == "SesstionStart" && readingStatus){
           setReadingStatus(false);
-          appContext.doChangeRinseStatus(false);
-          setReadStatus(false);
         }
-      });
-        initDB('sessions').then((res)=>{
-          if(currentRoute == "Dashboard"){
-            getDashboardSessions().then((resSessions)=>{
-              // console.log(">>Res ",resSessions);
-              var listSession = resSessions;
-              let calTotalTime = 0;
-              let initTime = "";
-              let ozSprayerd = 0;
-              if(resSessions){
-               for(let i=0;i<listSession.length;i++){
-                   if(listSession[i].sessionData != undefined && listSession[i].sessionData != null){
-                    listSession[i]['sessionData'] = JSON.parse(listSession[i]['sessionData']);
+        const unsubscribe = navigation.addListener('focus', () => {
+          // do something
+          // console.log(">>currentRoute "+currentRoute);
+          if(currentRoute == "HomePage"){
+            getSessionDBList();
+            setReadingStatus(false);
+            appContext.doChangeRinseStatus(false);
+            setReadStatus(false);
+          }
+        });
+          initDB('sessions').then((res)=>{
+            if(currentRoute == "Dashboard"){
+              getDashboardSessions().then((resSessions)=>{
+                // console.log(">>Res ",resSessions);
+                var listSession = resSessions;
+                let calTotalTime = 0;
+                let initTime = "";
+                let ozSprayerd = 0;
+                if(resSessions){
+                 for(let i=0;i<listSession.length;i++){
+                     if(listSession[i].sessionData != undefined && listSession[i].sessionData != null){
+                      listSession[i]['sessionData'] = JSON.parse(listSession[i]['sessionData']);
+                    }
+                    if(listSession[i].locationImages != undefined && listSession[i].locationImages != null){
+                      listSession[i]['locationImages'] = JSON.parse(listSession[i]['locationImages']);
+                    }
+                    if(i == 0){
+                      initTime = listSession[i].startTime;
+                    }
+                    ozSprayerd +=  parseFloat(listSession[i].ozSparayed).toFixed(2)
+                    calTotalTime += parseInt(listSession[i].startTime) - parseInt(listSession[i].endTime); // get milisecond diff 
                   }
-                  if(listSession[i].locationImages != undefined && listSession[i].locationImages != null){
-                    listSession[i]['locationImages'] = JSON.parse(listSession[i]['locationImages']);
-                  }
-                  if(i == 0){
-                    initTime = listSession[i].startTime;
-                  }
-                  ozSprayerd +=  parseFloat(listSession[i].ozSparayed).toFixed(2)
-                  calTotalTime += parseInt(listSession[i].startTime) - parseInt(listSession[i].endTime); // get milisecond diff 
+                  setTotalOZ(ozSprayerd);
+                  setInitialTime(initTime);
+                  setElapsedTime(convertTime(Math.ceil(Math.abs(calTotalTime) / 1000)))
+                  setSessionList(listSession);
                 }
-                setTotalOZ(ozSprayerd);
-                setInitialTime(initTime);
-                setElapsedTime(convertTime(Math.ceil(Math.abs(calTotalTime) / 1000)))
-                setSessionList(listSession);
-              }
-              // setSessionList(listSession);
-            })
-          } 
-        });
-      let listener = EventRegister.addEventListener('BLE_DATA', (value) => {
-         if(value.event == 'completed' && readingStatus){
-          // EventRegister.emit('StopInterval');
-          // EventRegister.emit('BLECMD', { event: "homepageEvent" , cmd:'getSerial\r'})
-         }
-         if(value.event == 'error'){
-            EventRegister.emit('BLE_STATUS', { event: "disconnected" })
-         }
-        });
+                // setSessionList(listSession);
+              })
+            } 
+          });
+        let listener = EventRegister.addEventListener('BLE_DATA', (value) => {
+           if(value.event == 'completed' && readingStatus){
+            // EventRegister.emit('StopInterval');
+            // EventRegister.emit('BLECMD', { event: "homepageEvent" , cmd:'getSerial\r'})
+           }
+           if(value.event == 'error'){
+              EventRegister.emit('BLE_STATUS', { event: "disconnected" })
+           }
+          });
+  
+        return ()=>{
+          EventRegister.removeEventListener(listener);
+          BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
+          unsubscribe();
+      }  
+      }
 
-      return ()=>{
-        EventRegister.removeEventListener(listener);
-        BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
-        unsubscribe();
-    }  
     },[]);
     
     var addSessionList = (comment,location)=>{
@@ -268,7 +274,70 @@ export default HomePage = ({ navigation })=>{
      </View>
     </View>
   }
-    
+   var footerView = () => {
+     if(!getIsDeviceConnected()){
+       return null;
+     } else{  
+       return           <View style={{backgroundColor:"#C8C8C8", width:"100%",flexDirection:"row",justifyContent:"space-around",position:"absolute",bottom:0}}>
+       <View style={{marginTop:"10%",width:"33%"}}>
+         <Button
+         icon={props=><Feather size={35} name="settings-sharp" onPress={()=>{navigation.navigate('SettingPage')}}
+         />}/>
+       </View>
+     <View style={{bottom:70,}}>
+       {currentRoute == "HomePageRinse"? 
+       <TouchableOpacity 
+       style={[styles.circle,{justifyContent:"center",marginTop:19}]}
+       onPress={() => {
+           navigation.navigate('Dashboard')
+         }}
+       >
+         <Feather 
+         name={"ios-open-outline"} 
+         size={45}
+         color={'#D8D8D8'}
+         style={{alignSelf:"center",paddingLeft:"5%"}}/>
+       </TouchableOpacity>:readingStatus ?
+       <TouchableOpacity 
+       disabled={locationText.length < 3}
+       style={[styles.circle,{justifyContent:"center",marginTop:19}]}
+       onPress={() => {
+             setEndTime = Date.now()
+             setReadStatus(false);
+             setReadingStatus(false);
+             appContext.doChangeRinseStatus(false);
+             addSessionList(commentText, locationText);
+             // showModal();
+         }}>
+         <AwesomeIcon name={"stop"} 
+         size={45}
+         // color={'#D8D8D8'}
+         color={'#D8D8D8'}
+         style={{alignSelf:"center",paddingLeft:"2%"}}/>
+       </TouchableOpacity>
+     :
+       <TouchableOpacity 
+       style={[styles.circle,{justifyContent:"center",marginTop:19}]}
+       onPress={() => {
+         setStartTime = Date.now()
+         startReading();
+         appContext.doChangeRinseStatus(true);
+         setReadStatus(true);
+         setReadingStatus(true);
+         navigation.navigate('SesstionStart');
+       }}>
+         <AwesomeIcon name={"play"} 
+         size={50}
+         color={'#D8D8D8'}
+         style={{alignSelf:"center",paddingLeft:"7%"}}/>
+       </TouchableOpacity>
+     }
+     </View>
+     <View style={{marginTop:"10%",width:"30%"}}>
+   </View>
+ </View>
+     }
+   } 
     var emptyList=()=>{
       return( <View style={{backgroundColor:"#012554",padding:35}}>
       <Text style={{color:"#fff",alignSelf:"center",fontSize:18,paddingBottom:5}}>Your spray history will show up here.</Text>
@@ -278,7 +347,7 @@ export default HomePage = ({ navigation })=>{
     return(<>
     <View style={{height:"100%"}}>
       <View style={{flex:1,flexDirection:"column",height:"100%",backgroundColor:"#fff"}}>
-          <View style={{height:"85%"}}>
+          <View style={getIsDeviceConnected()?{height:"85%"}:{height:"100%"}}>
           {currentRoute == "SesstionStart" ? 
             <ScrollView>
               <SubSession locationText={locationText} setLocationText={setLocationText} commentText={commentText} setCommentText={setCommentText} imageList={imageList} setImageList={setImageList}/>
@@ -324,64 +393,8 @@ export default HomePage = ({ navigation })=>{
          />
          }
           </View>
-          <View style={{backgroundColor:"#C8C8C8", width:"100%",flexDirection:"row",justifyContent:"space-around",position:"absolute",bottom:0}}>
-            <View style={{marginTop:"10%",width:"33%"}}>
-              <Button
-              icon={props=><Feather size={35} name="settings-sharp" onPress={()=>{navigation.navigate('SettingPage')}}
-              />}/>
-            </View>
-          <View style={{bottom:70,}}>
-            {currentRoute == "HomePageRinse"? 
-            <TouchableOpacity 
-            style={[styles.circle,{justifyContent:"center",marginTop:19}]}
-            onPress={() => {
-                 navigation.navigate('Dashboard')
-              }}
-            >
-              <Feather 
-              name={"ios-open-outline"} 
-              size={45}
-              color={'#D8D8D8'}
-              style={{alignSelf:"center",paddingLeft:"5%"}}/>
-            </TouchableOpacity>:readingStatus ?
-            <TouchableOpacity 
-            disabled={locationText.length < 3}
-            style={[styles.circle,{justifyContent:"center",marginTop:19}]}
-            onPress={() => {
-                  setEndTime = Date.now()
-                  setReadStatus(false);
-                  setReadingStatus(false);
-                  appContext.doChangeRinseStatus(false);
-                  addSessionList(commentText, locationText);
-                  // showModal();
-              }}>
-              <AwesomeIcon name={"stop"} 
-              size={45}
-              color={'#D8D8D8'}
-              style={{alignSelf:"center",paddingLeft:"2%"}}/>
-            </TouchableOpacity>
-           :
-            <TouchableOpacity 
-            style={[styles.circle,{justifyContent:"center",marginTop:19}]}
-            onPress={() => {
-              setStartTime = Date.now()
-              startReading();
-              appContext.doChangeRinseStatus(true);
-              setReadStatus(true);
-              setReadingStatus(true);
-              navigation.navigate('SesstionStart');
-             }}>
-              <AwesomeIcon name={"play"} 
-              size={50}
-              color={'#D8D8D8'}
-              style={{alignSelf:"center",paddingLeft:"7%"}}/>
-            </TouchableOpacity>
-           }
-          </View>
-          <View style={{marginTop:"10%",width:"30%"}}>
-        </View>
-      </View>
-    </View>
+          { footerView()}
+         </View>
   </View>
   <DeleteSessionModal deleteSucess={()=>{ getSessionDBList();}} sessionId={sessionPassId} deleteModal={deleteModal} setDeleteModal={setDeleteModal}/>
   <SaveModal locationImg={locationImg} setLocationImg={setLocationImg} addSessionList={addSessionList} setLocationText={setLocationText} locationText={locationText} commentText={commentText} setCommentText={setCommentText} visible={visible} hideModal={hideModal} SetReadingStatus={(isBack)=>{setReadStatus(isBack)}} />

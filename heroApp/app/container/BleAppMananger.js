@@ -11,6 +11,7 @@ import { predefinedSessionData,setPredefinedessionData ,
 import NetInfo from "@react-native-community/netinfo";
 import { addSessionDataDB } from '../services/DBService';
 import { apiEndPoint } from '../services/constants';
+import {setIsDeviceConnected} from '../services/BleService';
 
 const window = Dimensions.get('window');
 const BleManagerModule = NativeModules.BleManager;
@@ -199,6 +200,7 @@ export default class BleAppmanager extends Component {
     BleManager.disconnect(BleService.getPeripherial().id)
         .then(() => {
           EventRegister.emit('BLE_STATUS', { event: "disconnected" });
+          setIsDeviceConnected(false);
           setSecondRead(false); //for reset 
           setReadOk(false); //for reset 
           console.log("Successfully Disconnected");
@@ -231,6 +233,7 @@ export default class BleAppmanager extends Component {
     }
     console.log('Disconnected from ' + data.peripheral);
     EventRegister.emit('BLE_STATUS', { event: "disconnected" });
+    setIsDeviceConnected(false);
   }
   handleUpdateValueForCharacteristic(data) {
     if(getCurrentCmd() !=""){
@@ -424,6 +427,8 @@ export default class BleAppmanager extends Component {
             peripherals.set(peripheral.id, p);
           }
           EventRegister.emit('BLE_STATUS', { event: "connected" });
+          //isDeviceConnected
+          setIsDeviceConnected(true);
           deviceConnected = true;
           localHw.sdName = peripheral.name;
           localHw.hardwareId = peripheral.id;

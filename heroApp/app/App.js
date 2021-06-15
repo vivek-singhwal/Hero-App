@@ -22,7 +22,7 @@ import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import KeepAwake from 'react-native-keep-awake';
 import AppCtx from './AppContext'
-import { disableInterval } from './services/BleService';
+import { disableInterval ,getIsDeviceConnected } from './services/BleService';
 
 const Stack = createStackNavigator();
 
@@ -315,10 +315,16 @@ function App() {
           <IconButton
           disabled={isRinseStatus}
             onPress={()=>{
-              setNavigation(navigation);
-              setTimeout(()=>{
-                setRingseModal(true);
-              },600)
+              console.log("Back "+getIsDeviceConnected());
+              if(!getIsDeviceConnected()){//go back if connection not ok
+                console.log("");
+                navigation.navigate('DeviceConnection');
+              }else{// else use default
+                setNavigation(navigation);
+                setTimeout(()=>{
+                  setRingseModal(true);
+                },600)
+              }
             }}
            icon={props=><AwesomeIcon 
             size={32}
@@ -335,8 +341,11 @@ function App() {
           headerLeftContainerStyle:{paddingLeft:20},
           headerRight:(()=><AwesomeIcon
           onPress={()=>{
-            // console.log(">>Click bluetooth")
-           setModalVisible(true);
+              if(!getIsDeviceConnected()){//go back if connection not ok
+                navigation.navigate('DeviceConnection');
+              }else{// else use default
+                setModalVisible(true);
+              }
           }}
           size={36}
           // color={'#2C88D9'}
