@@ -286,7 +286,7 @@ export default HomePage = ({ navigation })=>{
      if(!getIsDeviceConnected()){
        return null;
      } else{  
-       return           <View style={{backgroundColor:"#C8C8C8", width:"100%",flexDirection:"row",justifyContent:"space-around",position:"absolute",bottom:0}}>
+       return <View style={{backgroundColor:"#C8C8C8",height:"17%", width:"100%",flexDirection:"row",justifyContent:"space-around",position:"absolute",bottom:0}}>
        <View style={{marginTop:"10%",width:"33%"}}>
          <Button
          icon={props=><Feather size={35} name="settings-sharp" onPress={()=>{navigation.navigate('SettingPage')}}
@@ -307,8 +307,10 @@ export default HomePage = ({ navigation })=>{
          style={{alignSelf:"center",paddingLeft:"5%"}}/>
        </TouchableOpacity>:readingStatus ?
        <TouchableOpacity 
-       disabled={locationText.length < 3}
-       style={[styles.circle,{ backgroundColor: "#E9A2AD",justifyContent:"center",marginTop:19}]}
+       disabled={()=>{
+        locationText.length < 3
+       }}
+       style={[styles.circle,{ backgroundColor: locationText.length>3?"#E9A2AD":"#E0E7EE",justifyContent:"center",marginTop:19}]}
        onPress={() => {
              setEndTime = Date.now()
              setReadStatus(false);
@@ -320,7 +322,7 @@ export default HomePage = ({ navigation })=>{
          <AwesomeIcon name={"stop"} 
          size={45}
          // color={'#D8D8D8'}
-         color={'#D3455B'}
+         color={locationText.length>3?"#D3455B":"#9FAFBB"}
          style={{alignSelf:"center",paddingLeft:"2%"}}/>
        </TouchableOpacity>
      :

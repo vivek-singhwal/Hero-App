@@ -77,7 +77,9 @@ export default SubSession =({locationText,setLocationText,commentText,setComment
                         placeholder={'Where did you spray?'}
                         style={{padding:10,marginTop:5,fontSize:16,borderWidth:1,paddingRight:10,borderColor:'#012554',borderRadius:4}}
                         defaultValue={locationText}
-                        onChangeText={text => setLocationText(text)}
+                        onChangeText={text => {
+                          setLocationText(text)
+                        }}
                         // ref = {(input) => this.input = input}
                     />
               <Text style={{fontSize:17,color:"#4A4A4A",paddingBottom:16,marginTop:10}}>Comments</Text>
@@ -98,14 +100,14 @@ export default SubSession =({locationText,setLocationText,commentText,setComment
               </View>
             </TouchableOpacity>
             <Text style={{fontSize:17,color:"#4A4A4A",paddingBottom:10,paddingTop:15}}>Photos</Text>
-            <ScrollView style={{borderColor:textFocused?'#012554':'gray',borderWidth:1.8,height:320,borderRadius:5,padding:10}}>
+            <ScrollView style={{borderColor:textFocused?'#012554':'gray',borderWidth:1.8,height:350,borderRadius:5,padding:8}}>
             <FlatList
             scrollEnabled={false}
             numColumns={3}
             data={imageList}
             ListEmptyComponent={emptyList}
             keyExtractor={(item, index) => String(item.id + index)}
-            contentContainerStyle={{justifyContent: 'flex-start',width:"90%",}}
+            contentContainerStyle={{justifyContent: 'flex-start',marginBottom:20,width:"90%"}}
             renderItem={({item,index})=>
                 <View key={index} style={{width:"32%", margin:7,flexDirection: imageList.length == 3 || imageList.length == 6 || imageList.length == 9?'column':'row' }}>
                   <View>
@@ -157,7 +159,7 @@ export default SubSession =({locationText,setLocationText,commentText,setComment
               style={{ ...styles.openButton,backgroundColor: "#fff",marginRight:10 ,borderColor:'#012554',borderWidth:1}}
               onPress={() => {
                 // EventRegister.emit('BLECMD',{cmd:'disconnect'}) 
-                setModalVisible(!modalVisible);
+                setmodalVisible(!modalVisible);
               }}>
               <Text style={[styles.textStyle,{color:'#012554'}]}>Cancel</Text>
             </TouchableHighlight>

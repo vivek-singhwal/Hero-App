@@ -124,7 +124,7 @@ function App() {
   const AlertModal = ({modalVisible,setModalVisible}) => {
     return (
         <Modal
-          animationType="slide"
+          // animationType="slide"
           transparent={true}
           visible={modalVisible}
           onRequestClose={() => {

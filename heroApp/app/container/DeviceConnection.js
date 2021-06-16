@@ -60,7 +60,6 @@ export default DeviceConnection = ({navigation})=>{
       })
     }
     useEffect(()=>{
-      console.log(">>> set");
         if(count){
             initDB('sprayers').then((res)=>{
               console.log(">>Res ",res);

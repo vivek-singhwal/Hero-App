@@ -83,7 +83,7 @@ export default EditScreen = ({route, navigation}) =>{
             // data={Array.from(Array(12).keys())}
              ListEmptyComponent={emptyList}
             keyExtractor={(item, index) => String(index)}
-            contentContainerStyle={{ justifyContent: 'flex-start',width:"90%",}}
+            contentContainerStyle={{ justifyContent: 'flex-start',marginBottom:20,width:"90%",}}
             renderItem={({item,index})=>
                 <View key={index} style={{width:"32%", margin:7,flexDirection: session.locationImages.length == 3 || session.locationImages.length == 6 || session.locationImages.length == 9?'column':'row' }}>
                     <Image style={{width:85,height:90,borderColor:'#012554',borderWidth:1}} source={{uri:item}}/>
