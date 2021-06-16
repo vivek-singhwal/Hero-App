@@ -14,7 +14,7 @@ let deviceListAr = [];
 export default DeviceConnection = ({navigation})=>{
     var deviceArray = [];
     const [count,setCount] = useState(true);
-    const [selectedId, setSelectedId] = useState(null);
+    const [selectedId, setSelectedId] = useState();
     const [deviceStatus, setDeviceStatus] = useState('');
     const [deviceList, setDeviceList] = useState(deviceArray);
     const [isDeviceConnected, setisDeviceConnected] = useState(false);
@@ -36,8 +36,31 @@ export default DeviceConnection = ({navigation})=>{
             </View>
         )
     }
-
+    var checkDeviceConnection = function(){
+      var deviceObj = {
+        sdName:getDeviceHWData().sdName,
+        hardwareId:getDeviceHWData().hardwareId,
+        serverId:null,
+        isSync:0,
+        sprayerName:getDeviceHWData().sprayerName
+      }
+      getSprayersByHwId(getDeviceHWData().hardwareId).then((resDevice)=>{
+        console.log(">> resDevice "+resDevice);
+        if(resDevice.length){
+            console.log(">>resDevice",resDevice);
+            deviceObj.serverId = resDevice[0].serverId;
+            deviceObj.sprayerName = resDevice[0].sprayerName;
+        }else{
+            addSprayer(deviceObj).then(()=>{
+            
+            })
+        }
+        setDeviceHWData(deviceObj);
+        navigation.navigate('HomePage');
+      })
+    }
     useEffect(()=>{
+      console.log(">>> set");
         if(count){
             initDB('sprayers').then((res)=>{
               console.log(">>Res ",res);
@@ -78,6 +101,8 @@ export default DeviceConnection = ({navigation})=>{
                 setDeviceStatus("Reading...");
               } else if(data.event == "readOK"){
                 setDeviceStatus("Ready");
+                // if ready then automatically goto homepage
+                checkDeviceConnection();
               } else if(data.event == "scanning"){
                 setDeviceStatus("Scanning...");
                 // showModal();  
@@ -122,7 +147,12 @@ export default DeviceConnection = ({navigation})=>{
                     const color = item === selectedId ? '#012554' : 'black';
                     const boldness = item === selectedId ? "bold":"300";
                     return (
-                        <TouchableOpacity onPress={()=>setSelectedId(item)} style={[styles.item,{backgroundColor:backgroundColor,borderLeftWidth:item === selectedId ?5:0,borderLeftColor:color}]}>
+                        <TouchableOpacity onPress={
+                          ()=>{
+                            setSelectedId(item);
+                            EventRegister.emit('BLECMD',{event:'reqConnect',device:item})
+                          }
+                          } style={[styles.item,{backgroundColor:backgroundColor,borderLeftWidth:item === selectedId ?5:0,borderLeftColor:color}]}>
                              <Text style={[styles.title,{color:color,paddingLeft:10,fontWeight:boldness}]}>{item.name}</Text>
                         </TouchableOpacity>
                     );
@@ -147,28 +177,8 @@ export default DeviceConnection = ({navigation})=>{
                     if(deviceStatus != 'Connected' && deviceStatus != 'Ready'){
                         EventRegister.emit('BLECMD',{event:'reqConnect',device:selectedId})
                     }
-                    
                     if(deviceStatus == 'Ready'){
-                        var deviceObj = {
-                            sdName:getDeviceHWData().sdName,
-                            hardwareId:getDeviceHWData().hardwareId,
-                            serverId:null,
-                            isSync:0,
-                            sprayerName:getDeviceHWData().sprayerName
-                        }
-                        getSprayersByHwId(getDeviceHWData().hardwareId).then((resDevice)=>{
-                          if(resDevice.length){
-                              console.log(">>resDevice",resDevice);
-                              deviceObj.serverId = resDevice[0].serverId;
-                              deviceObj.sprayerName = resDevice[0].sprayerName;
-                          }else{
-                              addSprayer(deviceObj).then(()=>{
-                               
-                              })
-                          }
-                          setDeviceHWData(deviceObj);
-                          navigation.navigate('HomePage');
-                        })
+                      checkDeviceConnection();
                     }/*else if (deviceStatus == 'Disconnected'){
                       setBleErrorModal(true);
                     }else if (deviceStatus == 'stopScan'){

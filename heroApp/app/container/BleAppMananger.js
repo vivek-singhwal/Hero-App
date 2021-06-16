@@ -152,6 +152,7 @@ export default class BleAppmanager extends Component {
         return 'test';
         }
         if(data.event == "reqConnect"){
+          console.log(">> reqConnect finish");
           var peripherals = this.state.peripherals;
           peripherals.set(data.device.id, data.device);
           this.connect(data.device);
