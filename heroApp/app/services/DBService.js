@@ -1,10 +1,8 @@
 import sqlite from 'react-native-sqlite-storage';
-
 var errorCB=(err)=> {
     console.log("SQL Error: " + err);
     return false;
   }
-   
  var successCB=()=> {
     console.log("SQL executed fine");
     return true;
@@ -28,7 +26,6 @@ export var initDB = (reqTable) => {
           )
             .then(DB => {
               db = DB;
-              // console.log("Database OPEN");
               db.executeSql('SELECT * FROM ' + reqTable + ' LIMIT 1').then((result) => {
                 console.log("Database is ready ... executing query ...",reqTable);
                 if(reqTable === 'sessions'){            
@@ -48,11 +45,9 @@ export var initDB = (reqTable) => {
                     }
                 }
               ).catch(error => {
-          
-              console.log(error);
+                console.log(error);
               })
-
-              console.log(error);
+                console.log(error);
               })
                 
                 db.executeSql(
@@ -70,14 +65,11 @@ export var initDB = (reqTable) => {
                           // console.log(">>No data found")
                       }
                   }
-                ).catch(error => {
-            
+                ).catch(error => {   
                 console.log(error);
                 })
-
                 console.log(error);
                 })
-                  
                   db.executeSql(
                       'SELECT isSync FROM sessions').then(
                     (results) => {
@@ -93,16 +85,12 @@ export var initDB = (reqTable) => {
                             // console.log(">>No data found")
                         }
                     }
-                  ).catch(error => {
-              
+                  ).catch(error => {            
                   console.log(error);
                   })
-
                   console.log(error);
-                  })
-                  
-                  db.executeSql(
-                    'SELECT appVersion FROM sessions').then(
+                  })           
+                  db.executeSql('SELECT appVersion FROM sessions').then(
                   (results) => {
                       if(results[0].rows.length == 0){
                           // console.log(">>No data found")
@@ -293,7 +281,6 @@ export var initDB = (reqTable) => {
   };
 
   export var deleteAllOperator = function () {
-    // console.log(">>data ",data)
     let promise = new Promise((resolve, reject) => {
         // console.log(">>addOperator ",db);
       db.transaction((tx) => {
@@ -370,7 +357,6 @@ export var addOperator = function (data) {
     });;;
     return promise;
   }
-
   export var addSession = function (data) {
     console.log(">>addSession ",JSON.stringify(data))
     let promise = new Promise((resolve, reject) => {
@@ -432,8 +418,7 @@ export var addOperator = function (data) {
     let promise = new Promise((resolve, reject) => {
         // console.log(">>addOperator ",db);
       db.transaction((tx) => {
-        tx.executeSql(
-          'UPDATE sessions SET isFinished=0 where isRinse=0',
+        tx.executeSql('UPDATE sessions SET isFinished=0 where isRinse=0',
           (tx, results) => {
             // console.log('Results', results.rowsAffected);
             var success = "true";
@@ -458,8 +443,7 @@ export var addOperator = function (data) {
     let promise = new Promise((resolve, reject) => {
         // console.log(">>addOperator ",db);
       db.transaction((tx) => {
-        tx.executeSql(
-          'INSERT INTO sessionData VALUES (?,?,?,?,?,?,?)',
+        tx.executeSql('INSERT INTO sessionData VALUES (?,?,?,?,?,?,?)',
           [,data.serverId,data.sessionId,data.serverSessionId,data.sessionData,data.isSync,data.isFinished],
           (tx, results) => {
             // console.log('Results', results.rowsAffected);
@@ -483,8 +467,7 @@ export var addOperator = function (data) {
 export var getOperators = function () {
     console.log("getOperators");
     let promise = new Promise((resolve, reject) => {
-        db.executeSql(
-            'SELECT * FROM operators ').then(
+        db.executeSql('SELECT * FROM operators ').then(
           (results) => {
               var records = [];
             // console.log(">>Inside getOperators",results)
@@ -549,8 +532,30 @@ export var getOperators = function () {
     return promise;
   }
   
+  export var getImagesAPISync = function () {
+    let promise = new Promise((resolve, reject) => {
+        db.executeSql(
+            'SELECT * FROM sessions where locationImages LIKE "%file%"').then(
+          (results) => {
+              var records = [];
+            // console.log(">>Inside getOperators",results)
+            if(results[0].rows.length){
+                for (let i = 0; i < results[0].rows.length; ++i){
+                    records.push(results[0].rows.item(i))
+                    // console.log(">>results ",i,)
+                }
+            }
+            resolve(records);
+          }
+        )
+    }).catch(error => {
+      console.log(error);
+    });;
+    return promise;
+  }
+
   export var getSessionAPISync = function () {
-    // console.log("getOperators");
+    console.log("getSessionAPISync");
     let promise = new Promise((resolve, reject) => {
         db.executeSql(
             'SELECT * FROM sessions where isSync=0 OR serverId=null').then(
@@ -573,7 +578,6 @@ export var getOperators = function () {
   }
   
   export var getSessionByIdSync = function (id) {
-    // console.log("getOperators");
     let promise = new Promise((resolve, reject) => {
         db.executeSql(
             'SELECT * FROM sessions where id=?',[id]).then(
@@ -664,14 +668,13 @@ export var getOperators = function () {
     return promise;
   }
 
-  export var updateSessionsImage = function (objSession) {
-    // console.log("getOperators");
-    let promise = new Promise((resolve, reject) => {
+  export var updateSessionsImage = async (objSession) => {
+     console.log("updateSessionsImage::",objSession);
+    return new Promise((resolve, reject) => {
         db.executeSql(
             'UPDATE sessions SET locationImages=?, isSync=? where id=?',[objSession.imageUrl,objSession.isSync,objSession.id]).then(
           (results) => {
-              var records = [];
-            // console.log(">>Inside getOperators",results)
+            var records = [];
             if(results[0].rows.length){
                 for (let i = 0; i < results[0].rows.length; ++i){
                     records.push(results[0].rows.item(i))
@@ -684,11 +687,9 @@ export var getOperators = function () {
     }).catch(error => {
       console.log(error);
     });;
-    return promise;
   }
 
   export var getDashboardSessions = function () {
-    // console.log("getSessions");
     let promise = new Promise((resolve, reject) => {
         db.executeSql(
             'SELECT * FROM sessions where isRinse=0 AND isFinished=1 ORDER BY startTime desc').then(
@@ -843,8 +844,46 @@ export var getOperators = function () {
     return promise;
   }
 
+  export var delLastIncompleteSession =  async() => {
+    let promise = new Promise((resolve, reject) => {
+      db.executeSql(
+        'select id FROM sessions where sessionLocation is null order by startTime desc limit 1').then(
+        async (results) => {
+          var records = [];
+          if(results[0].rows.length){
+              for (let i = 0; i < results[0].rows.length; ++i){
+                let delId = results[0].rows.item(i).id;
+                await delSessionData(delId);
+                await delSession(delId); //now delete this last session
+              }
+          }
+          resolve(records);
+        }
+      )
+  }).catch(error => {
+    console.log(error);
+  });;
+    return promise;
+  }
+
+  export var delSessionData = async (sessionId) => {
+    console.log("delSessionData session:"+sessionId);
+    let promise = new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        tx.executeSql(
+          'DELETE FROM sessionData where sessionId=?',
+          [sessionId],
+          (tx, results) => {
+            resolve(results);
+          })
+      })
+    }).catch(error => {
+      console.log(error);
+    });;
+    return promise;
+  }
+
   export var delSession = function (id) {
-    console.log("delete session:"+id);
     let promise = new Promise((resolve, reject) => {
       db.transaction((tx) => {
         tx.executeSql(

@@ -1,4 +1,4 @@
-import React,{ useState } from 'react';
+import React from 'react';
 import { View , StyleSheet, Text, Modal, TextInput as Input,TouchableHighlight, TouchableOpacity } from 'react-native';
 import AwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import {delSession} from '../services/DBService';
@@ -36,12 +36,13 @@ export default DeleteSessionModal = ({deleteSucess,sessionId,deleteModal,setDele
             </TouchableOpacity>
             <TouchableOpacity
               style={{ ...styles.openButton, backgroundColor: "red",paddingRight:18, paddingLeft:18 }}
-              onPress={() => {
+              onPress={async () => {
                   if(sessionId){
+                    //first delete from server
+                    await deleteSessionAPI(sessionId);
                     delSession(sessionId).then(()=>{
-                        deleteSucess();
-                        deleteSessionAPI(sessionId);
-                     })
+                      deleteSucess();
+                    })
                   }
                   setDeleteModal(!deleteModal);
               }}>

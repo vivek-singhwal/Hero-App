@@ -12,23 +12,16 @@ import ImageResizer from 'react-native-image-resizer';
   var inputBox;
     const [textFocused,setTextFocused] = useState(false);
     const [isClickable,setIsClickable] = useState(false);
-    
-  //  const [imageUri,setImageUri] = useState('');
     const containerStyle = {backgroundColor: 'white', padding: 20};
    var openlaunchCamera = () => {
       let options = {
-        
         storageOptions: {
           skipBackup: true,
           path: 'images'
         },
       };
-      launchImageLibrary(options,(response)=>{
-
-      })
       // return
       launchCamera(options, (response) => {
-        console.log('Response = 03', response);
         setIsClickable(false);
         if (response.didCancel) {
           console.log('User cancelled image picker');
@@ -40,11 +33,9 @@ import ImageResizer from 'react-native-image-resizer';
         } else {
           ImageResizer.createResizedImage(response.uri, 1000, 1000, 'JPEG', 50)
           .then(respImg => {
-            // console.log(">response compressed  img ",respImg);
             uploadImage(respImg).then((resp)=>{
                 if(resp.image){
-                  let imageuri = resp.image.replace('/opt/data/','');
-                // setImageUri(imageuri);
+                let imageuri = resp.image.replace('/opt/data/','');
                 setLocationImg(imageuri);
                 setIsClickable(true);
             }

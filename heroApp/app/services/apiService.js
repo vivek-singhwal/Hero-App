@@ -1,15 +1,14 @@
 import {getDeviceHWData} from '../services/DataService';
 import CryptoJS from "react-native-crypto-js";
 import {apiEndPoint,IV} from './constants';
+import {getSessionByIdSync,updateSessionsImage} from './DBService';
+import {updateSession} from './DataSyncService';
 
 var currentMonth = new Date().getMonth();
 var MONTH = currentMonth > 9? currentMonth.toString() :String("0"+ (currentMonth+1));
 var DAY = new Date().getDate() > 9?new Date().getDate().toString():"0"+new Date().getDate();
 var YEAR = new Date().getFullYear().toString();
 var token = YEAR+''+MONTH+''+DAY+'-'+getDeviceHWData().hardwareId+'-heroApp?'
-var currentOperatorId = "";
-var currentSessionId = "";
-var currentDeviceId = "";
 
 var encryptToken = () => {
     return CryptoJS.AES.encrypt(token, IV).toString();
@@ -25,10 +24,10 @@ export var setSessionId = (sessionId) => {
     currentSessionId = sessionId;
 }
 
+//test connection
 export var checkConnection = () => {
     return fetch(apiEndPoint+'/api/tests', {
             method: "GET",
-            // body: JSON.stringify(data),
             headers: { 'Content-Type': 'application/json' ,'Authorization':encryptToken()},
         })
         .then(res => res.json())
@@ -43,8 +42,67 @@ export var checkConnection = () => {
         )
 }
 
+
+export var uploadImageArray = async (images,sessionId) => {
+    if(images.length == 0){
+       return new Promise(function(myResolve, myReject) {
+           myResolve({result:'success'}); // when successful
+        });
+    }
+    var locationArray = []; 
+    var imagesObj = []; 
+        images.map((imageItem)=>{
+            if(typeof(imageItem) == 'string'){
+                if(imageItem.startsWith("file://")){
+                    let image = {};
+                	image.path = imageItem.substr(7);
+                	image.uri = imageItem;
+                	let lastIndex = imageItem.lastIndexOf("/");
+                	image.name = imageItem.substr(lastIndex + 1); 
+                	imagesObj.push(image);
+                }else{
+                    locationArray.push(imageItem);
+                }
+            }
+        })
+        const data = new FormData();
+        for (const file of imagesObj) {
+            data.append("demo_image", { uri: file.uri, name: file.name, type: 'image/jpeg' });
+          }
+        await fetch(apiEndPoint+'/api/sessions/upload-image?90', {
+            body: data,
+            method: "POST",
+            headers: {'Accept': 'application/json','Content-Type': 'multipart/form-data','Authorization':encryptToken()},
+         })
+        .then(res =>  res.json())
+        .then(
+            async (result) => {
+                if(result.status){
+                    locationArray = [...locationArray, ...result.image ];
+                    let sessionObj = {
+                        imageUrl:JSON.stringify(locationArray),
+                        isSync:0,
+                        id:sessionId
+                    };
+                    await updateSessionsImage(sessionObj);
+                    updateSession();//promise not return
+                };
+                 console.log("result ",result)
+                return result;
+            },
+            (error) => {
+                console.log(">>Error checkConnection uploadImage:", error)
+                return error;
+            }
+        )
+}
+
 export var uploadImage = (images) => {
-    console.log("uploadImag start 001 ",images);
+    if(images.length == 0){
+       return new Promise(function(myResolve, myReject) {
+           myResolve({result:'success'}); // when successful
+        });
+    }
     var imagesObj = []; 
 	if(images != null && typeof(images.map) == 'function' 
 		&& images.length > 0 && typeof (images[0]) == 'string')   {
@@ -76,13 +134,12 @@ export var uploadImage = (images) => {
         }
     */
         const data = new FormData();
-        // data.append("demo_image", { uri: image.uri, name: image.name, type: 'image/jpeg' });
         for (const file of imagesObj) {
             console.log("file::",file)
             // data.append('files[]', file, file.name);
             data.append("demo_image", { uri: file.uri, name: file.name, type: 'image/jpeg' });
           }
-    return fetch(apiEndPoint+'/api/sessions/upload-image?90', {
+        return fetch(apiEndPoint+'/api/sessions/upload-image?90', {
             body: data,
             method: "POST",
             headers: {'Accept': 'application/json','Content-Type': 'multipart/form-data','Authorization':encryptToken()},
@@ -134,10 +191,11 @@ export var getSessionAPI = () => {
         )
     }
 
-export var deleteSessionAPI = (sessionId) => {
-    //delete esample
-    ///api/sessions/8e761d2a-03e1-4daa-9c30-9090764be701
-    return fetch(apiEndPoint+'/api/sessions/'+sessionId, {
+export var deleteSessionAPI = async (sessionId) => {
+    var record = await getSessionByIdSync(sessionId);
+    if(record.length > 0){
+    var serverId = record[0].serverId;
+    return fetch(apiEndPoint+'/api/sessions/'+serverId, {
             method: "DELETE",
             headers: { 'Content-Type': 'application/json' ,'Authorization':encryptToken()},
         })
@@ -150,7 +208,8 @@ export var deleteSessionAPI = (sessionId) => {
                 console.log(">>Error deleteSessionAPI", error)
                 return error;
             }
-        )
+        );
+    }
 }
 
 export var getSessionDataAPI = () => {
@@ -178,7 +237,6 @@ export var addOperatorAPI = (data) => {
         "company": "Kesem"
         }
     */
-//    console.log(">>addOperatorAPI1 ", data)
     return fetch(apiEndPoint+'/api/operators', {
             method: "POST",
             body: JSON.stringify(data),
@@ -187,7 +245,6 @@ export var addOperatorAPI = (data) => {
         .then(res => res.json())
         .then(
             (result) => {
-                console.log(">>addOperatorAPI ", result)
                 return result.result;
             },
             (error) => {

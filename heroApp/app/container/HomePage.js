@@ -55,7 +55,7 @@ export default HomePage = ({ navigation })=>{
      BackHandler.exitApp();
     }
     var getSessionDBList = ()=>{
-      console.log(">> getSessionDBList..99999");
+      console.log(">>>>>>>>>>>> getSessionDBList..99999");
       getSessionsDisplay().then((resSessions)=>{
         listSession.length = 0; //clean array
         resSessions.map((item)=>{
@@ -70,7 +70,8 @@ export default HomePage = ({ navigation })=>{
             if(listSession[i].sessionData !=undefined && listSession[i].sessionData != null){
               listSession[i]['sessionData'] = JSON.parse(listSession[i]['sessionData']);
             }
-            if(listSession[i].locationImages !=undefined && listSession[i].locationImages != null){
+            if(listSession[i].locationImages != "" && listSession[i].locationImages !=undefined && listSession[i].locationImages != null){
+              console.log("listSession[i]['locationImages'] ",listSession[i]['locationImages']);
               listSession[i]['locationImages'] = JSON.parse(listSession[i]['locationImages']);
             }else{
               listSession[i].locationImages = [];
@@ -96,19 +97,23 @@ export default HomePage = ({ navigation })=>{
     }
 
     useEffect(()=>{
-      
       if(!getIsDeviceConnected()){
         // only show db if not connected
         getSessionDBList();
+        const unsubscribe = navigation.addListener('focus', () => {
+          if(currentRoute == "HomePage"){
+            console.log(">> HomePage...01 02");
+            getSessionDBList();
+          }
+        });
       }else{
         BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
         if(currentRoute == "SesstionStart" && readingStatus){
           setReadingStatus(false);
         }
         const unsubscribe = navigation.addListener('focus', () => {
-          // do something
-          // console.log(">>currentRoute "+currentRoute);
           if(currentRoute == "HomePage"){
+            console.log(">> HomePage...");
             getSessionDBList();
             setReadingStatus(false);
             appContext.doChangeRinseStatus(false);
@@ -160,15 +165,7 @@ export default HomePage = ({ navigation })=>{
           EventRegister.removeEventListener(listener);
           BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
           unsubscribe();
-      }  
-      
-
-    
-    
-    
-    
-    
-    
+        }  
       }
     },[]);
     
@@ -178,7 +175,6 @@ export default HomePage = ({ navigation })=>{
       KeepAwake.deactivate();
       var dbImageLocation = [];
       imageList.map(item=>{
-        console.log("item::",item);
         dbImageLocation.push(item); //db is capturing image path
       })
       var sessionListAr = [...sessionList];
@@ -221,8 +217,7 @@ export default HomePage = ({ navigation })=>{
 
     var startReading=()=>{
       KeepAwake.activate();
-      console.log(">>getLocalSessionId() ",getOperatorData(),getDeviceHWData());
-     var sessionObj = {
+      var sessionObj = {
       operatorId: getOperatorData().serverId,
       sprayerId: getDeviceHWData().serverId,
       chemistryType: getOperatorData().chemistryType,
@@ -307,11 +302,10 @@ export default HomePage = ({ navigation })=>{
          style={{alignSelf:"center",paddingLeft:"5%"}}/>
        </TouchableOpacity>:readingStatus ?
        <TouchableOpacity 
-       disabled={()=>{
-        locationText.length < 3
-       }}
+       disabled={locationText.length < 4}
        style={[styles.circle,{ backgroundColor: locationText.length>3?"#E9A2AD":"#E0E7EE",justifyContent:"center",marginTop:19}]}
        onPress={() => {
+            console.log("session end received.ee")
              setEndTime = Date.now()
              setReadStatus(false);
              setReadingStatus(false);
@@ -381,15 +375,15 @@ export default HomePage = ({ navigation })=>{
               {/* <Text style={{color:'#012554',fontSize:18,fontWeight:"bold",textTransform:'capitalize',marginStart:15,paddingBottom:4}}>{item.sessionLocation?item.sessionLocation:'Incomplete session'}</Text> */}
                 <View style={{justifyContent:"space-between",flexDirection:'row'}}>
                   <View style={{flexDirection:"row",alignSelf:"center", maxWidth:120}}>
-                  {item.locationImages != null ? <Image source={{uri: item.locationImages[0] }} style={{height:60,width:60,borderRadius:60,alignSelf:"center"}}/>:<View style={{height:60,width:30,alignSelf:"center"}}/>} 
+                  {(item.locationImages != undefined && item.locationImages != null && item.locationImages.length > 0) ? 
+                  <Image source={{uri: item.locationImages[0] }} style={{height:60,width:60,borderRadius:60, borderColor:'black',borderWidth:1,  alignSelf:"center"}}/>:
+                  <View style={{borderColor:'black',borderWidth:1, height:60,width:60,borderRadius:60,alignSelf:"center"}}/>} 
                     <Text style={{color:'#012554',fontSize:18,fontWeight:"bold",textTransform:'capitalize',marginStart:15,paddingBottom:4,alignSelf:"center"}}>{item.sessionLocation?item.sessionLocation:'Incomplete session'}</Text>
                   </View>
                    <View style={{flexDirection:"row",alignSelf:"center"}}>
-                   
                    {item.isRinse ?<View/>:<View>
                     <Text style={{color:'#012554',fontSize:16,alignSelf:"center", padding:3}}>{formatAMPM(item.startTime)} - {formatAMPM(item.endTime)}</Text>
                     </View>}
-
                     <Material 
                       style={{alignSelf:"center"}}
                       size={25}

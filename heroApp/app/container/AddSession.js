@@ -1,17 +1,77 @@
-import React,{ useState } from 'react';
+import React,{ useState,useEffect } from 'react';
 import { View,  Text, TouchableOpacity,ScrollView,TouchableHighlight, TextInput as Input, Image,FlatList, Modal,StyleSheet} from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Entypo from 'react-native-vector-icons/Entypo';
-import { launchCamera } from 'react-native-image-picker';
+import {launchImageLibrary, launchCamera } from 'react-native-image-picker';
 import ImageResizer from 'react-native-image-resizer';
+import { EventRegister } from 'react-native-event-listeners';
+import AwesomeIcon from 'react-native-vector-icons/FontAwesome';
 
+const DeleteImageModal = ({modalVisible,setModalVisible,photoDelete}) => {
+  return (
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+        }}>
+      <View
+        style={{
+          position: 'absolute',
+          width: '100%',
+          height: '100%',
+          justifyContent: 'center',
+          backgroundColor: 'rgba(100,100,100, 0.5)',
+          padding: 40,
+        }}>
+          <View style={styles.modalView}>
+           <AwesomeIcon name="trash" size={29} color="red" />
+            <Text style={styles.modalText}>Are you sure you want to delete this photo?</Text>
+          <View style={{flexDirection:"row",justifyContent:"space-between",marginTop:35,marginBottom:15}}>
+            <TouchableOpacity
+              style={{ ...styles.openButton,backgroundColor: "#fff",marginRight:10 ,borderColor:'#012554',borderWidth:1}}
+              onPress={() => {
+                setModalVisible(!modalVisible);
+              }}>
+              <Text style={[styles.textStyle,{color:'#012554'}]}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{ ...styles.openButton, backgroundColor: "red" }}
+              onPress={() => {
+                if(typeof(photoDelete[0]) == 'function'){
+                  photoDelete[0]();
+                }
+                setModalVisible(!modalVisible);
+              }}>
+              <Text style={styles.textStyle}>Delete</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+};
 export default SubSession =({locationText,setLocationText,commentText,setCommentText, imageList, setImageList})=>{
     var inputBox;
+    var photoDeleteFunArr = [];
     const [textFocused,setTextFocused] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const [indexVal, setIndexVal] = useState(0);
-
+    const [deletePhotoModalVisible, setDeletePhotoModalVisible] = React.useState(false);
+    const [photoDeleteArray, setPhotoDeleteArray] = React.useState(photoDeleteFunArr);
+    useEffect(()=>{
+      let unsubscribe = EventRegister.addEventListener('OPEN_CAMERA', (value) => {
+        if(value.cmd == "camera"){
+          addImages("launchCamera");
+        }else{
+          addImages("launchImageLibrary");
+        }
+       });
+       return ()=>{
+        EventRegister.removeEventListener(unsubscribe);
+      }
+    });
     var getIndexVal=(index)=>{
       if(imageList.length == 3 || imageList.length == 6 || imageList.length == 9){
         return imageList.length - 3 == index;
@@ -19,28 +79,27 @@ export default SubSession =({locationText,setLocationText,commentText,setComment
         return imageList.length - 1 == index;
       } 
     }
-  
     var emptyList = ()=>{
       return(
-       <TouchableOpacity onPress={()=>{ addImages() }} 
+       <TouchableOpacity onPress={()=>{ openCameraOption() }} 
           style={{borderColor:'#012554',borderWidth:1,width:95,height:90,justifyContent:"center"}}>
             <MaterialIcons name="add" color={'#012554'} size={35} style={{alignSelf:"center"}}/>
         </TouchableOpacity>
       )
     }
-  
-    var addImages = () =>{
+    
+    var openCameraOption = ()=>{
+      EventRegister.emit('SELECT_CAMERA', { cmd: 'openModal' });
+    }
+    var addImages = (funcName) =>{
       let options = {
         storageOptions: {
           skipBackup: true,
           path: 'images'
         },
       };
-     
-      // return
-      launchCamera(options, (response) => {
-        console.log('Response = 01 ', response);
-        // setIsClickable(false);
+    if(funcName == "launchImageLibrary"){
+     launchImageLibrary(options, (response) => {
         if (response.didCancel) {
           // console.log('User cancelled image picker');
         } else if (response.error) {
@@ -52,7 +111,7 @@ export default SubSession =({locationText,setLocationText,commentText,setComment
           // console.log(">Resp",JSON.stringify(response));
           ImageResizer.createResizedImage(response.uri, 1000, 1000, 'JPEG', 50)
           .then(respImg => {
-             console.log(">response compressed  img ",respImg);
+             console.log(">response compressed  img 01",respImg);
               let tempList = [...imageList];
               tempList.push(respImg.uri)
               setImageList(tempList);
@@ -62,6 +121,29 @@ export default SubSession =({locationText,setLocationText,commentText,setComment
           });
         }
       });
+    } else {
+      launchCamera(options, (response) => {
+        if (response.didCancel) {
+          // console.log('User cancelled image picker');
+        } else if (response.error) {
+          // console.log('ImagePicker Error: ', response.error);
+        } else if (response.customButton) {
+          // console.log('User tapped custom button: ', response.customButton);
+          alert(response.customButton);
+        } else {
+          // console.log(">Resp",JSON.stringify(response));
+          ImageResizer.createResizedImage(response.uri, 1000, 1000, 'JPEG', 50)
+          .then(respImg => {
+             let tempList = [...imageList];
+              tempList.push(respImg.uri)
+              setImageList(tempList);
+          })
+          .catch(err => {
+           console.log(err);
+          });
+        }
+      });
+      }
     }
     if(imageList != null && typeof imageList.map != 'undefined' ){
       imageList.map((item)=>{
@@ -70,18 +152,13 @@ export default SubSession =({locationText,setLocationText,commentText,setComment
     }
   return <>
     <View style={{padding:25}}>
+    <DeleteImageModal modalVisible={deletePhotoModalVisible} setModalVisible={setDeletePhotoModalVisible} photoDelete={photoDeleteArray}/>
        <Text style={{fontSize:17,color:"#4A4A4A",paddingBottom:5}}>Location*</Text>
-       <Input
-                        // onFocus={()=> setTextFocused(true)}
-                        // onBlur={()=> setTextFocused(false)}
-                        placeholder={'Where did you spray?'}
-                        style={{padding:10,marginTop:5,fontSize:16,borderWidth:1,paddingRight:10,borderColor:'#012554',borderRadius:4}}
-                        defaultValue={locationText}
-                        onChangeText={text => {
-                          setLocationText(text)
-                        }}
-                        // ref = {(input) => this.input = input}
-                    />
+              <Input placeholder={'Where did you spray?'}
+              style={{padding:10,marginTop:5,fontSize:16,borderWidth:1,paddingRight:10,borderColor:'#012554',borderRadius:4}}
+              defaultValue={locationText}
+              onChangeText={text => { setLocationText(text)}}
+              />
               <Text style={{fontSize:17,color:"#4A4A4A",paddingBottom:16,marginTop:10}}>Comments</Text>
             <TouchableOpacity
               activeOpacity={1}
@@ -112,11 +189,17 @@ export default SubSession =({locationText,setLocationText,commentText,setComment
                 <View key={index} style={{width:"32%", margin:7,flexDirection: imageList.length == 3 || imageList.length == 6 || imageList.length == 9?'column':'row' }}>
                   <View>
                     <Entypo color={'gray'} 
-                    onPress={()=>{
-                        let tempList = [...imageList];
-                        tempList.splice(index,1);
-                        setImageList(tempList);
-                        setIndexVal(index);
+                      onPress={()=>{
+                        let deleteImage = () =>{
+                          console.log(">> deleteImage");
+                          let tempList = [...imageList];
+                          tempList.splice(index,1);
+                          setImageList(tempList);
+                          setIndexVal(index);
+                        }
+                        setPhotoDeleteArray([deleteImage]);
+                        setDeletePhotoModalVisible(true)
+                        //EventRegister.emit('DELETE_PHOTO',{callback:deleteImage})                        
                       }} 
                       name="circle-with-cross" 
                       size={25} 
@@ -124,7 +207,7 @@ export default SubSession =({locationText,setLocationText,commentText,setComment
                     <Image style={{width:85,height:90,borderColor:'#012554',borderWidth:1}} source={{uri:item}}/>
                   </View>
                   { imageList.length < 12 && getIndexVal(index) && <TouchableOpacity onPress={()=>{
-                    addImages()
+                    openCameraOption()
                   }} style={(imageList.length == 3 || imageList.length == 6 || imageList.length == 9)?{marginTop:15,borderColor:'#012554',borderWidth:1,width:85,height:90,justifyContent:"center"}:{marginLeft:22,borderColor:'#012554',borderWidth:1,width:85,height:90,justifyContent:"center"}}>
                       <MaterialIcons name="add" color={'#012554'} size={35} style={{alignSelf:"center"}}/>
                     </TouchableOpacity>}
@@ -154,7 +237,7 @@ export default SubSession =({locationText,setLocationText,commentText,setComment
             <FontAwesome name="trash" size={30} color={'red'}/>
             <Text style={[styles.modalText,{fontSize:16}]}>Are you sure you want to {'\ndelete this Photo ?'}</Text>
             <Text style={[styles.modalText,{fontSize:16}]}>{'This cannot be undone.'}</Text>
-        <View style={{flexDirection:"row", justifyContent:"space-between", marginTop:35, marginBottom:15}}>
+          <View style={{flexDirection:"row", justifyContent:"space-between", marginTop:35, marginBottom:15}}>
             <TouchableHighlight
               style={{ ...styles.openButton,backgroundColor: "#fff",marginRight:10 ,borderColor:'#012554',borderWidth:1}}
               onPress={() => {

@@ -32,7 +32,6 @@ let defaultBleResults = {
     'getBatteryLevel\r':""
     //bleResults
 }
-
 export var bleCommands = [
    /* 'getSerial\r',
     'getModel\r',

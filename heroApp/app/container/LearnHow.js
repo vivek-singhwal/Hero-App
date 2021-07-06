@@ -12,21 +12,28 @@ export default LearnHow = ({modalVisible,setModalVisible}) =>{
         animationType="slide"
         transparent={true}
         visible={modalVisible}
+        onPress={()=>{console.log("Ramaaa")}}
         onRequestClose={() => {
-          Alert.alert("Modal has been closed.");
         }}>
          <View 
          style={{
             alignSelf:"center",
             position: 'absolute',
             width: '100%',
-            height: '84%',
+            height: '90%',
             justifyContent: 'center',
             backgroundColor: 'rgba(100,100,100, 0.5)',
             padding: 50,
-            top:"10%",
+            top:"5%",
+            bottom:"5%",
       }}>
-
+         <TouchableOpacity style={{height:'10%'}}
+        onPressOut={()=>{
+          setModalVisible(false);
+          setIndexScroll(0);
+        }}
+        >
+        </TouchableOpacity>
       <Swiper 
       showsPagination={false}
       showsButtons={true}
@@ -80,7 +87,7 @@ export default LearnHow = ({modalVisible,setModalVisible}) =>{
         <View style={{backgroundColor:indxScroll == 1?"#012554":"gray",width:30,height:5,alignSelf:"center"}}/>
         <View style={{backgroundColor:indxScroll == 2?"#012554":"gray",width:30,height:5,alignSelf:"center"}}/>
         </View>
-          <Text style={styles.text}>{'First, make sure your sprayer battery is charged and inserted correctly into the  battery housing.'}</Text>
+          <Text style={styles.text}>{'First make sure your sprayer battery is sufficiently charged before beginning a spray session.'}</Text>
           <Image style={{height:"60%", width:"80%",borderColor:"gray",borderWidth:0.7,alignSelf:"center",marginTop:10}} source={require('../asset/learn-more-device1.png')} />
         </View>
         <View style={{backgroundColor:"#fff",height:"100%",paddingTop:15,paddingBottom:25}}>
@@ -89,7 +96,7 @@ export default LearnHow = ({modalVisible,setModalVisible}) =>{
         <View style={{backgroundColor:"#012554",width:30,height:5,alignSelf:"center"}}/>
         <View style={{backgroundColor:"gray",width:30,height:5,alignSelf:"center"}}/>
         </View>
-          <Text style={styles.text}> {'Next, make sure your sprayer is powered ON, Wait 5 seconds for your sprayer to enter paring mode.'}</Text>
+          <Text style={styles.text}> {'Next, insert the charged battery into the battery housing located on the side of your sprayer.'}</Text>
           <Image style={{height:"60%",width:"80%",borderColor:"gray",borderWidth:0.7,alignSelf:"center"}} source={require('../asset/learn-more-device2.png')} />
         </View>
         <View style={{backgroundColor:"#fff",height:"100%",paddingTop:15,paddingBottom:25}}>
@@ -98,15 +105,20 @@ export default LearnHow = ({modalVisible,setModalVisible}) =>{
         <View style={{backgroundColor:"gray",width:30,height:5,alignSelf:"center"}}/>
         <View style={{backgroundColor:"#012554",width:30,height:5,alignSelf:"center"}}/>
         </View>
-          <Text style={[styles.text]}>{"Finally, turn your mobile device's bluetooth ON "} {'Return to the Scout ES mobile app and select the sprayer you want to connect with.'}</Text>
+          <Text style={[styles.text]}>{'Finally, make sure your sprayer is powered ON. Wait 5 seconds for your sprayer to enter pairing mode.'}</Text>
           <Image style={{height:"60%",width:"80%",borderColor:"gray",borderWidth:0.7,alignSelf:"center"}} source={require('../asset/learn-more-device3.png')} />
         </View>
       </Swiper>
+      <TouchableOpacity style={{height:'10%'}}
+        onPressOut={()=>{
+          setModalVisible(false);
+          setIndexScroll(0);
+        }}
+        ></TouchableOpacity>
       </View>
       </Modal>
       )
 }
-
 const styles = StyleSheet.create({
     text: {
         paddingLeft:5,
