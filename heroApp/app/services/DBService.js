@@ -1,4 +1,6 @@
 import sqlite from 'react-native-sqlite-storage';
+import {deleteSessionAPI } from './apiService';
+
 var errorCB=(err)=> {
     console.log("SQL Error: " + err);
     return false;
@@ -853,6 +855,7 @@ export var getOperators = function () {
           if(results[0].rows.length){
               for (let i = 0; i < results[0].rows.length; ++i){
                 let delId = results[0].rows.item(i).id;
+                await deleteSessionAPI(delId);
                 await delSessionData(delId);
                 await delSession(delId); //now delete this last session
               }

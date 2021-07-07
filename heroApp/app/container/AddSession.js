@@ -145,11 +145,6 @@ export default SubSession =({locationText,setLocationText,commentText,setComment
       });
       }
     }
-    if(imageList != null && typeof imageList.map != 'undefined' ){
-      imageList.map((item)=>{
-        console.log("Image Item::"+JSON.stringify(item));
-      });
-    }
   return <>
     <View style={{padding:25}}>
     <DeleteImageModal modalVisible={deletePhotoModalVisible} setModalVisible={setDeletePhotoModalVisible} photoDelete={photoDeleteArray}/>

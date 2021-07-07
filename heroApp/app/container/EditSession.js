@@ -34,7 +34,8 @@ export default EditSession=({ route , navigation})=>{
             commentText={commentText} setCommentText={setCommentText} 
             imageList={imageList} setImageList={setImageList}/>
             <View style={{flexDirection:"row",justifyContent:"space-around",paddingBottom:20}}>
-                <TouchableOpacity onPress={()=>{navigation.navigate('SessionDetail');}} style={{borderWidth:1,width:"35%", height:40,justifyContent:"center",borderColor:"red"}}><Text style={{alignSelf:"center",fontSize:17,color:"red"}}>Cancel</Text></TouchableOpacity>
+                <TouchableOpacity onPress={()=>{navigation.navigate('HomePage');}} 
+                  style={{borderWidth:1,width:"35%", height:40,justifyContent:"center",borderColor:"red"}}><Text style={{alignSelf:"center",fontSize:17,color:"red"}}>Cancel</Text></TouchableOpacity>
                 <TouchableOpacity onPress={
                   ()=>updateDetails()} style={{borderWidth:1,width:"35%",height:40,justifyContent:"center",backgroundColor:"#012554" }}><Text style={{alignSelf:"center",fontSize:17,color:"white"}}>Save</Text></TouchableOpacity>
             </View>

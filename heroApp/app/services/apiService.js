@@ -191,24 +191,28 @@ export var getSessionAPI = () => {
         )
     }
 
+    export var deleteSessionAPIByServerId = async (serverId) => {
+        return fetch(apiEndPoint+'/api/sessions/'+serverId, {
+                method: "DELETE",
+                headers: { 'Content-Type': 'application/json' ,'Authorization':encryptToken()},
+            })
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    return result;
+                },
+                (error) => {
+                    console.log(">>Error deleteSessionAPI", error)
+                    return error;
+                }
+            );
+    }
+    
 export var deleteSessionAPI = async (sessionId) => {
     var record = await getSessionByIdSync(sessionId);
     if(record.length > 0){
     var serverId = record[0].serverId;
-    return fetch(apiEndPoint+'/api/sessions/'+serverId, {
-            method: "DELETE",
-            headers: { 'Content-Type': 'application/json' ,'Authorization':encryptToken()},
-        })
-        .then(res => res.json())
-        .then(
-            (result) => {
-                return result;
-            },
-            (error) => {
-                console.log(">>Error deleteSessionAPI", error)
-                return error;
-            }
-        );
+    return deleteSessionAPIByServerId(serverId);
     }
 }
 

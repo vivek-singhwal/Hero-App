@@ -374,7 +374,6 @@ function App() {
             }}
            icon={props=><AwesomeIcon 
             size={32}
-            // color={'#2C88D9'}
             color={'#012554'}
             style={{
               transform: [

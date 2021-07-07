@@ -55,7 +55,6 @@ export default HomePage = ({ navigation })=>{
      BackHandler.exitApp();
     }
     var getSessionDBList = ()=>{
-      console.log(">>>>>>>>>>>> getSessionDBList..99999");
       getSessionsDisplay().then((resSessions)=>{
         listSession.length = 0; //clean array
         resSessions.map((item)=>{
@@ -71,7 +70,6 @@ export default HomePage = ({ navigation })=>{
               listSession[i]['sessionData'] = JSON.parse(listSession[i]['sessionData']);
             }
             if(listSession[i].locationImages != "" && listSession[i].locationImages !=undefined && listSession[i].locationImages != null){
-              console.log("listSession[i]['locationImages'] ",listSession[i]['locationImages']);
               listSession[i]['locationImages'] = JSON.parse(listSession[i]['locationImages']);
             }else{
               listSession[i].locationImages = [];
@@ -102,7 +100,6 @@ export default HomePage = ({ navigation })=>{
         getSessionDBList();
         const unsubscribe = navigation.addListener('focus', () => {
           if(currentRoute == "HomePage"){
-            console.log(">> HomePage...01 02");
             getSessionDBList();
           }
         });
@@ -113,7 +110,6 @@ export default HomePage = ({ navigation })=>{
         }
         const unsubscribe = navigation.addListener('focus', () => {
           if(currentRoute == "HomePage"){
-            console.log(">> HomePage...");
             getSessionDBList();
             setReadingStatus(false);
             appContext.doChangeRinseStatus(false);
@@ -251,13 +247,20 @@ export default HomePage = ({ navigation })=>{
       (sec.toString().length == 1) ? sec = '0'+sec : void 0;    
       return hours+':'+min+':'+sec;
   }
+  const leftSwipeTrash = (sessionId) => {
     const leftSwipe = (progress, dragX) => {
-     return (
-        <TouchableOpacity style={{backgroundColor:"#ff9999",width:"30%",borderRadius:50,height:80, marginTop:5}} >
-            <AwesomeIcon name="trash" style={{alignSelf:"flex-end",paddingTop:20, paddingRight:40}} size={30} color={'red'}/>
-         </TouchableOpacity>
-      );
-    };
+      return (
+         <TouchableOpacity onPress={()=>{ 
+          setSessionPassId(sessionId); 
+          setTimeout(()=>setDeleteModal(true),200)}} 
+          style={{backgroundColor:"#ff9999",width:"30%",borderRadius:50,height:80, marginTop:5}} >
+             <AwesomeIcon name="trash" style={{alignSelf:"flex-end",paddingTop:20, paddingRight:40}} size={30} color={'red'}/>
+          </TouchableOpacity>
+       );
+     };
+     return leftSwipe;
+   };
+    
   var sessionHeader = () =>{
     return <View style={{paddingTop:8,padding:7,backgroundColor:"#fff"}}>
      <Text style={{fontWeight:"bold", fontSize:22, color:"#012554", paddingBottom:5}}>Your Session</Text>
@@ -295,15 +298,15 @@ export default HomePage = ({ navigation })=>{
            navigation.navigate('Dashboard')
          }}
        >
-         <Feather 
+       <Feather 
          name={"ios-open-outline"} 
          size={45}
          color={'#D8D8D8'}
          style={{alignSelf:"center",paddingLeft:"5%"}}/>
        </TouchableOpacity>:readingStatus ?
        <TouchableOpacity 
-       disabled={locationText.length < 4}
-       style={[styles.circle,{ backgroundColor: locationText.length>3?"#E9A2AD":"#E0E7EE",justifyContent:"center",marginTop:19}]}
+       disabled={locationText.length < 3}
+       style={[styles.circle,{ backgroundColor: locationText.length > 2?"#E9A2AD":"#E0E7EE",justifyContent:"center",marginTop:19}]}
        onPress={() => {
             console.log("session end received.ee")
              setEndTime = Date.now()
@@ -311,12 +314,11 @@ export default HomePage = ({ navigation })=>{
              setReadingStatus(false);
              appContext.doChangeRinseStatus(false);
              addSessionList(commentText, locationText);
-             // showModal();
          }}>
          <AwesomeIcon name={"stop"} 
          size={45}
          // color={'#D8D8D8'}
-         color={locationText.length>3?"#D3455B":"#9FAFBB"}
+         color={locationText.length > 2?"#D3455B":"#9FAFBB"}
          style={{alignSelf:"center",paddingLeft:"2%"}}/>
        </TouchableOpacity>
      :
@@ -365,9 +367,7 @@ export default HomePage = ({ navigation })=>{
             keyExtractor={(item, index) => String(item.id)}
             renderItem={({item,index})=>
             <Swipeable key={index +item.id} 
-              onSwipeableRightOpen={()=>{ setSessionPassId(item.id); 
-              setTimeout(()=>setDeleteModal(true),200)}} 
-              renderRightActions={leftSwipe}>
+              renderRightActions={leftSwipeTrash(item.id)}>
             <TouchableOpacity onPress={()=>{
               navigation.navigate('SessionDetail',{id:item.id})
             }} 

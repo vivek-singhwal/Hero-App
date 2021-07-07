@@ -6,13 +6,12 @@ import {deleteSessionAPI} from '../services/apiService';
 
 export default DeleteSessionModal = ({deleteSucess,sessionId,deleteModal,setDeleteModal}) => {
     return(<Modal
-        animationType="slide"
+        animationType="none"
         transparent={true}
         visible={deleteModal}
         onRequestClose={() => {
           Alert.alert("Modal has been closed.");
         }}>
-
       <View
         style={{
           position: 'absolute',

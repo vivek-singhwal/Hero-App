@@ -24,10 +24,12 @@ export default LearnHow = ({modalVisible,setModalVisible}) =>{
             justifyContent: 'center',
             backgroundColor: 'rgba(100,100,100, 0.5)',
             padding: 50,
-            top:"5%",
-            bottom:"5%",
+            paddingTop:0,
+            paddingBottom:0,
+            top:"4%",
+            bottom:"4%",
       }}>
-         <TouchableOpacity style={{height:'10%'}}
+         <TouchableOpacity style={{height:'8%'}}
         onPressOut={()=>{
           setModalVisible(false);
           setIndexScroll(0);
@@ -109,7 +111,7 @@ export default LearnHow = ({modalVisible,setModalVisible}) =>{
           <Image style={{height:"60%",width:"80%",borderColor:"gray",borderWidth:0.7,alignSelf:"center"}} source={require('../asset/learn-more-device3.png')} />
         </View>
       </Swiper>
-      <TouchableOpacity style={{height:'10%'}}
+      <TouchableOpacity style={{height:'8%'}}
         onPressOut={()=>{
           setModalVisible(false);
           setIndexScroll(0);
