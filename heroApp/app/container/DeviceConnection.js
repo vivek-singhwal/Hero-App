@@ -6,10 +6,9 @@ import Material from 'react-native-vector-icons/MaterialIcons';
 import Foundation from 'react-native-vector-icons/Foundation';
 import { EventRegister } from 'react-native-event-listeners';
 import { BluetoothStatus } from 'react-native-bluetooth-status';
-import { getOperatorData, setDeviceData, getDeviceHWData, setDeviceHWData , sessionDataList } from '../services/DataService';
+import { getDeviceHWData, setDeviceHWData } from '../services/DataService';
 import {initDB, addSprayer, getSprayers, getSprayersByHwId, delSprayer} from '../services/DBService';
 import LearnHow from './LearnHow';
-
 let deviceListAr = [];
 export default DeviceConnection = ({navigation})=>{
     var deviceArray = [];
@@ -45,9 +44,7 @@ export default DeviceConnection = ({navigation})=>{
         sprayerName:getDeviceHWData().sprayerName
       }
       getSprayersByHwId(getDeviceHWData().hardwareId).then((resDevice)=>{
-        console.log(">> resDevice "+resDevice);
         if(resDevice.length){
-            console.log(">>resDevice",resDevice);
             deviceObj.serverId = resDevice[0].serverId;
             deviceObj.sprayerName = resDevice[0].sprayerName;
         }else{
@@ -62,7 +59,6 @@ export default DeviceConnection = ({navigation})=>{
     useEffect(()=>{
         if(count){
             initDB('sprayers').then((res)=>{
-              console.log(">>Res ",res);
             });
           setCount(false);
         }
@@ -90,21 +86,20 @@ export default DeviceConnection = ({navigation})=>{
                 }
               if(data.event == "connected"){
                 setisDeviceConnected(true);
-                setDeviceStatus("Connected");
+                setDeviceStatus("Connecting");
               } else if(data.event == "bleDevices"){
                   deviceListAr.push(data.devices);
                   var arrayUniqueByKey = [...new Map(deviceListAr.map(item =>
                     [item['id'], item])).values()];
                   setDeviceList(arrayUniqueByKey);
               } else if(data.event == "reading"){
-                setDeviceStatus("Reading...");
+                //setDeviceStatus("Reading...");
               } else if(data.event == "readOK"){
-                setDeviceStatus("Ready");
+                // setDeviceStatus("Ready");
                 // if ready then automatically goto homepage
                 checkDeviceConnection();
               } else if(data.event == "scanning"){
-                setDeviceStatus("Scanning...");
-                // showModal();  
+                setDeviceStatus("Scanning...");  
               } else if(data.event == "disconnected"){
                 setisDeviceConnected(false);
                 setDeviceStatus("Disconnected");
@@ -146,13 +141,14 @@ export default DeviceConnection = ({navigation})=>{
                     const color = item === selectedId ? '#012554' : 'black';
                     const boldness = item === selectedId ? "bold":"300";
                     return (
-                        <TouchableOpacity onPress={
+                        <TouchableOpacity style={{width:'100%'}} onPress={
                           ()=>{
                             setSelectedId(item);
-                            EventRegister.emit('BLECMD',{event:'reqConnect',device:item})
+                            // no direct select and connect
+                            //EventRegister.emit('BLECMD',{event:'reqConnect',device:item})
                           }
                           } style={[styles.item,{backgroundColor:backgroundColor,borderLeftWidth:item === selectedId ?5:0,borderLeftColor:color}]}>
-                             <Text style={[styles.title,{color:color,paddingLeft:10,fontWeight:boldness}]}>{item.name}</Text>
+                             <Text style={[styles.title,{color:color,paddingLeft:12,fontWeight:boldness}]}>{item.name}</Text>
                         </TouchableOpacity>
                     );
                   }}
@@ -173,7 +169,7 @@ export default DeviceConnection = ({navigation})=>{
                     name="keyboard-arrow-right"/>}
                 contentStyle={{flexDirection:"row-reverse",paddingTop:1,height:47,width:"90%",alignSelf:"center"}}
                 onPress={()=>{
-                    if(deviceStatus != 'Connected' && deviceStatus != 'Ready'){
+                    if(deviceStatus != 'Connecting' && deviceStatus != 'Ready'){
                         EventRegister.emit('BLECMD',{event:'reqConnect',device:selectedId})
                     }
                     if(deviceStatus == 'Ready'){
@@ -185,7 +181,7 @@ export default DeviceConnection = ({navigation})=>{
                       setDeviceList([]);
                     }*/
                 }}>
-              {deviceStatus == "Reading..." || deviceStatus == 'Connected' || deviceStatus=='Ready'?deviceStatus:'Connect'}
+              {deviceStatus == "Reading..." || deviceStatus == 'Connecting' || deviceStatus=='Ready'?deviceStatus:'Connect'}
             </Button>:<Button 
                 style={{flexDirection:"row",borderRadius:4,height:47,justifyContent:"center",marginTop:30}}
                 color={'#012554'}
@@ -199,10 +195,10 @@ export default DeviceConnection = ({navigation})=>{
                     name="keyboard-arrow-right"/>}
                 contentStyle={{flexDirection:"row-reverse",paddingTop:1,height:47,width:"90%",alignSelf:"center"}}
                 onPress={ async()=> {
-                  console.log("BluetoothStatus.state()::"+BluetoothStatus.state());
                   if(await BluetoothStatus.state()){
                     EventRegister.emit('BLECMD', { cmd: 'startScan' });
                   }else{
+                    console.log(" state false ...");
                     setBlueToothON(true);
                   }
                 }}>
@@ -218,7 +214,6 @@ export default DeviceConnection = ({navigation})=>{
         onRequestClose={() => {
           Alert.alert("Modal has been closed.");
         }}>
-
       <View
         style={{
           position: 'absolute',
@@ -271,7 +266,7 @@ export default DeviceConnection = ({navigation})=>{
             <TouchableHighlight
               style={{ ...styles.openButton, backgroundColor: "#012554",paddingRight:25,paddingLeft:25 }}
               onPress={async() => {
-                setBlueToothON(!blueToothOFF);
+                setBlueToothON(false);
                 if(await BluetoothStatus.state()){
                   EventRegister.emit('BLECMD', { cmd: 'startScan' });
                 }
@@ -284,7 +279,6 @@ export default DeviceConnection = ({navigation})=>{
     </Modal>
     </>)
 }
-
 const styles = StyleSheet.create({
     container: {
       flex: 1,
