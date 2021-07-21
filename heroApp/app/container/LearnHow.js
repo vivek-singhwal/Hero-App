@@ -12,13 +12,14 @@ export default LearnHow = ({modalVisible,setModalVisible}) =>{
         animationType="slide"
         transparent={true}
         visible={modalVisible}
+        onPress={()=>{console.log("Ramaaa")}}
         onRequestClose={() => {
         }}>
          <View 
          style={{
             alignSelf:"center",
             position: 'absolute',
-            width: '110%',
+            width: "110%",
             height: '90%',
             justifyContent: 'center',
             backgroundColor: 'rgba(100,100,100, 0.5)',
@@ -28,10 +29,14 @@ export default LearnHow = ({modalVisible,setModalVisible}) =>{
             top:"4%",
             bottom:"4%",
       }}>
-        <TouchableOpacity style={{ top:50,bottom:0}}>
+        <TouchableOpacity
+        style={{ top:50,bottom:0}}
+        >
           <Material name="close" size={35} style={{alignSelf: "flex-end", color:"#fff" }}/>
         </TouchableOpacity>
-         <TouchableOpacity style={{height:'8%'}}
+
+
+         <TouchableOpacity style={{height: 45}}
         onPressOut={()=>{
           setModalVisible(false);
           setIndexScroll(0);
@@ -49,6 +54,7 @@ export default LearnHow = ({modalVisible,setModalVisible}) =>{
       
       buttonWrapperStyle={{backgroundColor: 'transparent', flexDirection: 'row', position: 'absolute', top:"40%", left: 0,  paddingHorizontal: 10, paddingVertical: 10, justifyContent: 'space-between',}}
       prevButton={indxScroll == 0 ?<></> : <Button
+              style={{alignSelf:"flex-end", left:15, top: 10}}
               color={'#012554'}
               icon={()=><Material 
                         size={25}
@@ -60,7 +66,7 @@ export default LearnHow = ({modalVisible,setModalVisible}) =>{
               </Button>}
       nextButton={
           indxScroll == 2 ? <Button
-                  style={{alignSelf:"flex-end"}}
+                  style={{alignSelf:"flex-end", right: 15 , top: 10}}
                 color={'#012554'}
                 contentStyle={{flexDirection:"row-reverse"}}
                 icon={()=><Material 
@@ -75,7 +81,7 @@ export default LearnHow = ({modalVisible,setModalVisible}) =>{
           >
           { 'Done' } 
           </Button> : <Button
-                  style={{alignSelf:"flex-end"}}
+                  style={{alignSelf:"flex-end", right:15 ,top: 10}}
                 color={'#012554'}
                 contentStyle={{flexDirection:"row-reverse"}}
                 icon={()=><Material 
@@ -85,14 +91,14 @@ export default LearnHow = ({modalVisible,setModalVisible}) =>{
                 mode="contained">
           { 'Next' } 
         </Button> }>
-       <View style={{backgroundColor:"#fff",height:"100%", paddingTop:15,paddingBottom:25}}>
+       <View style={{backgroundColor:"#fff",height:"100%",width:"100%" , paddingTop:15,paddingBottom:25}}>
           <View style={{flexDirection:"row",justifyContent:"space-around",paddingBottom:10}}>
         <View style={{backgroundColor:"#012554",width:30,height:5,alignSelf:"center",}}/>
         <View style={{backgroundColor:indxScroll == 1?"#012554":"gray",width:30,height:5,alignSelf:"center"}}/>
         <View style={{backgroundColor:indxScroll == 2?"#012554":"gray",width:30,height:5,alignSelf:"center"}}/>
         </View>
           <Text style={styles.text}>{'First make sure your sprayer battery is sufficiently charged before beginning a spray session.'}</Text>
-          <Image style={{height:"60%", width:"80%",borderColor:"gray",borderWidth:0.7,alignSelf:"center",marginTop:10}} source={require('../asset/learn-more-device1.png')} />
+          <Image style={{height:"60%", width:"85%",borderColor:"gray",borderWidth:0.7,alignSelf:"center"}} source={require('../asset/learn-more-device1.png')} />
         </View>
         <View style={{backgroundColor:"#fff",height:"100%",paddingTop:15,paddingBottom:25}}>
         <View style={{flexDirection:"row",justifyContent:"space-around",paddingBottom:10}}>
@@ -101,7 +107,7 @@ export default LearnHow = ({modalVisible,setModalVisible}) =>{
         <View style={{backgroundColor:"gray",width:30,height:5,alignSelf:"center"}}/>
         </View>
           <Text style={styles.text}> {'Next, insert the charged battery into the battery housing located on the side of your sprayer.'}</Text>
-          <Image style={{height:"60%",width:"80%",borderColor:"gray",borderWidth:0.7,alignSelf:"center"}} source={require('../asset/learn-more-device2.png')} />
+          <Image style={{height:"60%",width:"85%",borderColor:"gray",borderWidth:0.7,alignSelf:"center"}} source={require('../asset/learn-more-device2.png')} />
         </View>
         <View style={{backgroundColor:"#fff",height:"100%",paddingTop:15,paddingBottom:25}}>
         <View style={{flexDirection:"row",justifyContent:"space-around",paddingBottom:10}}>
@@ -110,7 +116,7 @@ export default LearnHow = ({modalVisible,setModalVisible}) =>{
         <View style={{backgroundColor:"#012554",width:30,height:5,alignSelf:"center"}}/>
         </View>
           <Text style={[styles.text]}>{'Finally, make sure your sprayer is powered ON. Wait 5 seconds for your sprayer to enter pairing mode.'}</Text>
-          <Image style={{height:"60%",width:"80%",borderColor:"gray",borderWidth:0.7,alignSelf:"center"}} source={require('../asset/learn-more-device3.png')} />
+          <Image style={{height:"60%",width:"85%",borderColor:"gray",borderWidth:0.7,alignSelf:"center"}} source={require('../asset/learn-more-device3.png')} />
         </View>
       </Swiper>
       <TouchableOpacity style={{height:'8%'}}
@@ -125,10 +131,10 @@ export default LearnHow = ({modalVisible,setModalVisible}) =>{
 }
 const styles = StyleSheet.create({
     text: {
-        paddingLeft:5,
-        paddingRight:5,
+        paddingLeft:20,
+        paddingRight:19,
         paddingTop:6,
-        fontSize: 17,
+        fontSize: 21,
         textAlign:"center",
         paddingBottom:10
     }
