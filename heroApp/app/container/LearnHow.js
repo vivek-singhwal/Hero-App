@@ -12,14 +12,13 @@ export default LearnHow = ({modalVisible,setModalVisible}) =>{
         animationType="slide"
         transparent={true}
         visible={modalVisible}
-        onPress={()=>{console.log("Ramaaa")}}
         onRequestClose={() => {
         }}>
          <View 
          style={{
             alignSelf:"center",
             position: 'absolute',
-            width: '100%',
+            width: '110%',
             height: '90%',
             justifyContent: 'center',
             backgroundColor: 'rgba(100,100,100, 0.5)',
@@ -29,6 +28,9 @@ export default LearnHow = ({modalVisible,setModalVisible}) =>{
             top:"4%",
             bottom:"4%",
       }}>
+        <TouchableOpacity style={{ top:50,bottom:0}}>
+          <Material name="close" size={35} style={{alignSelf: "flex-end", color:"#fff" }}/>
+        </TouchableOpacity>
          <TouchableOpacity style={{height:'8%'}}
         onPressOut={()=>{
           setModalVisible(false);

@@ -23,7 +23,7 @@ export default EditSession=({ route , navigation})=>{
             id:id,
         }
         updateSessionsDetail(sessionObj).then((resDetail)=>{
-          navigation.navigate('SessionDetail');
+          navigation.navigate('HomePage');
           checkAndSyncDbImages(); //check and sync images records
         })
     }
